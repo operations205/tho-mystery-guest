@@ -132,16 +132,48 @@ let state = {
   hotels:[],
   assignments:[],
   inspections:[],
+  settings:null,
+  templates:{},
+  clients:[],
+  documents:[],
+  selectedClientId:null,
   currentAssignmentId:null,
   currentInspectionId:null,
   activeCatIndex:0,
   reportMode:'detailed',
   sidebarOpen:false,
-  drawer:null,             // {type:'property'|'inspector'|'assignment', editId:null|id}
+  drawer:null,             // {type:'property'|'inspector'|'assignment'|'client', editId:null|id}
   inspTab:'assignments',
   inspFilterStatus:'all',
   standardsDocId:'audit4'
 };
+
+/* Placeholder tags available inside uploaded proposal/contract .docx templates. */
+const PLACEHOLDER_TAGS = [
+  {key:'client_name', en:'Client name (Arabic)', ar:'اسم العميل (عربي)'},
+  {key:'client_name_en', en:'Client name (English)', ar:'اسم العميل (إنجليزي)'},
+  {key:'hotel_name', en:'Hotel / property name (Arabic)', ar:'اسم الفندق (عربي)'},
+  {key:'hotel_name_en', en:'Hotel / property name (English)', ar:'اسم الفندق (إنجليزي)'},
+  {key:'client_contact', en:'Contact person', ar:'المسؤول عن التواصل'},
+  {key:'client_phone', en:'Client phone', ar:'هاتف العميل'},
+  {key:'client_email', en:'Client email', ar:'بريد العميل'},
+  {key:'num_visits', en:'Number of visits', ar:'عدد الزيارات'},
+  {key:'visit_frequency', en:'Visit frequency', ar:'تكرار الزيارات'},
+  {key:'price_per_visit', en:'Price per visit', ar:'سعر الزيارة'},
+  {key:'total_price', en:'Total price', ar:'الإجمالي'},
+  {key:'currency', en:'Currency', ar:'العملة'},
+  {key:'contract_duration', en:'Contract duration (months)', ar:'مدة العقد بالشهور'},
+  {key:'start_date', en:'Start date', ar:'تاريخ البدء'},
+  {key:'end_date', en:'End date', ar:'تاريخ الانتهاء'},
+  {key:'document_date', en:'Document date', ar:'تاريخ المستند'},
+  {key:'document_ref', en:'Reference number', ar:'الرقم المرجعي'},
+  {key:'company_name', en:'Your company name (Arabic)', ar:'اسم شركتكم (عربي)'},
+  {key:'company_name_en', en:'Your company name (English)', ar:'اسم شركتكم (إنجليزي)'},
+  {key:'company_email', en:'Your company email', ar:'بريد الشركة'},
+  {key:'company_phone', en:'Your company phone', ar:'هاتف الشركة'},
+  {key:'company_website', en:'Your company website', ar:'موقع الشركة'}
+];
+let pendingLogoDataUrl = undefined;
 
 /* Loads public strings + (if logged in) session + all app data from the API.
    Called once at boot, and again right after a successful login. */
@@ -158,14 +190,18 @@ async function loadData(){
   }
   state.session = { userId: me.id, role: me.role };
 
-  const [standardsMeta, audit4Cats, plus5Cats, hotels, inspectors, assignments, inspections] = await Promise.all([
+  const [standardsMeta, audit4Cats, plus5Cats, hotels, inspectors, assignments, inspections, settings, templates, clients, documents] = await Promise.all([
     apiGet('/standards'),
     apiGet('/standards/audit4/categories'),
     apiGet('/standards/plus5/categories'),
     apiGet('/hotels'),
     apiGet('/inspectors'),
     apiGet('/assignments'),
-    apiGet('/inspections')
+    apiGet('/inspections'),
+    apiGet('/settings'),
+    apiGet('/templates'),
+    apiGet('/clients'),
+    apiGet('/documents')
   ]);
   STANDARDS = standardsMeta.STANDARDS;
   CLASS_META = standardsMeta.CLASS_META;
@@ -177,6 +213,10 @@ async function loadData(){
   state.hotels = hotels;
   state.assignments = assignments;
   state.inspections = inspections;
+  state.settings = settings;
+  state.templates = templates;
+  state.clients = clients;
+  state.documents = documents;
 }
 
 /* No-op placeholders kept so any leftover call sites don't throw — persistence now happens
@@ -365,7 +405,9 @@ function adminNavItems(){
     {view:'admin-inspectors', icon:'badge', label:t('navInspectors')},
     {view:'admin-assignments', icon:'assignment_turned_in', label:t('navAssignments')},
     {view:'admin-inspections', icon:'fact_check', label:t('navInspections')},
-    {view:'admin-standards', icon:'menu_book', label:t('navStandards')}
+    {view:'admin-standards', icon:'menu_book', label:t('navStandards')},
+    {view:'admin-documents', icon:'request_quote', label:t('navDocuments')},
+    {view:'admin-settings', icon:'settings', label:t('navSettings')}
   ];
 }
 function adminPageTitle(){
@@ -573,6 +615,224 @@ function renderAdminInspections(){
   </div>
   `;
 }
+/* ---- Admin: Settings ---- */
+function fmtDate(ms){ return ms ? new Date(ms).toLocaleDateString(state.lang==='ar'?'ar-EG':'en-GB') : ''; }
+function renderTemplateSlot(type, tpl){
+  const label = type==='proposal' ? t('settingsProposalTemplate') : t('settingsContractTemplate');
+  return `
+  <div class="field">
+    <label>${label}</label>
+    <div class="tpl-slot">
+      ${tpl ? `<div class="tpl-file">${ic('description')}<div><strong>${esc(tpl.originalName)}</strong><div class="hint">${t('settingsTemplateUploaded')} ${fmtDate(tpl.uploadedAt)}</div></div></div>`
+        : `<div class="hint">${t('settingsNoTemplate')}</div>`}
+      <label class="btn btn-outline btn-sm" style="cursor:pointer;margin-top:10px;">${ic('upload')}${tpl?t('settingsReplaceTemplate'):t('settingsUploadTemplate')}<input type="file" accept=".docx" style="display:none;" onchange="uploadTemplate('${type}', this)"></label>
+    </div>
+  </div>`;
+}
+function renderAdminSettings(){
+  const s = state.settings || {companyName:{en:'',ar:''}, logo:'', email:'', phone:'', website:'', address:''};
+  const tpl = state.templates || {};
+  return `
+  <div class="page-head"><div><h2>${t('navSettings')}</h2></div></div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <h3 style="margin-top:0;">${t('settingsCompanyTitle')}</h3>
+    <p class="hint" style="margin-bottom:16px;">${t('settingsCompanyDesc')}</p>
+    <div class="form-grid">
+      <div class="field"><label>${t('settingsNameEn')}</label><input id="sf_name_en" value="${esc(s.companyName.en)}"></div>
+      <div class="field"><label>${t('settingsNameAr')}</label><input id="sf_name_ar" value="${esc(s.companyName.ar)}"></div>
+      <div class="field"><label>${t('settingsEmail')}</label><input id="sf_email" value="${esc(s.email)}"></div>
+      <div class="field"><label>${t('settingsPhone')}</label><input id="sf_phone" value="${esc(s.phone)}"></div>
+      <div class="field"><label>${t('settingsWebsite')}</label><input id="sf_website" value="${esc(s.website)}"></div>
+      <div class="field"><label>${t('settingsAddress')}</label><input id="sf_address" value="${esc(s.address)}"></div>
+    </div>
+    <div class="field" style="max-width:360px;">
+      <label>${t('settingsLogo')}</label>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="logo-preview">${s.logo ? `<img src="${s.logo}" alt="logo">` : ic('image')}</div>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer;">${ic('upload')}${t('settingsUploadLogo')}<input type="file" accept="image/*" style="display:none;" onchange="pickLogoFile(this)"></label>
+      </div>
+    </div>
+    <div class="drawer-foot" style="border:none;padding:18px 0 0;justify-content:flex-start;">
+      <button class="btn btn-primary" onclick="saveSettings()">${ic('check')}${t('settingsSave')}</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">${t('settingsTemplatesTitle')}</h3>
+    <p class="hint" style="margin-bottom:16px;">${t('settingsTemplatesDesc')}</p>
+    <div class="form-grid">
+      ${renderTemplateSlot('proposal', tpl.proposal)}
+      ${renderTemplateSlot('contract', tpl.contract)}
+    </div>
+    <h4>${t('settingsPlaceholdersTitle')}</h4>
+    <div class="placeholder-grid">
+      ${PLACEHOLDER_TAGS.map(p=>`<div class="ph-chip"><code>{{${p.key}}}</code><span>${esc(state.lang==='ar'?p.ar:p.en)}</span></div>`).join('')}
+    </div>
+  </div>
+  `;
+}
+function pickLogoFile(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    pendingLogoDataUrl = reader.result;
+    state.settings = state.settings || {companyName:{en:'',ar:''}};
+    state.settings.logo = pendingLogoDataUrl;
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+async function saveSettings(){
+  const body = {
+    name_en: document.getElementById('sf_name_en').value.trim(),
+    name_ar: document.getElementById('sf_name_ar').value.trim(),
+    email: document.getElementById('sf_email').value.trim(),
+    phone: document.getElementById('sf_phone').value.trim(),
+    website: document.getElementById('sf_website').value.trim(),
+    address: document.getElementById('sf_address').value.trim()
+  };
+  if(pendingLogoDataUrl !== undefined) body.logo = pendingLogoDataUrl;
+  try{
+    state.settings = await apiPut('/settings', body);
+    pendingLogoDataUrl = undefined;
+    alert(t('settingsSaved'));
+    render();
+  }catch(e){
+    alert((state.lang==='ar'?'حدث خطأ: ':'Something went wrong: ') + e.message);
+  }
+}
+async function uploadTemplate(type, input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const fd = new FormData();
+  fd.append('file', file);
+  try{
+    const res = await fetch('/api/templates/' + type, { method:'POST', body: fd, credentials:'same-origin' });
+    const data = await res.json();
+    if(!res.ok) throw new Error((data && data.error) || 'upload_failed');
+    state.templates = await apiGet('/templates');
+    render();
+  }catch(e){
+    alert(t('settingsTemplateUploadFailed'));
+  }
+  input.value = '';
+}
+
+/* ---- Admin: Proposals & Contracts (document generator) ---- */
+function renderAdminDocuments(){
+  const clients = state.clients || [];
+  const rows = clients.map(c=>`
+    <tr class="${state.selectedClientId===c.id?'row-active':''}">
+      <td class="name-cell"><div class="avatar avatar-sm">${initials(c.name)}</div><div><strong>${esc(tl(c.name))}</strong><div class="hint">${esc(tl(c.hotelName))}</div></div></td>
+      <td>${esc(c.contact||'')}</td>
+      <td>${esc(c.phone||'')}</td>
+      <td class="row-actions">
+        <button class="btn btn-ghost btn-sm" onclick="selectClientForDocs('${c.id}')">${ic('request_quote')}${t('docsGenerate')}</button>
+        <button class="icon-btn" onclick="openDrawer('client','${c.id}')" title="${t('edit')}">${ic('edit')}</button>
+        <button class="icon-btn danger" onclick="deleteClient('${c.id}')" title="${t('delete')}">${ic('delete')}</button>
+      </td>
+    </tr>`).join('');
+
+  return `
+  <div class="page-head"><div><h2>${t('docsTitle')}</h2></div>
+    <button class="btn btn-gold" onclick="openDrawer('client')">${ic('add')}${t('docsAddClient')}</button>
+  </div>
+  <div class="card" style="margin-bottom:20px;">
+    <h3 style="margin-top:0;">${t('docsClientsTitle')}</h3>
+    ${clients.length===0 ? `<div class="empty"><div class="big">${ic('groups')}</div>${t('docsAddClient')}</div>` : `
+    <table><thead><tr><th>${t('docsClientNameEn')}</th><th>${t('docsContact')}</th><th>${t('settingsPhone')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
+  </div>
+  ${state.selectedClientId ? renderDocGeneratorPanel() : `<div class="card"><div class="empty">${t('docsSelectClient')}</div></div>`}
+  `;
+}
+function renderDocGeneratorPanel(){
+  const client = (state.clients||[]).find(c=>c.id===state.selectedClientId);
+  if(!client) return '';
+  const tpl = state.templates || {};
+  const history = (state.documents||[]).filter(d=>d.clientId===client.id).sort((a,b)=>b.createdAt-a.createdAt);
+  const hotelLabel = tl(client.hotelName);
+  return `
+  <div class="card" style="margin-bottom:20px;">
+    <h3 style="margin-top:0;">${esc(tl(client.name))}${hotelLabel ? ' — ' + esc(hotelLabel) : ''}</h3>
+    ${(!tpl.proposal && !tpl.contract) ? `<div class="hint" style="color:var(--red);margin-bottom:14px;">${t('docsNoTemplateWarning')}</div>` : ''}
+    <div class="form-grid">
+      <div class="field"><label>${t('docsNumVisits')}</label><input id="gf_visits" type="number" min="0"></div>
+      <div class="field"><label>${t('docsVisitFrequency')}</label><input id="gf_freq" placeholder="${state.lang==='ar'?'شهري':'Monthly'}"></div>
+      <div class="field"><label>${t('docsPricePerVisit')}</label><input id="gf_price" type="number" min="0"></div>
+      <div class="field"><label>${t('docsTotalPrice')}</label><input id="gf_total" type="number" min="0"></div>
+      <div class="field"><label>${t('docsCurrency')}</label><input id="gf_currency" value="${state.lang==='ar'?'ريال سعودي':'SAR'}"></div>
+      <div class="field"><label>${t('docsContractDuration')}</label><input id="gf_duration" type="number" min="0"></div>
+      <div class="field"><label>${t('docsStartDate')}</label><input id="gf_start" type="date"></div>
+      <div class="field"><label>${t('docsEndDate')}</label><input id="gf_end" type="date"></div>
+      <div class="field"><label>${t('docsDocumentDate')}</label><input id="gf_docdate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="field"><label>${t('docsDocumentRef')}</label><input id="gf_ref" placeholder="${state.lang==='ar'?'يتولد تلقائيًا':'auto-generated'}"></div>
+    </div>
+    <div class="drawer-foot" style="border:none;padding:18px 0 0;justify-content:flex-start;gap:10px;">
+      <button class="btn btn-primary" ${!tpl.proposal?'disabled':''} onclick="generateDoc('proposal')">${ic('request_quote')}${t('docsGenerateProposal')}</button>
+      <button class="btn btn-outline" ${!tpl.contract?'disabled':''} onclick="generateDoc('contract')">${ic('description')}${t('docsGenerateContract')}</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">${t('docsHistory')}</h3>
+    ${history.length===0 ? `<div class="empty">${t('docsNoHistory')}</div>` : `
+    <table><thead><tr><th>${t('docsGenerate')}</th><th>${t('docsDocumentRef')}</th><th>${t('colDate')}</th><th></th></tr></thead><tbody>
+    ${history.map(h=>`<tr>
+      <td>${h.type==='proposal'?`<span class="badge badge-gold">${t('docsGenerateProposal')}</span>`:`<span class="badge badge-gray">${t('docsGenerateContract')}</span>`}</td>
+      <td>${esc((h.data && h.data.document_ref) || '')}</td>
+      <td>${fmtDate(h.createdAt)}</td>
+      <td class="row-actions">
+        <a class="icon-btn" href="/api/documents/${h.id}/download" title="${t('docsDownload')}">${ic('download')}</a>
+        <button class="icon-btn danger" onclick="deleteGeneratedDoc('${h.id}')" title="${t('delete')}">${ic('delete')}</button>
+      </td>
+    </tr>`).join('')}
+    </tbody></table>`}
+  </div>
+  `;
+}
+function selectClientForDocs(id){ state.selectedClientId = id; render(); }
+async function generateDoc(type){
+  const clientId = state.selectedClientId;
+  if(!clientId) return;
+  const body = {
+    type, clientId,
+    numVisits: document.getElementById('gf_visits').value,
+    visitFrequency: document.getElementById('gf_freq').value,
+    pricePerVisit: document.getElementById('gf_price').value,
+    totalPrice: document.getElementById('gf_total').value,
+    currency: document.getElementById('gf_currency').value,
+    contractDuration: document.getElementById('gf_duration').value,
+    startDate: document.getElementById('gf_start').value,
+    endDate: document.getElementById('gf_end').value,
+    documentDate: document.getElementById('gf_docdate').value,
+    documentRef: document.getElementById('gf_ref').value
+  };
+  try{
+    const doc = await apiPost('/documents/generate', body);
+    state.documents = await apiGet('/documents');
+    render();
+    window.open('/api/documents/' + doc.id + '/download', '_blank');
+    alert(t('docsGenerated'));
+  }catch(e){
+    const detail = (e.data && e.data.detail) ? ('\n' + e.data.detail) : '';
+    alert(t('docsGenerateFailed') + detail);
+  }
+}
+async function deleteGeneratedDoc(id){
+  if(!confirm(t('confirmDelete'))) return;
+  await apiDelete('/documents/' + id);
+  state.documents = await apiGet('/documents');
+  render();
+}
+async function deleteClient(id){
+  if(!confirm(t('confirmDelete'))) return;
+  await apiDelete('/clients/' + id);
+  state.clients = await apiGet('/clients');
+  if(state.selectedClientId===id) state.selectedClientId = null;
+  render();
+}
+
 async function viewAdminReport(id){
   state.currentInspectionId = id;
   try{ await loadInspectionDetail(id); }catch(e){}
@@ -632,6 +892,18 @@ function renderDrawer(){
         </select>
       </div>
     `;
+  } else if(d.type==='client'){
+    const editing = d.editId ? (state.clients||[]).find(c=>c.id===d.editId) : null;
+    title = editing ? t('edit') : t('docsAddClient');
+    body = `
+      <div class="field"><label>${t('docsClientNameEn')}</label><input id="cf_name_en" value="${esc(editing?editing.name.en:'')}"></div>
+      <div class="field"><label>${t('docsClientNameAr')}</label><input id="cf_name_ar" value="${esc(editing?editing.name.ar:'')}"></div>
+      <div class="field"><label>${t('docsHotelNameEn')}</label><input id="cf_hotel_en" value="${esc(editing?editing.hotelName.en:'')}"></div>
+      <div class="field"><label>${t('docsHotelNameAr')}</label><input id="cf_hotel_ar" value="${esc(editing?editing.hotelName.ar:'')}"></div>
+      <div class="field"><label>${t('docsContact')}</label><input id="cf_contact" value="${esc(editing?editing.contact:'')}"></div>
+      <div class="field"><label>${t('settingsPhone')}</label><input id="cf_phone" value="${esc(editing?editing.phone:'')}"></div>
+      <div class="field"><label>${t('settingsEmail')}</label><input id="cf_email" value="${esc(editing?editing.email:'')}"></div>
+    `;
   }
   return `
   <div class="drawer-backdrop show" onclick="closeDrawer()"></div>
@@ -686,6 +958,19 @@ async function submitDrawer(){
       if(d.editId){ await apiPut('/assignments/' + d.editId, body); }
       else { await apiPost('/assignments', body); }
       state.assignments = await apiGet('/assignments');
+    } else if(d.type==='client'){
+      const name_en = document.getElementById('cf_name_en').value.trim();
+      const name_ar = document.getElementById('cf_name_ar').value.trim();
+      const hotel_name_en = document.getElementById('cf_hotel_en').value.trim();
+      const hotel_name_ar = document.getElementById('cf_hotel_ar').value.trim();
+      const contact = document.getElementById('cf_contact').value.trim();
+      const phone = document.getElementById('cf_phone').value.trim();
+      const email = document.getElementById('cf_email').value.trim();
+      if(!name_en || !name_ar){ alert(t('required')); return; }
+      const body = { name_en, name_ar, hotel_name_en, hotel_name_ar, contact, phone, email };
+      if(d.editId){ await apiPut('/clients/' + d.editId, body); }
+      else { await apiPost('/clients', body); }
+      state.clients = await apiGet('/clients');
     }
   }catch(e){
     alert((state.lang==='ar' ? 'حدث خطأ: ' : 'Something went wrong: ') + e.message);
@@ -1252,6 +1537,8 @@ function render(){
     else if(state.view==='admin-inspections') content = renderAdminInspections();
     else if(state.view==='admin-report') content = renderAdminReport();
     else if(state.view==='admin-standards') content = renderAdminStandards();
+    else if(state.view==='admin-documents') content = renderAdminDocuments();
+    else if(state.view==='admin-settings') content = renderAdminSettings();
     else content = renderAdminOverview();
     html = renderAdminShell(content);
   } else {

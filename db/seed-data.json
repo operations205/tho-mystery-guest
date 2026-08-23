@@ -4025,6 +4025,214 @@
     "viewStandardsBtn": {
       "en": "View Full Standards",
       "ar": "عرض دليل المعايير الكامل"
+    },
+    "navSettings": {
+      "en": "Settings",
+      "ar": "الإعدادات"
+    },
+    "navDocuments": {
+      "en": "Proposals & Contracts",
+      "ar": "العروض والعقود"
+    },
+    "settingsCompanyTitle": {
+      "en": "Company profile",
+      "ar": "بيانات الشركة"
+    },
+    "settingsCompanyDesc": {
+      "en": "Shown across the app and used to fill your proposal/contract templates.",
+      "ar": "بتظهر في البرنامج وبتتعبى تلقائي في نماذج العروض والعقود."
+    },
+    "settingsNameEn": {
+      "en": "Company name (English)",
+      "ar": "اسم الشركة (إنجليزي)"
+    },
+    "settingsNameAr": {
+      "en": "Company name (Arabic)",
+      "ar": "اسم الشركة (عربي)"
+    },
+    "settingsLogo": {
+      "en": "Logo",
+      "ar": "الشعار"
+    },
+    "settingsUploadLogo": {
+      "en": "Upload logo",
+      "ar": "رفع الشعار"
+    },
+    "settingsEmail": {
+      "en": "Email",
+      "ar": "البريد الإلكتروني"
+    },
+    "settingsPhone": {
+      "en": "Phone",
+      "ar": "رقم الهاتف"
+    },
+    "settingsWebsite": {
+      "en": "Website",
+      "ar": "الموقع الإلكتروني"
+    },
+    "settingsAddress": {
+      "en": "Address",
+      "ar": "العنوان"
+    },
+    "settingsSave": {
+      "en": "Save settings",
+      "ar": "حفظ الإعدادات"
+    },
+    "settingsSaved": {
+      "en": "Settings saved.",
+      "ar": "تم حفظ الإعدادات."
+    },
+    "settingsTemplatesTitle": {
+      "en": "Proposal & contract templates",
+      "ar": "نماذج العروض والعقود"
+    },
+    "settingsTemplatesDesc": {
+      "en": "Upload your own Word (.docx) template for proposals and one for contracts. Use the placeholder tags below anywhere in the document — the app will replace them automatically each time you generate a document.",
+      "ar": "ارفع نموذج Word (.docx) الخاص بيك لعرض السعر، وواحد تاني للعقد. حط علامات النص (Placeholders) اللي تحت في أي مكان في المستند، والبرنامج هيستبدلها تلقائي كل مرة تولّد فيها مستند جديد."
+    },
+    "settingsProposalTemplate": {
+      "en": "Proposal template",
+      "ar": "نموذج عرض السعر"
+    },
+    "settingsContractTemplate": {
+      "en": "Contract template",
+      "ar": "نموذج العقد"
+    },
+    "settingsUploadTemplate": {
+      "en": "Upload .docx",
+      "ar": "رفع ملف .docx"
+    },
+    "settingsReplaceTemplate": {
+      "en": "Replace file",
+      "ar": "استبدال الملف"
+    },
+    "settingsNoTemplate": {
+      "en": "No file uploaded yet",
+      "ar": "لسه مفيش ملف مرفوع"
+    },
+    "settingsTemplateUploaded": {
+      "en": "Uploaded",
+      "ar": "اترفع بتاريخ"
+    },
+    "settingsPlaceholdersTitle": {
+      "en": "Placeholder tags to use in your Word file",
+      "ar": "علامات النص اللي تحطها في ملف الوورد"
+    },
+    "settingsTemplateUploadFailed": {
+      "en": "Couldn't upload the file — make sure it's a .docx file.",
+      "ar": "تعذر رفع الملف — تأكد إنه ملف .docx."
+    },
+    "docsTitle": {
+      "en": "Proposals & Contracts",
+      "ar": "العروض والعقود"
+    },
+    "docsClientsTitle": {
+      "en": "Clients",
+      "ar": "العملاء"
+    },
+    "docsAddClient": {
+      "en": "Add client",
+      "ar": "إضافة عميل"
+    },
+    "docsClientNameEn": {
+      "en": "Client name (English)",
+      "ar": "اسم العميل (إنجليزي)"
+    },
+    "docsClientNameAr": {
+      "en": "Client name (Arabic)",
+      "ar": "اسم العميل (عربي)"
+    },
+    "docsHotelNameEn": {
+      "en": "Hotel / property name (English)",
+      "ar": "اسم الفندق / المنشأة (إنجليزي)"
+    },
+    "docsHotelNameAr": {
+      "en": "Hotel / property name (Arabic)",
+      "ar": "اسم الفندق / المنشأة (عربي)"
+    },
+    "docsContact": {
+      "en": "Contact person",
+      "ar": "المسؤول عن التواصل"
+    },
+    "docsGenerate": {
+      "en": "Generate",
+      "ar": "توليد"
+    },
+    "docsGenerateProposal": {
+      "en": "Generate proposal",
+      "ar": "توليد عرض سعر"
+    },
+    "docsGenerateContract": {
+      "en": "Generate contract",
+      "ar": "توليد عقد"
+    },
+    "docsNumVisits": {
+      "en": "Number of visits",
+      "ar": "عدد الزيارات"
+    },
+    "docsVisitFrequency": {
+      "en": "Visit frequency",
+      "ar": "تكرار الزيارات"
+    },
+    "docsPricePerVisit": {
+      "en": "Price per visit",
+      "ar": "سعر الزيارة"
+    },
+    "docsTotalPrice": {
+      "en": "Total price",
+      "ar": "الإجمالي"
+    },
+    "docsCurrency": {
+      "en": "Currency",
+      "ar": "العملة"
+    },
+    "docsContractDuration": {
+      "en": "Contract duration (months)",
+      "ar": "مدة العقد (بالشهور)"
+    },
+    "docsStartDate": {
+      "en": "Start date",
+      "ar": "تاريخ البدء"
+    },
+    "docsEndDate": {
+      "en": "End date",
+      "ar": "تاريخ الانتهاء"
+    },
+    "docsDocumentDate": {
+      "en": "Document date",
+      "ar": "تاريخ المستند"
+    },
+    "docsDocumentRef": {
+      "en": "Reference number",
+      "ar": "الرقم المرجعي"
+    },
+    "docsHistory": {
+      "en": "History",
+      "ar": "السجل"
+    },
+    "docsNoHistory": {
+      "en": "No proposals or contracts generated yet for this client.",
+      "ar": "لسه مفيش عروض أو عقود اتولّدت للعميل ده."
+    },
+    "docsDownload": {
+      "en": "Download",
+      "ar": "تحميل"
+    },
+    "docsNoTemplateWarning": {
+      "en": "Upload a template first from Settings before generating a document.",
+      "ar": "لازم ترفع نموذج الملف الأول من صفحة الإعدادات قبل ما تولّد مستند."
+    },
+    "docsGenerateFailed": {
+      "en": "Couldn't generate the document. Check that the placeholder tags in your template are correct.",
+      "ar": "تعذر توليد المستند. تأكد إن علامات النص في النموذج مكتوبة صح."
+    },
+    "docsGenerated": {
+      "en": "Document generated and saved to the client's history.",
+      "ar": "اتولّد المستند وانحفظ في سجل العميل."
+    },
+    "docsSelectClient": {
+      "en": "Select a client to generate a proposal or contract",
+      "ar": "اختار عميل عشان تولّد عرض سعر أو عقد"
     }
   },
   "defaultHotelsData": [

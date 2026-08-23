@@ -13,9 +13,13 @@ const assignmentRoutes = require('./src/routes/assignments');
 const inspectionRoutes = require('./src/routes/inspections');
 const standardsRoutes = require('./src/routes/standards');
 const metaRoutes = require('./src/routes/meta');
+const settingsRoutes = require('./src/routes/settings');
+const clientsRoutes = require('./src/routes/clients');
+const templatesRoutes = require('./src/routes/templates');
+const documentsRoutes = require('./src/routes/documents');
 
 const app = express();
-app.use(express.json({ limit: '5mb' })); // signatures are base64 PNGs
+app.use(express.json({ limit: '8mb' })); // signatures + logo are base64 images
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
 
@@ -26,6 +30,10 @@ app.use('/api/assignments', assignmentRoutes);
 app.use('/api/inspections', inspectionRoutes);
 app.use('/api/standards', standardsRoutes);
 app.use('/api/meta', metaRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/clients', clientsRoutes);
+app.use('/api/templates', templatesRoutes);
+app.use('/api/documents', documentsRoutes);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
