@@ -490,6 +490,7 @@ function renderAdminInspectors(){
       <td><span class="badge badge-gold">${count} ${t('inspAssignedCount')}</span></td>
       <td class="row-actions">
         <button class="icon-btn" onclick="openDrawer('inspector','${u.id}')" title="${t('edit')}">${ic('edit')}</button>
+        <button class="icon-btn danger" onclick="deleteInspector('${u.id}')" title="${t('delete')}">${ic('delete')}</button>
       </td>
     </tr>`;
   }).join('');
@@ -702,6 +703,14 @@ async function deleteHotel(id){
 async function deleteAssignment(id){
   if(!confirm(t('confirmDelete'))) return;
   await apiDelete('/assignments/' + id);
+  state.assignments = await apiGet('/assignments');
+  render();
+}
+async function deleteInspector(id){
+  if(!confirm(t('confirmDelete'))) return;
+  await apiDelete('/inspectors/' + id);
+  const inspectors = await apiGet('/inspectors');
+  USERS = [ USERS.find(u=>u.role==='admin') || USERS[0], ...inspectors ];
   state.assignments = await apiGet('/assignments');
   render();
 }
