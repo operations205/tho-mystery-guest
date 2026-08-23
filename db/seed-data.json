@@ -4233,6 +4233,22 @@
     "docsSelectClient": {
       "en": "Select a client to generate a proposal or contract",
       "ar": "اختار عميل عشان تولّد عرض سعر أو عقد"
+    },
+    "docsGoToSettings": {
+      "en": "Go to Settings",
+      "ar": "روح الإعدادات"
+    },
+    "docsTemplateReady": {
+      "en": "Uploaded",
+      "ar": "مرفوع"
+    },
+    "docsTemplateMissing": {
+      "en": "Not uploaded yet",
+      "ar": "لسه مرفوعش"
+    },
+    "docsNoClientsYet": {
+      "en": "No clients yet. Add one to get started.",
+      "ar": "لسه مفيش عملاء. ضيف عميل عشان تبدأ."
     }
   },
   "defaultHotelsData": [

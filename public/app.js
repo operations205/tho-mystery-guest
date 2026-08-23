@@ -735,13 +735,24 @@ function renderAdminDocuments(){
       </td>
     </tr>`).join('');
 
+  const tpl = state.templates || {};
+  const tplBanner = `
+  <div class="card" style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+    <div style="display:flex;gap:26px;flex-wrap:wrap;">
+      <div><div class="hint">${t('settingsProposalTemplate')}</div><strong style="color:${tpl.proposal?'var(--green)':'var(--red)'};">${tpl.proposal ? '✓ '+t('docsTemplateReady') : '✕ '+t('docsTemplateMissing')}</strong></div>
+      <div><div class="hint">${t('settingsContractTemplate')}</div><strong style="color:${tpl.contract?'var(--green)':'var(--red)'};">${tpl.contract ? '✓ '+t('docsTemplateReady') : '✕ '+t('docsTemplateMissing')}</strong></div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="go('admin-settings')">${ic('settings')}${t('docsGoToSettings')}</button>
+  </div>`;
+
   return `
   <div class="page-head"><div><h2>${t('docsTitle')}</h2></div>
     <button class="btn btn-gold" onclick="openDrawer('client')">${ic('add')}${t('docsAddClient')}</button>
   </div>
+  ${tplBanner}
   <div class="card" style="margin-bottom:20px;">
     <h3 style="margin-top:0;">${t('docsClientsTitle')}</h3>
-    ${clients.length===0 ? `<div class="empty"><div class="big">${ic('groups')}</div>${t('docsAddClient')}</div>` : `
+    ${clients.length===0 ? `<div class="empty"><div class="big">${ic('groups')}</div>${t('docsNoClientsYet')}</div>` : `
     <table><thead><tr><th>${t('docsClientNameEn')}</th><th>${t('docsContact')}</th><th>${t('settingsPhone')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
   </div>
   ${state.selectedClientId ? renderDocGeneratorPanel() : `<div class="card"><div class="empty">${t('docsSelectClient')}</div></div>`}
