@@ -711,7 +711,21 @@ async function uploadTemplate(type, input){
   try{
     const res = await fetch('/api/templates/' + type, { method:'POST', body: fd, credentials:'same-origin' });
     const data = await res.json();
-    if(!res.ok) throw new Error((data && data.error) || 'upload_failed');
+    if(!res.ok){
+      if(data && data.error==='invalid_file_type'){
+        const name = (data.detail && data.detail.originalname) || file.name;
+        const msg = state.lang==='ar'
+          ? `الملف "${name}" مش ملف .docx. لو ده ملف Word قديم بامتداد .doc، افتحه في Word واحفظه بصيغة .docx (من القائمة: حفظ باسم ← Word Document ‎(.docx)‎) وارفعه تاني.`
+          : `The file "${name}" is not a .docx file. If this is an older .doc file, open it in Word and use "Save As" → "Word Document (.docx)", then upload the new file.`;
+        alert(msg);
+      } else if(data && data.error==='file_too_large'){
+        alert(state.lang==='ar' ? 'الملف كبير أوي (الحد الأقصى 15 ميجا).' : 'The file is too large (15MB max).');
+      } else {
+        alert(t('settingsTemplateUploadFailed'));
+      }
+      input.value = '';
+      return;
+    }
     state.templates = await apiGet('/templates');
     render();
   }catch(e){
