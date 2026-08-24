@@ -279,7 +279,7 @@ async function attemptLogin(){
   const username = (document.getElementById('f_username')||{}).value || '';
   const password = (document.getElementById('f_password')||{}).value || '';
   try{
-    await apiPost('/auth/login', { username: username.trim(), password });
+    await apiPost('/auth/login', { username: username.trim(), password, role: state.loginRole });
   }catch(e){
     state.loginError = t('invalidLogin');
     render();
