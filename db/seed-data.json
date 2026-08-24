@@ -4310,6 +4310,18 @@
       "en": "Could not save the logo. Please try a smaller image.",
       "ar": "تعذّر حفظ الشعار. جرّب صورة أصغر."
     },
+    "editProfileTitle": {
+      "en": "Edit my name",
+      "ar": "تعديل اسمي"
+    },
+    "profileNameEn": {
+      "en": "Name (English)",
+      "ar": "الاسم (إنجليزي)"
+    },
+    "profileNameAr": {
+      "en": "Name (Arabic)",
+      "ar": "الاسم (عربي)"
+    },
     "hotelAccountHint": {
       "en": "Give this username and password to the hotel's responsible person so they can view their inspection reports.",
       "ar": "أعطِ اسم المستخدم وكلمة المرور دي للمسؤول في الفندق عشان يقدر يشوف تقارير التفتيش بتاعته."

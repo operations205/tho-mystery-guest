@@ -48,4 +48,17 @@ router.get('/me', requireAuth, (req, res) => {
   res.json({ user: toPublicUser(row) });
 });
 
+// Self-service display-name edit — any logged-in role (admin/inspector/hotel) can fix the
+// name shown for their own account. Deliberately scoped to name_en/name_ar only: username,
+// password and role are not editable here.
+router.put('/me', requireAuth, (req, res) => {
+  const existing = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  if (!existing) return res.status(404).json({ error: 'not_found' });
+  const { name_en, name_ar } = req.body || {};
+  if (!name_en || !name_ar) return res.status(400).json({ error: 'missing_fields' });
+  db.prepare('UPDATE users SET name_en=?, name_ar=? WHERE id=?').run(name_en, name_ar, req.user.id);
+  const row = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  res.json({ user: toPublicUser(row) });
+});
+
 module.exports = router;

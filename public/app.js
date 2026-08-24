@@ -472,9 +472,10 @@ function renderAdminShell(contentHtml){
         ${nav}
       </nav>
       <div class="side-foot">
-        <div class="side-user">
+        <div class="side-user" onclick="openDrawer('profile')" title="${t('editProfileTitle')}" style="cursor:pointer;">
           <div class="avatar">${initials(user.name)}</div>
           <div><div class="su-name">${esc(tl(user.name))}</div><div class="su-role">${esc(tl(user.title))}</div></div>
+          <span class="side-user-edit-ic">${ic('edit')}</span>
         </div>
         <button class="btn btn-outline btn-sm btn-block side-logout" onclick="logout()">${ic('logout')}${t('logout')}</button>
       </div>
@@ -1055,6 +1056,13 @@ function renderDrawer(){
       <div class="field"><label>${t('settingsPhone')}</label><input id="cf_phone" value="${esc(editing?editing.phone:'')}"></div>
       <div class="field"><label>${t('settingsEmail')}</label><input id="cf_email" value="${esc(editing?editing.email:'')}"></div>
     `;
+  } else if(d.type==='profile'){
+    const me = currentUser();
+    title = t('editProfileTitle');
+    body = `
+      <div class="field"><label>${t('profileNameEn')}</label><input id="mf_name_en" value="${esc(me.name.en)}"></div>
+      <div class="field"><label>${t('profileNameAr')}</label><input id="mf_name_ar" value="${esc(me.name.ar)}"></div>
+    `;
   }
   return `
   <div class="drawer-backdrop show" onclick="closeDrawer()"></div>
@@ -1122,6 +1130,13 @@ async function submitDrawer(){
       if(d.editId){ await apiPut('/clients/' + d.editId, body); }
       else { await apiPost('/clients', body); }
       state.clients = await apiGet('/clients');
+    } else if(d.type==='profile'){
+      const name_en = document.getElementById('mf_name_en').value.trim();
+      const name_ar = document.getElementById('mf_name_ar').value.trim();
+      if(!name_en || !name_ar){ alert(t('required')); return; }
+      const result = await apiPut('/auth/me', { name_en, name_ar });
+      const me = USERS.find(u=>u.id===state.session.userId);
+      if(me) me.name = result.user.name;
     }
   }catch(e){
     alert((state.lang==='ar' ? 'حدث خطأ: ' : 'Something went wrong: ') + e.message);
