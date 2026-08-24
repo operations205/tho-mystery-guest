@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   title_en TEXT DEFAULT '',
   title_ar TEXT DEFAULT '',
   hotel_id TEXT REFERENCES hotels(id) ON DELETE CASCADE,
+  token_version INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL
 );
 

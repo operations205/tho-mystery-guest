@@ -71,7 +71,21 @@ router.post('/change-password', requireAuth, (req, res) => {
   if (!row || !bcrypt.compareSync(current_password, row.password_hash)) {
     return res.status(401).json({ error: 'invalid_current_password' });
   }
-  db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(bcrypt.hashSync(new_password, 10), req.user.id);
+  // Bumping token_version invalidates every OTHER device/session currently holding an old
+  // token for this account (see requireAuth) — the whole point of this change. But that would
+  // also kick out this very request's own session on its next call, so immediately re-sign and
+  // re-set the cookie for the current device so the person doesn't get logged out by their own
+  // password change.
+  db.prepare('UPDATE users SET password_hash=?, token_version = token_version + 1 WHERE id=?')
+    .run(bcrypt.hashSync(new_password, 10), req.user.id);
+  const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  const token = signToken(updated);
+  res.cookie('tho_token', token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 30 * 24 * 60 * 60 * 1000
+  });
   res.json({ ok: true });
 });
 

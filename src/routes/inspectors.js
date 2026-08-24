@@ -46,9 +46,12 @@ router.put('/:id', requireRole('admin'), (req, res) => {
     const clash = db.prepare('SELECT id FROM users WHERE username=? AND id != ?').get(uname, req.params.id);
     if (clash) return res.status(409).json({ error: 'username_taken' });
   }
+  // Changing the login username is a credential change — bump token_version so any session
+  // still logged in under the old username is forced to sign in again (see requireAuth).
+  const usernameChanged = uname !== existing.username;
 
-  db.prepare('UPDATE users SET name_en=?, name_ar=?, title_en=?, title_ar=?, username=? WHERE id=?')
-    .run(name_en ?? existing.name_en, name_ar ?? existing.name_ar, title_en ?? existing.title_en, title_ar ?? existing.title_ar, uname, req.params.id);
+  db.prepare('UPDATE users SET name_en=?, name_ar=?, title_en=?, title_ar=?, username=?, token_version = token_version + ? WHERE id=?')
+    .run(name_en ?? existing.name_en, name_ar ?? existing.name_ar, title_en ?? existing.title_en, title_ar ?? existing.title_ar, uname, usernameChanged ? 1 : 0, req.params.id);
   res.json(toPublic(db.prepare('SELECT * FROM users WHERE id=?').get(req.params.id)));
 });
 
@@ -56,7 +59,8 @@ router.post('/:id/reset-password', requireRole('admin'), (req, res) => {
   const existing = db.prepare("SELECT * FROM users WHERE id=? AND role='inspector'").get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'not_found' });
   const tempPassword = Math.random().toString(36).slice(2, 10);
-  db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(bcrypt.hashSync(tempPassword, 10), req.params.id);
+  // token_version bump forces out any device still logged in under the old password.
+  db.prepare('UPDATE users SET password_hash=?, token_version = token_version + 1 WHERE id=?').run(bcrypt.hashSync(tempPassword, 10), req.params.id);
   res.json({ ok: true, tempPassword });
 });
 

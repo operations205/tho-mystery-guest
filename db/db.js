@@ -37,6 +37,19 @@ if (!columnExists('hotels', 'logo_data')) {
   console.log('[migrate] hotels.logo_data column added');
 }
 
+// users.token_version — closes a real security gap: JWTs are stateless and were valid for
+// their full 30-day life regardless of a later password/username change, so a session/cookie
+// obtained before a credential change (e.g. during the earlier demo-credentials incident)
+// kept working as that user on whatever device held it. requireAuth now rejects any token
+// whose "tv" claim doesn't match the user's current token_version, and password/username
+// changes bump it — which also means every token issued before this migration (none of which
+// carry a "tv" claim at all) is invalidated the moment this deploys, forcing a fresh login
+// everywhere. That's intentional here, not a side effect to work around.
+if (!columnExists('users', 'token_version')) {
+  db.exec("ALTER TABLE users ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0");
+  console.log('[migrate] users.token_version column added — all existing sessions will need to log in again');
+}
+
 // users: allow role='hotel' + hotel_id column. SQLite can't ALTER a CHECK constraint, so an
 // existing users table (created before this change) needs to be rebuilt.
 const usersTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get();
