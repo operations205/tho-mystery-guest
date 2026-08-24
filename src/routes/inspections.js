@@ -139,4 +139,17 @@ router.post('/:id/complete', requireRole('inspector'), (req, res) => {
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });
 
+// Delete a report (admin only) — e.g. to remove test/mistaken inspections. If it was started
+// from an assignment, hand that assignment back to pending (cleared of the deleted inspection)
+// instead of leaving it pointing at a now-missing report.
+router.delete('/:id', requireRole('admin'), (req, res) => {
+  const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!insp) return res.status(404).json({ error: 'not_found' });
+  if (insp.assignment_id) {
+    db.prepare("UPDATE assignments SET status='pending', inspection_id=NULL WHERE id=?").run(insp.assignment_id);
+  }
+  db.prepare('DELETE FROM inspections WHERE id=?').run(req.params.id); // answers cascade via FK
+  res.json({ ok: true });
+});
+
 module.exports = router;

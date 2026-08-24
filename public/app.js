@@ -704,7 +704,10 @@ function renderAdminInspections(){
       <td>${esc(insp.visitDate||'')}</td>
       <td>${badge}</td>
       <td>${insp.status==='completed' ? `<span class="badge badge-gray">${t('statusDone')}</span>` : `<span class="badge badge-amber">${t('statusProgress')}</span>`}</td>
-      <td style="text-align:end;"><button class="btn btn-ghost btn-sm" onclick="viewAdminReport('${insp.id}')">${t('view')}</button></td>
+      <td class="row-actions" style="justify-content:flex-end;">
+        <button class="btn btn-ghost btn-sm" onclick="viewAdminReport('${insp.id}')">${t('view')}</button>
+        <button class="icon-btn danger" onclick="deleteInspectionReport('${insp.id}')" title="${t('delete')}">${ic('delete')}</button>
+      </td>
     </tr>`;
   }).join('');
 
@@ -971,6 +974,19 @@ async function viewAdminReport(id){
   try{ await loadInspectionDetail(id); }catch(e){}
   go('admin-report');
 }
+async function deleteInspectionReport(id){
+  if(!confirm(t('confirmDeleteReport'))) return;
+  try{
+    await apiDelete('/inspections/' + id);
+  }catch(e){
+    alert((state.lang==='ar' ? 'تعذّر حذف التقرير: ' : 'Could not delete the report: ') + e.message);
+    return;
+  }
+  state.inspections = state.inspections.filter(i => i.id !== id);
+  state.assignments = await apiGet('/assignments');
+  if(state.currentInspectionId === id){ state.currentInspectionId = null; go('admin-inspections'); }
+  else render();
+}
 
 /* ---- Drawer forms ---- */
 function renderDrawer(){
@@ -1233,6 +1249,7 @@ function renderReportBody(insp, backAction){
   <div class="top-actions no-print">
     <button class="btn btn-ghost btn-sm" onclick="${backAction}">${ic('arrow_back')}${t('backDash')}</button>
     <button class="btn btn-primary btn-sm" onclick="window.print()">${ic('print')}${t('printBtn')}</button>
+    ${state.session && state.session.role==='admin' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteInspectionReport('${insp.id}')">${ic('delete')}${t('delete')}</button>` : ''}
   </div>
   <div class="report-mode-tabs no-print">
     <button class="report-mode-tab ${isDetailed?'active':''}" onclick="setReportMode('detailed')">${ic('fact_check')}${t('reportDetailed')}</button>

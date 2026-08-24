@@ -4290,6 +4290,10 @@
       "en": "Delete this hotel's login account?",
       "ar": "هل تريد حذف حساب دخول هذا الفندق؟"
     },
+    "confirmDeleteReport": {
+      "en": "Delete this report? This cannot be undone.",
+      "ar": "متأكد إنك عايز تحذف التقرير ده؟ الإجراء ده مايتراجعش."
+    },
     "hotelAccountHint": {
       "en": "Give this username and password to the hotel's responsible person so they can view their inspection reports.",
       "ar": "أعطِ اسم المستخدم وكلمة المرور دي للمسؤول في الفندق عشان يقدر يشوف تقارير التفتيش بتاعته."
