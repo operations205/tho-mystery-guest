@@ -103,7 +103,7 @@ function initials(nameObj){
    before submitting instead of guessed at blind. */
 function pwField(id, autocomplete){
   return `<div class="pw-field-wrap">
-    <input id="${id}" type="password" autocomplete="${autocomplete||'off'}">
+    <input id="${id}" type="password" autocomplete="${autocomplete||'off'}" autocapitalize="off" autocorrect="off" spellcheck="false">
     <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('${id}', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
   </div>`;
 }
@@ -424,7 +424,7 @@ function renderLogin(){
         <div class="field" style="margin-bottom:18px;">
           <label>${t('password')}</label>
           <div class="pw-field-wrap">
-            <input id="f_password" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')attemptLogin()">
+            <input id="f_password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')attemptLogin()">
             <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('f_password', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
           </div>
         </div>
@@ -1186,16 +1186,30 @@ async function resetInspectorPassword(id){
   alert((state.lang==='ar' ? 'كلمة المرور المؤقتة الجديدة: ' : 'New temporary password: ') + result.tempPassword);
 }
 async function changeMyPassword(){
-  const cur = document.getElementById('mf_cur_pw').value;
-  const npw = document.getElementById('mf_new_pw').value;
-  const cpw = document.getElementById('mf_confirm_pw').value;
+  // Trim: mobile keyboards / password managers occasionally slip in a leading or trailing
+  // space on autofill, which silently turns a correct password into a wrong one.
+  const cur = document.getElementById('mf_cur_pw').value.trim();
+  const npw = document.getElementById('mf_new_pw').value.trim();
+  const cpw = document.getElementById('mf_confirm_pw').value.trim();
   if(!cur || !npw || !cpw){ alert(t('required')); return; }
   if(npw !== cpw){ alert(t('passwordMismatch')); return; }
   if(npw.length < 6){ alert(t('passwordTooShort')); return; }
   try{
     await apiPost('/auth/change-password', { current_password: cur, new_password: npw });
   }catch(e){
-    alert(e.status===401 ? t('wrongCurrentPassword') : ((state.lang==='ar' ? 'تعذّر تغيير كلمة المرور: ' : 'Could not change password: ') + e.message));
+    // A 401 here means one of two different things server-side — the session cookie is gone
+    // (not_authenticated) vs. the typed current password just doesn't match (invalid_current_password).
+    // Show the right message for each instead of always blaming the typed password.
+    const code = e.data && e.data.error;
+    let msg;
+    if(code === 'not_authenticated' || code === 'invalid_token'){
+      msg = state.lang==='ar' ? 'انتهت جلسة الدخول، سجّل دخول تاني وحاول مرة أخرى.' : 'Your session expired — please log in again and retry.';
+    } else if(code === 'invalid_current_password'){
+      msg = t('wrongCurrentPassword');
+    } else {
+      msg = (state.lang==='ar' ? 'تعذّر تغيير كلمة المرور: ' : 'Could not change password: ') + e.message;
+    }
+    alert(msg);
     return;
   }
   alert(t('passwordChanged'));
