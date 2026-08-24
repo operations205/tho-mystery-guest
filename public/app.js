@@ -106,8 +106,13 @@ function pwField(id, autocomplete){
   // rtl direction, and the browser's bidi algorithm can reorder how Latin letters + symbols
   // (e.g. "Tho@2030*&") are actually inserted as you type — not just displayed differently, the
   // stored value itself comes out scrambled. Passwords must always be typed/stored as LTR.
-  return `<div class="pw-field-wrap">
-    <input id="${id}" type="password" dir="ltr" style="text-align:left;" autocomplete="${autocomplete||'off'}" autocapitalize="off" autocorrect="off" spellcheck="false">
+  // The dir="ltr" MUST be on the wrapper div too, not just the input: the CSS uses logical
+  // properties (padding-inline-end / inset-inline-end) for the eye-icon button, which flip
+  // physical side based on direction. With only the input forced LTR, the wrapper stayed RTL,
+  // so the icon and the input's reserved padding ended up on opposite sides — the icon flipped
+  // to the wrong side and sat on top of the first character instead of clear of the text.
+  return `<div class="pw-field-wrap" dir="ltr">
+    <input id="${id}" type="password" style="text-align:left;" autocomplete="${autocomplete||'off'}" autocapitalize="off" autocorrect="off" spellcheck="false">
     <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('${id}', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
   </div>`;
 }
@@ -427,8 +432,8 @@ function renderLogin(){
         </div>
         <div class="field" style="margin-bottom:18px;">
           <label>${t('password')}</label>
-          <div class="pw-field-wrap">
-            <input id="f_password" type="password" dir="ltr" style="text-align:left;" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')attemptLogin()">
+          <div class="pw-field-wrap" dir="ltr">
+            <input id="f_password" type="password" style="text-align:left;" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')attemptLogin()">
             <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('f_password', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
           </div>
         </div>
