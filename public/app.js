@@ -125,6 +125,30 @@ function togglePwVisibility(id, btn){
   btn.title = showing ? t('showPassword') : t('hidePassword');
 }
 
+/* Toast — a self-dismissing confirmation banner that renders directly into the DOM (not
+   through the normal render() cycle, so it survives closeDrawer()/re-render happening right
+   after it's shown). Used for success confirmations like "password changed" so the person
+   gets an unmistakable, hard-to-miss confirmation rather than relying only on a native
+   alert() dialog, which is easy to dismiss/miss on mobile. */
+function showToast(message, kind){
+  let wrap = document.getElementById('toastWrap');
+  if(!wrap){
+    wrap = document.createElement('div');
+    wrap.id = 'toastWrap';
+    wrap.className = 'toast-wrap';
+    document.body.appendChild(wrap);
+  }
+  const el = document.createElement('div');
+  el.className = 'toast' + (kind ? ' toast-' + kind : '');
+  el.innerHTML = `${ic(kind==='error' ? 'error' : 'check_circle')}<span>${esc(message)}</span>`;
+  wrap.appendChild(el);
+  requestAnimationFrame(() => { el.classList.add('show'); });
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 300);
+  }, 3200);
+}
+
 /* ===================== STATE & PERSISTENCE ===================== */
 /* ===================== API HELPER ===================== */
 async function api(method, path, body){
@@ -1240,7 +1264,7 @@ async function tryChangePassword(){
     alert(msg);
     return false;
   }
-  alert(t('passwordChanged'));
+  showToast(t('passwordChanged'), 'success');
   return true;
 }
 async function changeMyPassword(){

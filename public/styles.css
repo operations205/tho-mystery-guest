@@ -415,3 +415,12 @@
   .sigpad-wrap{background:#fff;border:1.5px dashed var(--border);border-radius:14px;padding:8px;margin:12px 0;}
   #sigCanvas{width:100%;height:180px;touch-action:none;border-radius:10px;background:#fbfbfc;display:block;}
   .sig-hint{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.6;}
+  /* Toast notification — a guaranteed-visible, self-dismissing confirmation banner, used
+     instead of relying solely on native alert() for success messages like "password changed"
+     (native alert() can be missed/dismissed quickly, especially on mobile). */
+  .toast-wrap{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-16px);z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:100%;max-width:420px;padding:0 14px;}
+  .toast{pointer-events:auto;display:flex;align-items:center;gap:10px;background:var(--navy);color:#fff;padding:13px 18px;border-radius:12px;font-size:13.5px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transform:translateY(-10px);transition:opacity .25s ease,transform .25s ease;max-width:100%;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.toast-success{background:var(--green);}
+  .toast.toast-error{background:var(--red);}
+  .toast .material-symbols-outlined{font-size:19px;}
