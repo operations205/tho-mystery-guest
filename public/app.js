@@ -1148,6 +1148,11 @@ async function submitDrawer(){
       const result = await apiPut('/auth/me', { name_en, name_ar });
       const me = USERS.find(u=>u.id===state.session.userId);
       if(me) me.name = result.user.name;
+      // If the password fields were filled in, honor them too instead of silently dropping
+      // them just because the user clicked the main Save button instead of the small inline
+      // "change password" button (see tryChangePassword's comment for the full bug this fixes).
+      const pwOk = await tryChangePassword();
+      if(!pwOk) return; // keep the drawer open so they can fix the password fields
     }
   }catch(e){
     alert((state.lang==='ar' ? 'حدث خطأ: ' : 'Something went wrong: ') + e.message);
@@ -1189,15 +1194,29 @@ async function resetInspectorPassword(id){
   }
   alert((state.lang==='ar' ? 'كلمة المرور المؤقتة الجديدة: ' : 'New temporary password: ') + result.tempPassword);
 }
-async function changeMyPassword(){
+/* Shared by both the dedicated "change password" button AND the main drawer Save button
+   (see submitDrawer's 'profile' branch). Real bug this fixes: the profile drawer has its own
+   password section PLUS the generic blue Save button at the bottom of every drawer — but Save
+   used to only ever touch the name fields, so a user who filled in the password boxes and
+   naturally clicked Save (instead of the small inline button) had their password silently
+   discarded: no error, no success message, old password kept working. Now both buttons run
+   this same logic, so whichever one is clicked, filled-in password fields are honored.
+   Returns true if there was nothing to do or the change succeeded; false if it failed (an
+   alert has already been shown) so the caller can keep the drawer open. */
+async function tryChangePassword(){
+  const curEl = document.getElementById('mf_cur_pw');
+  const newEl = document.getElementById('mf_new_pw');
+  const cpwEl = document.getElementById('mf_confirm_pw');
+  if(!curEl || !newEl || !cpwEl) return true; // this drawer has no password section
   // Trim: mobile keyboards / password managers occasionally slip in a leading or trailing
   // space on autofill, which silently turns a correct password into a wrong one.
-  const cur = document.getElementById('mf_cur_pw').value.trim();
-  const npw = document.getElementById('mf_new_pw').value.trim();
-  const cpw = document.getElementById('mf_confirm_pw').value.trim();
-  if(!cur || !npw || !cpw){ alert(t('required')); return; }
-  if(npw !== cpw){ alert(t('passwordMismatch')); return; }
-  if(npw.length < 6){ alert(t('passwordTooShort')); return; }
+  const cur = curEl.value.trim();
+  const npw = newEl.value.trim();
+  const cpw = cpwEl.value.trim();
+  if(!cur && !npw && !cpw) return true; // user didn't touch the password section — nothing to save
+  if(!cur || !npw || !cpw){ alert(t('required')); return false; }
+  if(npw !== cpw){ alert(t('passwordMismatch')); return false; }
+  if(npw.length < 6){ alert(t('passwordTooShort')); return false; }
   try{
     await apiPost('/auth/change-password', { current_password: cur, new_password: npw });
   }catch(e){
@@ -1214,10 +1233,14 @@ async function changeMyPassword(){
       msg = (state.lang==='ar' ? 'تعذّر تغيير كلمة المرور: ' : 'Could not change password: ') + e.message;
     }
     alert(msg);
-    return;
+    return false;
   }
   alert(t('passwordChanged'));
-  closeDrawer();
+  return true;
+}
+async function changeMyPassword(){
+  const ok = await tryChangePassword();
+  if(ok) closeDrawer();
 }
 
 /* ===================== SHARED: REPORT VIEW (dual-mode: detailed / summary) ===================== */
