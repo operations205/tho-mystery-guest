@@ -102,8 +102,12 @@ function initials(nameObj){
    mistyped character (a real cause of "my new password doesn't work" reports) can be caught
    before submitting instead of guessed at blind. */
 function pwField(id, autocomplete){
+  // dir="ltr" is critical here, not cosmetic: on an RTL (Arabic) page, a plain input inherits
+  // rtl direction, and the browser's bidi algorithm can reorder how Latin letters + symbols
+  // (e.g. "Tho@2030*&") are actually inserted as you type — not just displayed differently, the
+  // stored value itself comes out scrambled. Passwords must always be typed/stored as LTR.
   return `<div class="pw-field-wrap">
-    <input id="${id}" type="password" autocomplete="${autocomplete||'off'}" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <input id="${id}" type="password" dir="ltr" style="text-align:left;" autocomplete="${autocomplete||'off'}" autocapitalize="off" autocorrect="off" spellcheck="false">
     <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('${id}', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
   </div>`;
 }
@@ -419,12 +423,12 @@ function renderLogin(){
         ${state.loginError ? `<div class="login-error">${ic('error')}${esc(state.loginError)}</div>` : ''}
         <div class="field" style="margin-bottom:14px;">
           <label>${t('username')}</label>
-          <input id="f_username" type="text" autocomplete="username" onkeydown="if(event.key==='Enter')attemptLogin()">
+          <input id="f_username" type="text" dir="ltr" style="text-align:left;" autocapitalize="off" autocomplete="username" onkeydown="if(event.key==='Enter')attemptLogin()">
         </div>
         <div class="field" style="margin-bottom:18px;">
           <label>${t('password')}</label>
           <div class="pw-field-wrap">
-            <input id="f_password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')attemptLogin()">
+            <input id="f_password" type="password" dir="ltr" style="text-align:left;" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')attemptLogin()">
             <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('f_password', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
           </div>
         </div>
@@ -756,9 +760,9 @@ function renderAdminSettings(){
     <div class="form-grid">
       <div class="field"><label>${t('settingsNameEn')}</label><input id="sf_name_en" value="${esc(s.companyName.en)}"></div>
       <div class="field"><label>${t('settingsNameAr')}</label><input id="sf_name_ar" value="${esc(s.companyName.ar)}"></div>
-      <div class="field"><label>${t('settingsEmail')}</label><input id="sf_email" value="${esc(s.email)}"></div>
-      <div class="field"><label>${t('settingsPhone')}</label><input id="sf_phone" value="${esc(s.phone)}"></div>
-      <div class="field"><label>${t('settingsWebsite')}</label><input id="sf_website" value="${esc(s.website)}"></div>
+      <div class="field"><label>${t('settingsEmail')}</label><input id="sf_email" dir="ltr" style="text-align:left;" value="${esc(s.email)}"></div>
+      <div class="field"><label>${t('settingsPhone')}</label><input id="sf_phone" dir="ltr" style="text-align:left;" value="${esc(s.phone)}"></div>
+      <div class="field"><label>${t('settingsWebsite')}</label><input id="sf_website" dir="ltr" style="text-align:left;" value="${esc(s.website)}"></div>
       <div class="field"><label>${t('settingsAddress')}</label><input id="sf_address" value="${esc(s.address)}"></div>
     </div>
     <div class="field" style="max-width:360px;">
@@ -1016,7 +1020,7 @@ function renderDrawer(){
     body = `
       <div class="field"><label>${t('inspNameEn')}</label><input id="if_name_en" value="${esc(editing?editing.name.en:'')}"></div>
       <div class="field"><label>${t('inspNameAr')}</label><input id="if_name_ar" value="${esc(editing?editing.name.ar:'')}"></div>
-      <div class="field"><label>${t('inspUsername')}</label><input id="if_username" value="${esc(editing?editing.username:'')}">${editing ? `<div class="hint">${t('usernameEditHint')}</div>` : ''}</div>
+      <div class="field"><label>${t('inspUsername')}</label><input id="if_username" dir="ltr" style="text-align:left;" autocapitalize="off" value="${esc(editing?editing.username:'')}">${editing ? `<div class="hint">${t('usernameEditHint')}</div>` : ''}</div>
       <div class="field"><label>${t('inspTitleEn')}</label><input id="if_title_en" value="${esc(editing?editing.title.en:'Inspector')}"></div>
       <div class="field"><label>${t('inspTitleAr')}</label><input id="if_title_ar" value="${esc(editing?editing.title.ar:'مفتش')}"></div>
       ${!editing ? `<div class="field"><div class="hint">${t('tempPassHint')}</div></div>` : ''}
