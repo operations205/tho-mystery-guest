@@ -99,6 +99,11 @@
     transition:border-color var(--dur);
   }
   .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft);}
+  .pw-field-wrap{position:relative;}
+  .pw-field-wrap input{padding-inline-end:42px;}
+  .pw-toggle-btn{position:absolute;top:50%;transform:translateY(-50%);inset-inline-end:4px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:8px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+  .pw-toggle-btn:hover{background:#eef0f3;color:var(--navy);}
+  .pw-toggle-btn .material-symbols-outlined{font-size:19px;}
   select.mini{padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-size:13px;font-family:inherit;min-height:38px;}
 
   /* ===== LOGIN ===== */

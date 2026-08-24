@@ -4366,6 +4366,14 @@
       "en": "Current password is incorrect.",
       "ar": "كلمة المرور الحالية غير صحيحة."
     },
+    "showPassword": {
+      "en": "Show password",
+      "ar": "إظهار كلمة المرور"
+    },
+    "hidePassword": {
+      "en": "Hide password",
+      "ar": "إخفاء كلمة المرور"
+    },
     "hotelAccountHint": {
       "en": "Give this username and password to the hotel's responsible person so they can view their inspection reports.",
       "ar": "أعطِ اسم المستخدم وكلمة المرور دي للمسؤول في الفندق عشان يقدر يشوف تقارير التفتيش بتاعته."

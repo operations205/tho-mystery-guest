@@ -98,6 +98,24 @@ function initials(nameObj){
   return ((parts[0]?parts[0][0]:'') + (parts[1]?parts[1][0]:'')).toUpperCase();
 }
 
+/* Password field with a show/hide eye toggle — used anywhere a password is typed, so a
+   mistyped character (a real cause of "my new password doesn't work" reports) can be caught
+   before submitting instead of guessed at blind. */
+function pwField(id, autocomplete){
+  return `<div class="pw-field-wrap">
+    <input id="${id}" type="password" autocomplete="${autocomplete||'off'}">
+    <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('${id}', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
+  </div>`;
+}
+function togglePwVisibility(id, btn){
+  const input = document.getElementById(id);
+  if(!input) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.innerHTML = ic(showing ? 'visibility' : 'visibility_off');
+  btn.title = showing ? t('showPassword') : t('hidePassword');
+}
+
 /* ===================== STATE & PERSISTENCE ===================== */
 /* ===================== API HELPER ===================== */
 async function api(method, path, body){
@@ -405,7 +423,10 @@ function renderLogin(){
         </div>
         <div class="field" style="margin-bottom:18px;">
           <label>${t('password')}</label>
-          <input id="f_password" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')attemptLogin()">
+          <div class="pw-field-wrap">
+            <input id="f_password" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')attemptLogin()">
+            <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('f_password', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
+          </div>
         </div>
         <button class="btn btn-primary btn-block" onclick="attemptLogin()">${ic('login')}${t('loginBtn')}</button>
         ${state.loginRole==='hotel' ? `
@@ -1044,9 +1065,9 @@ function renderDrawer(){
       <div class="field"><label>${t('profileNameAr')}</label><input id="mf_name_ar" value="${esc(me.name.ar)}"></div>
       <hr style="margin:20px 0 16px;border:none;border-top:1px solid var(--border);">
       <h4 style="margin:0 0 10px;">${t('changePasswordBtn')}</h4>
-      <div class="field"><label>${t('currentPassword')}</label><input id="mf_cur_pw" type="password" autocomplete="current-password"></div>
-      <div class="field"><label>${t('newPassword')}</label><input id="mf_new_pw" type="password" autocomplete="new-password"></div>
-      <div class="field"><label>${t('confirmNewPassword')}</label><input id="mf_confirm_pw" type="password" autocomplete="new-password"></div>
+      <div class="field"><label>${t('currentPassword')}</label>${pwField('mf_cur_pw','current-password')}</div>
+      <div class="field"><label>${t('newPassword')}</label>${pwField('mf_new_pw','new-password')}</div>
+      <div class="field"><label>${t('confirmNewPassword')}</label>${pwField('mf_confirm_pw','new-password')}</div>
       <button type="button" class="btn btn-outline btn-sm" onclick="changeMyPassword()">${ic('lock_reset')}${t('changePasswordBtn')}</button>
     `;
   }
