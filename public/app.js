@@ -266,15 +266,6 @@ function newId(prefix){ return prefix + '_' + Date.now() + '_' + Math.floor(Math
 /* ===================== AUTH ===================== */
 function currentUser(){ return state.session ? USERS.find(u=>u.id===state.session.userId) : null; }
 function setLoginRole(role){ state.loginRole = role; state.loginError=''; render(); }
-function fillDemo(username){
-  state.loginRole = username === 'admin' ? 'admin' : 'inspector';
-  render();
-  setTimeout(()=>{
-    const un = document.getElementById('f_username'); const pw = document.getElementById('f_password');
-    if(un) un.value = username;
-    if(pw) pw.value = 'demo123';
-  }, 20);
-}
 async function attemptLogin(){
   const username = (document.getElementById('f_username')||{}).value || '';
   const password = (document.getElementById('f_password')||{}).value || '';
@@ -382,7 +373,6 @@ function standardBadge(id){
 
 /* ===================== LOGIN VIEW ===================== */
 function renderLogin(){
-  const isAdmin = state.loginRole==='admin';
   return `
   <div class="login-wrap">
     <button class="lang-toggle login-lang" onclick="toggleLang()">${ic('translate')}<span>${state.lang==='ar'?'English':'عربي'}</span></button>
@@ -420,18 +410,7 @@ function renderLogin(){
         <button class="btn btn-primary btn-block" onclick="attemptLogin()">${ic('login')}${t('loginBtn')}</button>
         ${state.loginRole==='hotel' ? `
         <p style="font-size:12px;color:var(--muted);margin-top:16px;text-align:center;">${t('hotelLoginHint')}</p>
-        ` : `
-        <div class="demo-box">
-          <b>${t('demoCredsTitle')}</b>
-          ${isAdmin
-            ? `<div class="demo-cred-row"><span>admin@THO — admin / demo123</span><button onclick="fillDemo('admin')">${state.lang==='ar'?'تعبئة':'Fill'}</button></div>`
-            : `
-            <div class="demo-cred-row"><span>Sara Al-Qahtani — sara / demo123</span><button onclick="fillDemo('sara')">${state.lang==='ar'?'تعبئة':'Fill'}</button></div>
-            <div class="demo-cred-row"><span>Omar Al-Harbi — omar / demo123</span><button onclick="fillDemo('omar')">${state.lang==='ar'?'تعبئة':'Fill'}</button></div>
-            <div class="demo-cred-row"><span>Lama Al-Otaibi — lama / demo123</span><button onclick="fillDemo('lama')">${state.lang==='ar'?'تعبئة':'Fill'}</button></div>
-            `}
-        </div>
-        `}
+        ` : ''}
         <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center;">${t('poweredBy')}</p>
       </div>
     </div>
@@ -643,6 +622,7 @@ function renderAdminInspectors(){
       <td><span class="badge badge-gold">${count} ${t('inspAssignedCount')}</span></td>
       <td class="row-actions">
         <button class="icon-btn" onclick="openDrawer('inspector','${u.id}')" title="${t('edit')}">${ic('edit')}</button>
+        <button class="icon-btn" onclick="resetInspectorPassword('${u.id}')" title="${t('resetPasswordBtn')}">${ic('lock_reset')}</button>
         <button class="icon-btn danger" onclick="deleteInspector('${u.id}')" title="${t('delete')}">${ic('delete')}</button>
       </td>
     </tr>`;
@@ -1015,7 +995,7 @@ function renderDrawer(){
     body = `
       <div class="field"><label>${t('inspNameEn')}</label><input id="if_name_en" value="${esc(editing?editing.name.en:'')}"></div>
       <div class="field"><label>${t('inspNameAr')}</label><input id="if_name_ar" value="${esc(editing?editing.name.ar:'')}"></div>
-      <div class="field"><label>${t('inspUsername')}</label><input id="if_username" value="${esc(editing?editing.username:'')}" ${editing?'disabled':''}></div>
+      <div class="field"><label>${t('inspUsername')}</label><input id="if_username" value="${esc(editing?editing.username:'')}">${editing ? `<div class="hint">${t('usernameEditHint')}</div>` : ''}</div>
       <div class="field"><label>${t('inspTitleEn')}</label><input id="if_title_en" value="${esc(editing?editing.title.en:'Inspector')}"></div>
       <div class="field"><label>${t('inspTitleAr')}</label><input id="if_title_ar" value="${esc(editing?editing.title.ar:'مفتش')}"></div>
       ${!editing ? `<div class="field"><div class="hint">${t('tempPassHint')}</div></div>` : ''}
@@ -1062,6 +1042,12 @@ function renderDrawer(){
     body = `
       <div class="field"><label>${t('profileNameEn')}</label><input id="mf_name_en" value="${esc(me.name.en)}"></div>
       <div class="field"><label>${t('profileNameAr')}</label><input id="mf_name_ar" value="${esc(me.name.ar)}"></div>
+      <hr style="margin:20px 0 16px;border:none;border-top:1px solid var(--border);">
+      <h4 style="margin:0 0 10px;">${t('changePasswordBtn')}</h4>
+      <div class="field"><label>${t('currentPassword')}</label><input id="mf_cur_pw" type="password" autocomplete="current-password"></div>
+      <div class="field"><label>${t('newPassword')}</label><input id="mf_new_pw" type="password" autocomplete="new-password"></div>
+      <div class="field"><label>${t('confirmNewPassword')}</label><input id="mf_confirm_pw" type="password" autocomplete="new-password"></div>
+      <button type="button" class="btn btn-outline btn-sm" onclick="changeMyPassword()">${ic('lock_reset')}${t('changePasswordBtn')}</button>
     `;
   }
   return `
@@ -1097,10 +1083,10 @@ async function submitDrawer(){
       const title_en = document.getElementById('if_title_en').value.trim();
       const title_ar = document.getElementById('if_title_ar').value.trim();
       if(!name_en || !name_ar){ alert(t('required')); return; }
+      const username = document.getElementById('if_username').value.trim();
       if(d.editId){
-        await apiPut('/inspectors/' + d.editId, { name_en, name_ar, title_en, title_ar });
+        await apiPut('/inspectors/' + d.editId, { name_en, name_ar, title_en, title_ar, username });
       } else {
-        const username = document.getElementById('if_username').value.trim();
         const created = await apiPost('/inspectors', { name_en, name_ar, username, title_en, title_ar });
         alert((state.lang==='ar' ? 'كلمة المرور المؤقتة للمفتش الجديد: ' : 'Temporary password for the new inspector: ') + created.tempPassword);
       }
@@ -1166,6 +1152,33 @@ async function deleteInspector(id){
   USERS = [ USERS.find(u=>u.role==='admin') || USERS[0], ...inspectors ];
   state.assignments = await apiGet('/assignments');
   render();
+}
+async function resetInspectorPassword(id){
+  if(!confirm(t('confirmResetInspectorPassword'))) return;
+  let result;
+  try{
+    result = await apiPost('/inspectors/' + id + '/reset-password', {});
+  }catch(e){
+    alert((state.lang==='ar' ? 'تعذّر إعادة تعيين كلمة المرور: ' : 'Could not reset password: ') + e.message);
+    return;
+  }
+  alert((state.lang==='ar' ? 'كلمة المرور المؤقتة الجديدة: ' : 'New temporary password: ') + result.tempPassword);
+}
+async function changeMyPassword(){
+  const cur = document.getElementById('mf_cur_pw').value;
+  const npw = document.getElementById('mf_new_pw').value;
+  const cpw = document.getElementById('mf_confirm_pw').value;
+  if(!cur || !npw || !cpw){ alert(t('required')); return; }
+  if(npw !== cpw){ alert(t('passwordMismatch')); return; }
+  if(npw.length < 6){ alert(t('passwordTooShort')); return; }
+  try{
+    await apiPost('/auth/change-password', { current_password: cur, new_password: npw });
+  }catch(e){
+    alert(e.status===401 ? t('wrongCurrentPassword') : ((state.lang==='ar' ? 'تعذّر تغيير كلمة المرور: ' : 'Could not change password: ') + e.message));
+    return;
+  }
+  alert(t('passwordChanged'));
+  closeDrawer();
 }
 
 /* ===================== SHARED: REPORT VIEW (dual-mode: detailed / summary) ===================== */

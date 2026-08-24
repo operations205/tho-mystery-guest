@@ -36,11 +36,19 @@ router.post('/', requireRole('admin'), (req, res) => {
 });
 
 router.put('/:id', requireRole('admin'), (req, res) => {
-  const { name_en, name_ar, title_en, title_ar } = req.body || {};
+  const { name_en, name_ar, title_en, title_ar, username } = req.body || {};
   const existing = db.prepare("SELECT * FROM users WHERE id=? AND role='inspector'").get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'not_found' });
-  db.prepare('UPDATE users SET name_en=?, name_ar=?, title_en=?, title_ar=? WHERE id=?')
-    .run(name_en ?? existing.name_en, name_ar ?? existing.name_ar, title_en ?? existing.title_en, title_ar ?? existing.title_ar, req.params.id);
+
+  let uname = existing.username;
+  if (username !== undefined && String(username).trim() && String(username).trim() !== existing.username) {
+    uname = String(username).trim().toLowerCase().replace(/[^a-z0-9_.]/g, '');
+    const clash = db.prepare('SELECT id FROM users WHERE username=? AND id != ?').get(uname, req.params.id);
+    if (clash) return res.status(409).json({ error: 'username_taken' });
+  }
+
+  db.prepare('UPDATE users SET name_en=?, name_ar=?, title_en=?, title_ar=?, username=? WHERE id=?')
+    .run(name_en ?? existing.name_en, name_ar ?? existing.name_ar, title_en ?? existing.title_en, title_ar ?? existing.title_ar, uname, req.params.id);
   res.json(toPublic(db.prepare('SELECT * FROM users WHERE id=?').get(req.params.id)));
 });
 

@@ -4322,6 +4322,50 @@
       "en": "Name (Arabic)",
       "ar": "الاسم (عربي)"
     },
+    "resetPasswordBtn": {
+      "en": "Reset password",
+      "ar": "إعادة تعيين كلمة المرور"
+    },
+    "confirmResetInspectorPassword": {
+      "en": "Reset this inspector's password? A new temporary password will be generated.",
+      "ar": "هل تريد إعادة تعيين كلمة مرور هذا المفتش؟ هيتولّد كلمة مرور مؤقتة جديدة."
+    },
+    "usernameEditHint": {
+      "en": "Changing this changes what the inspector types to log in.",
+      "ar": "تغيير اسم المستخدم ده هيغيّر اللي المفتش لازم يكتبه عشان يسجّل دخول."
+    },
+    "currentPassword": {
+      "en": "Current password",
+      "ar": "كلمة المرور الحالية"
+    },
+    "newPassword": {
+      "en": "New password",
+      "ar": "كلمة المرور الجديدة"
+    },
+    "confirmNewPassword": {
+      "en": "Confirm new password",
+      "ar": "تأكيد كلمة المرور الجديدة"
+    },
+    "changePasswordBtn": {
+      "en": "Change password",
+      "ar": "تغيير كلمة المرور"
+    },
+    "passwordMismatch": {
+      "en": "New passwords don't match.",
+      "ar": "كلمتا المرور الجديدتان غير متطابقتين."
+    },
+    "passwordTooShort": {
+      "en": "Password must be at least 6 characters.",
+      "ar": "كلمة المرور لازم تكون 6 حروف على الأقل."
+    },
+    "passwordChanged": {
+      "en": "Password changed successfully.",
+      "ar": "تم تغيير كلمة المرور بنجاح."
+    },
+    "wrongCurrentPassword": {
+      "en": "Current password is incorrect.",
+      "ar": "كلمة المرور الحالية غير صحيحة."
+    },
     "hotelAccountHint": {
       "en": "Give this username and password to the hotel's responsible person so they can view their inspection reports.",
       "ar": "أعطِ اسم المستخدم وكلمة المرور دي للمسؤول في الفندق عشان يقدر يشوف تقارير التفتيش بتاعته."

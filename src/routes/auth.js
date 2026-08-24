@@ -61,4 +61,18 @@ router.put('/me', requireAuth, (req, res) => {
   res.json({ user: toPublicUser(row) });
 });
 
+// Self-service password change — any logged-in role. Requires the current password so a
+// hijacked/left-open session can't be used to silently lock the real owner out.
+router.post('/change-password', requireAuth, (req, res) => {
+  const { current_password, new_password } = req.body || {};
+  if (!current_password || !new_password) return res.status(400).json({ error: 'missing_fields' });
+  if (String(new_password).length < 6) return res.status(400).json({ error: 'password_too_short' });
+  const row = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  if (!row || !bcrypt.compareSync(current_password, row.password_hash)) {
+    return res.status(401).json({ error: 'invalid_current_password' });
+  }
+  db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(bcrypt.hashSync(new_password, 10), req.user.id);
+  res.json({ ok: true });
+});
+
 module.exports = router;
