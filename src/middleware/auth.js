@@ -7,7 +7,7 @@ if (!process.env.JWT_SECRET) {
 
 function signToken(user) {
   return jwt.sign(
-    { id: user.id, role: user.role, username: user.username },
+    { id: user.id, role: user.role, username: user.username, hotel_id: user.hotel_id || null },
     JWT_SECRET,
     { expiresIn: '30d' }
   );
@@ -26,8 +26,10 @@ function requireAuth(req, res, next) {
 }
 
 function requireRole(role) {
+  // Accepts a single role string or an array of allowed roles.
+  const allowed = Array.isArray(role) ? role : [role];
   return (req, res, next) => {
-    if (!req.user || req.user.role !== role) {
+    if (!req.user || !allowed.includes(req.user.role)) {
       return res.status(403).json({ error: 'forbidden' });
     }
     next();

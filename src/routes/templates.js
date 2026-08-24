@@ -23,6 +23,7 @@ function toPublic(row) {
 }
 
 router.get('/', (req, res) => {
+  if (req.user.role === 'hotel') return res.json({}); // not relevant to the hotel view
   const rows = db.prepare('SELECT type, original_name, uploaded_at, uploaded_by FROM doc_templates').all();
   const byType = {};
   rows.forEach(r => { byType[r.type] = toPublic(r); });

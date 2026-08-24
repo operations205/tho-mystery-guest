@@ -17,6 +17,9 @@ router.get('/', (req, res) => {
   let rows;
   if (req.user.role === 'inspector') {
     rows = db.prepare('SELECT * FROM assignments WHERE inspector_id=? ORDER BY created_at DESC').all(req.user.id);
+  } else if (req.user.role === 'hotel') {
+    // Not relevant to the hotel side (that's internal scheduling) — no assignments exposed.
+    rows = [];
   } else {
     rows = db.prepare('SELECT * FROM assignments ORDER BY created_at DESC').all();
   }

@@ -16,4 +16,58 @@ db.exec('PRAGMA foreign_keys = ON');
 const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
 db.exec(schema);
 
+// ===================== Lightweight migrations =====================
+// schema.sql only uses CREATE TABLE IF NOT EXISTS, so it never touches tables that already
+// exist on a live database. Anything added to the schema after first release needs an
+// explicit, idempotent migration here so existing deployments (with real data) pick it up.
+
+function columnExists(table, column) {
+  return db.prepare(`PRAGMA table_info(${table})`).all().some(c => c.name === column);
+}
+
+// answers.photo — plain additive column, safe to ALTER TABLE directly.
+if (!columnExists('answers', 'photo')) {
+  db.exec("ALTER TABLE answers ADD COLUMN photo TEXT DEFAULT ''");
+  console.log('[migrate] answers.photo column added');
+}
+
+// users: allow role='hotel' + hotel_id column. SQLite can't ALTER a CHECK constraint, so an
+// existing users table (created before this change) needs to be rebuilt.
+const usersTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get();
+if (usersTableSql && !usersTableSql.sql.includes("'hotel'")) {
+  db.exec('PRAGMA foreign_keys = OFF');
+  // legacy_alter_table=ON stops SQLite from rewriting OTHER tables' stored "REFERENCES users(id)"
+  // schema text to "REFERENCES users_old(id)" when we rename users below. Those references stay
+  // pointed at the name "users", which becomes valid again once we recreate that table further down.
+  db.exec('PRAGMA legacy_alter_table = ON');
+  db.exec('BEGIN');
+  try {
+    db.exec('ALTER TABLE users RENAME TO users_old');
+    db.exec(`CREATE TABLE users (
+      id TEXT PRIMARY KEY,
+      role TEXT NOT NULL CHECK(role IN ('admin','inspector','hotel')),
+      username TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      name_en TEXT NOT NULL,
+      name_ar TEXT NOT NULL,
+      title_en TEXT DEFAULT '',
+      title_ar TEXT DEFAULT '',
+      hotel_id TEXT REFERENCES hotels(id) ON DELETE CASCADE,
+      created_at INTEGER NOT NULL
+    )`);
+    db.exec(`INSERT INTO users (id, role, username, password_hash, name_en, name_ar, title_en, title_ar, hotel_id, created_at)
+      SELECT id, role, username, password_hash, name_en, name_ar, title_en, title_ar, NULL, created_at FROM users_old`);
+    db.exec('DROP TABLE users_old');
+    db.exec('COMMIT');
+    console.log('[migrate] users table upgraded — hotel role + hotel_id column added');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    db.exec('PRAGMA legacy_alter_table = OFF');
+    db.exec('PRAGMA foreign_keys = ON');
+    throw e;
+  }
+  db.exec('PRAGMA legacy_alter_table = OFF');
+  db.exec('PRAGMA foreign_keys = ON');
+}
+
 module.exports = db;

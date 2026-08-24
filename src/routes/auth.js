@@ -9,7 +9,8 @@ function toPublicUser(row) {
   return {
     id: row.id, role: row.role, username: row.username,
     name: { en: row.name_en, ar: row.name_ar },
-    title: { en: row.title_en, ar: row.title_ar }
+    title: { en: row.title_en, ar: row.title_ar },
+    hotelId: row.hotel_id || null
   };
 }
 

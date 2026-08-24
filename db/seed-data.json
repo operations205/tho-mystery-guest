@@ -4249,6 +4249,110 @@
     "docsNoClientsYet": {
       "en": "No clients yet. Add one to get started.",
       "ar": "لسه مفيش عملاء. ضيف عميل عشان تبدأ."
+    },
+    "roleHotel": {
+      "en": "Hotel",
+      "ar": "الفندق"
+    },
+    "hotelLoginHint": {
+      "en": "Use the username and password provided by your inspection company.",
+      "ar": "استخدم اسم المستخدم وكلمة المرور اللي أعطتك إياها شركة التفتيش."
+    },
+    "hotelAccountTitle": {
+      "en": "Hotel login account",
+      "ar": "حساب دخول الفندق"
+    },
+    "hotelAccountNone": {
+      "en": "No login account yet",
+      "ar": "لا يوجد حساب دخول بعد"
+    },
+    "createHotelAccount": {
+      "en": "Create login for hotel",
+      "ar": "إنشاء حساب دخول للفندق"
+    },
+    "hotelAccountUsername": {
+      "en": "Username",
+      "ar": "اسم المستخدم"
+    },
+    "hotelAccountTempPassword": {
+      "en": "Temporary password",
+      "ar": "كلمة مرور مؤقتة"
+    },
+    "resetHotelPassword": {
+      "en": "Reset password",
+      "ar": "إعادة تعيين كلمة المرور"
+    },
+    "deleteHotelAccount": {
+      "en": "Delete account",
+      "ar": "حذف الحساب"
+    },
+    "confirmDeleteHotelAccount": {
+      "en": "Delete this hotel's login account?",
+      "ar": "هل تريد حذف حساب دخول هذا الفندق؟"
+    },
+    "hotelAccountHint": {
+      "en": "Give this username and password to the hotel's responsible person so they can view their inspection reports.",
+      "ar": "أعطِ اسم المستخدم وكلمة المرور دي للمسؤول في الفندق عشان يقدر يشوف تقارير التفتيش بتاعته."
+    },
+    "hotelAccountCreatedTitle": {
+      "en": "Login account created",
+      "ar": "تم إنشاء حساب الدخول"
+    },
+    "addPhoto": {
+      "en": "Add photo",
+      "ar": "إضافة صورة"
+    },
+    "retakePhoto": {
+      "en": "Retake photo",
+      "ar": "إعادة التقاط الصورة"
+    },
+    "removePhoto": {
+      "en": "Remove photo",
+      "ar": "حذف الصورة"
+    },
+    "photoUploading": {
+      "en": "Uploading...",
+      "ar": "جاري الرفع..."
+    },
+    "photoTooLarge": {
+      "en": "Photo is too large. Try a smaller image.",
+      "ar": "حجم الصورة كبير جدًا. جرّب صورة أصغر."
+    },
+    "photoSaveFailed": {
+      "en": "Couldn't save photo. Please try again.",
+      "ar": "تعذر حفظ الصورة. حاول مرة أخرى."
+    },
+    "itemPhotoLabel": {
+      "en": "Photo",
+      "ar": "صورة"
+    },
+    "noPhotoAttached": {
+      "en": "No photo attached",
+      "ar": "لا توجد صورة مرفقة"
+    },
+    "viewPhoto": {
+      "en": "View photo",
+      "ar": "عرض الصورة"
+    },
+    "hotelNavReports": {
+      "en": "My reports",
+      "ar": "تقاريري"
+    },
+    "hotelDashboardTitle": {
+      "en": "Inspection reports",
+      "ar": "تقارير التفتيش"
+    },
+    "hotelWelcome": {
+      "en": "Welcome",
+      "ar": "أهلاً"
+    },
+    "noReportsYet": {
+      "en": "No completed reports yet",
+      "ar": "لا توجد تقارير مكتملة بعد"
+    },
+    "backToReports": {
+      "en": "Back to reports",
+      "ar": "الرجوع للتقارير"
     }
   },
   "defaultHotelsData": [

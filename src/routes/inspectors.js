@@ -15,6 +15,7 @@ function toPublic(row) {
 }
 
 router.get('/', (req, res) => {
+  if (req.user.role === 'hotel') return res.json([]); // not relevant to the hotel side
   const rows = db.prepare("SELECT * FROM users WHERE role='inspector' ORDER BY created_at DESC").all();
   res.json(rows.map(toPublic));
 });

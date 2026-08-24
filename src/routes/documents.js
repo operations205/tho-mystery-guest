@@ -24,6 +24,7 @@ function toPublic(row) {
 }
 
 router.get('/', (req, res) => {
+  if (req.user.role === 'hotel') return res.json([]); // proposals/contracts aren't part of the hotel view
   const clientId = req.query.clientId;
   const rows = clientId
     ? db.prepare('SELECT id,type,client_id,file_name,data_json,created_at,created_by FROM generated_documents WHERE client_id=? ORDER BY created_at DESC').all(clientId)
@@ -86,6 +87,7 @@ router.post('/generate', requireRole('admin'), (req, res) => {
 });
 
 router.get('/:id/download', (req, res) => {
+  if (req.user.role === 'hotel') return res.status(403).json({ error: 'forbidden' });
   const row = db.prepare('SELECT * FROM generated_documents WHERE id=?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
   const buf = Buffer.from(row.file_data, 'base64');

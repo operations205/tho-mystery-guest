@@ -2,13 +2,14 @@
 
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
-  role TEXT NOT NULL CHECK(role IN ('admin','inspector')),
+  role TEXT NOT NULL CHECK(role IN ('admin','inspector','hotel')),
   username TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   name_en TEXT NOT NULL,
   name_ar TEXT NOT NULL,
   title_en TEXT DEFAULT '',
   title_ar TEXT DEFAULT '',
+  hotel_id TEXT REFERENCES hotels(id) ON DELETE CASCADE,
   created_at INTEGER NOT NULL
 );
 
@@ -59,6 +60,7 @@ CREATE TABLE IF NOT EXISTS answers (
   item_id TEXT NOT NULL,
   value TEXT CHECK(value IN ('yes','no','na') OR value IS NULL),
   note TEXT DEFAULT '',
+  photo TEXT DEFAULT '',
   PRIMARY KEY (inspection_id, item_id)
 );
 

@@ -136,6 +136,9 @@ let state = {
   templates:{},
   clients:[],
   documents:[],
+  hotelAccounts:{},
+  openHotelAccountId:null,
+  hotelAccountReveal:null,
   selectedClientId:null,
   currentAssignmentId:null,
   currentInspectionId:null,
@@ -188,9 +191,39 @@ async function loadData(){
     state.session = null;
     return;
   }
-  state.session = { userId: me.id, role: me.role };
+  state.session = { userId: me.id, role: me.role, hotelId: me.hotelId || null };
 
-  const [standardsMeta, audit4Cats, plus5Cats, hotels, inspectors, assignments, inspections, settings, templates, clients, documents] = await Promise.all([
+  if (me.role === 'hotel') {
+    // The hotel side only ever needs: strings for rendering the report layout, its own hotel
+    // record, and its own completed inspections. Everything else (clients, templates, other
+    // hotels' data) is admin/inspector business and stays out of this session entirely.
+    const [standardsMeta, audit4Cats, plus5Cats, hotels, inspections, settings] = await Promise.all([
+      apiGet('/standards'),
+      apiGet('/standards/audit4/categories'),
+      apiGet('/standards/plus5/categories'),
+      apiGet('/hotels'),
+      apiGet('/inspections'),
+      apiGet('/settings')
+    ]);
+    STANDARDS = standardsMeta.STANDARDS;
+    CLASS_META = standardsMeta.CLASS_META;
+    PILLAR_DESC = standardsMeta.PILLAR_DESC;
+    PROPERTY_TYPES = standardsMeta.PROPERTY_TYPES;
+    CATS = audit4Cats;
+    CATS_PLUS_EXTRA = plus5Cats.slice(audit4Cats.length);
+    USERS = [ { id: me.id, role: me.role, username: me.username, name: me.name, title: me.title } ];
+    state.hotels = hotels;
+    state.assignments = [];
+    state.inspections = inspections;
+    state.settings = settings;
+    state.templates = {};
+    state.clients = [];
+    state.documents = [];
+    state.hotelAccounts = {};
+    return;
+  }
+
+  const [standardsMeta, audit4Cats, plus5Cats, hotels, inspectors, assignments, inspections, settings, templates, clients, documents, hotelAccounts] = await Promise.all([
     apiGet('/standards'),
     apiGet('/standards/audit4/categories'),
     apiGet('/standards/plus5/categories'),
@@ -201,7 +234,8 @@ async function loadData(){
     apiGet('/settings'),
     apiGet('/templates'),
     apiGet('/clients'),
-    apiGet('/documents')
+    apiGet('/documents'),
+    me.role === 'admin' ? apiGet('/hotels/accounts') : Promise.resolve({})
   ]);
   STANDARDS = standardsMeta.STANDARDS;
   CLASS_META = standardsMeta.CLASS_META;
@@ -217,6 +251,7 @@ async function loadData(){
   state.templates = templates;
   state.clients = clients;
   state.documents = documents;
+  state.hotelAccounts = hotelAccounts;
 }
 
 /* No-op placeholders kept so any leftover call sites don't throw — persistence now happens
@@ -253,13 +288,14 @@ async function attemptLogin(){
   state.loginError = '';
   await loadData();
   if(state.session.role==='admin'){ state.view = 'admin-overview'; }
+  else if(state.session.role==='hotel'){ state.view = 'hotel-reports'; }
   else{ state.view = 'inspector-home'; state.inspTab='assignments'; }
   render();
 }
 async function logout(){
   try{ await apiPost('/auth/logout'); }catch(e){}
   state.session = null;
-  state.hotels = []; state.assignments = []; state.inspections = [];
+  state.hotels = []; state.assignments = []; state.inspections = []; state.hotelAccounts = {};
   state.view = 'login';
   render();
 }
@@ -368,8 +404,9 @@ function renderLogin(){
         <h2>${t('loginTitle')}</h2>
         <p class="sub">${t('loginSub')}</p>
         <div class="role-tabs">
-          <button class="role-tab ${isAdmin?'active':''}" onclick="setLoginRole('admin')">${ic('admin_panel_settings')}${t('roleAdmin')}</button>
-          <button class="role-tab ${!isAdmin?'active':''}" onclick="setLoginRole('inspector')">${ic('badge')}${t('roleInspector')}</button>
+          <button class="role-tab ${state.loginRole==='admin'?'active':''}" onclick="setLoginRole('admin')">${ic('admin_panel_settings')}${t('roleAdmin')}</button>
+          <button class="role-tab ${state.loginRole==='inspector'?'active':''}" onclick="setLoginRole('inspector')">${ic('badge')}${t('roleInspector')}</button>
+          <button class="role-tab ${state.loginRole==='hotel'?'active':''}" onclick="setLoginRole('hotel')">${ic('hotel')}${t('roleHotel')}</button>
         </div>
         ${state.loginError ? `<div class="login-error">${ic('error')}${esc(state.loginError)}</div>` : ''}
         <div class="field" style="margin-bottom:14px;">
@@ -381,6 +418,9 @@ function renderLogin(){
           <input id="f_password" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')attemptLogin()">
         </div>
         <button class="btn btn-primary btn-block" onclick="attemptLogin()">${ic('login')}${t('loginBtn')}</button>
+        ${state.loginRole==='hotel' ? `
+        <p style="font-size:12px;color:var(--muted);margin-top:16px;text-align:center;">${t('hotelLoginHint')}</p>
+        ` : `
         <div class="demo-box">
           <b>${t('demoCredsTitle')}</b>
           ${isAdmin
@@ -391,6 +431,7 @@ function renderLogin(){
             <div class="demo-cred-row"><span>Lama Al-Otaibi — lama / demo123</span><button onclick="fillDemo('lama')">${state.lang==='ar'?'تعبئة':'Fill'}</button></div>
             `}
         </div>
+        `}
         <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center;">${t('poweredBy')}</p>
       </div>
     </div>
@@ -506,9 +547,11 @@ function renderAdminProperties(){
       <td>${esc(h.contact||'')}<br><span style="color:var(--muted);font-size:12px;">${esc(h.phone||'')}</span></td>
       <td class="row-actions">
         <button class="icon-btn" onclick="openDrawer('property','${h.id}')" title="${t('edit')}">${ic('edit')}</button>
+        <button class="icon-btn" onclick="toggleHotelAccountPanel('${h.id}')" title="${t('hotelAccountTitle')}">${ic('key')}</button>
         <button class="icon-btn danger" onclick="deleteHotel('${h.id}')" title="${t('delete')}">${ic('delete')}</button>
       </td>
-    </tr>`;
+    </tr>
+    ${state.openHotelAccountId===h.id ? `<tr><td colspan="5" style="padding:0;border:none;"><div class="hotel-account-box">${renderHotelAccountPanel(h)}</div></td></tr>` : ''}`;
   }).join('');
   return `
   <div class="page-head"><div><h2>${t('propertiesTitle')}</h2><p>${t('propertiesSub')}</p></div>
@@ -519,6 +562,71 @@ function renderAdminProperties(){
     <table><thead><tr><th>${t('colProperty')}</th><th>${t('colType')}</th><th>${t('colCity')}</th><th>${t('colContact')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
   </div>
   `;
+}
+function renderHotelAccountPanel(h){
+  const account = state.hotelAccounts[h.id];
+  const reveal = state.hotelAccountReveal && state.hotelAccountReveal.hotelId===h.id ? state.hotelAccountReveal : null;
+  const revealHtml = reveal ? `
+    <div class="hotel-account-creds">
+      <div class="cred-row"><span>${t('hotelAccountUsername')}</span><b>${esc(reveal.username)}</b></div>
+      <div class="cred-row"><span>${t('hotelAccountTempPassword')}</span><b>${esc(reveal.tempPassword)}</b></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin:8px 0 0;">${esc(t('hotelAccountHint'))}</p>
+  ` : '';
+  if(!account){
+    return `
+    <div><strong>${esc(t('hotelAccountTitle'))}</strong> — <span style="color:var(--muted);">${esc(t('hotelAccountNone'))}</span></div>
+    <button class="btn btn-gold btn-sm" style="margin-top:10px;" onclick="createHotelAccount('${h.id}')">${ic('vpn_key')}${t('createHotelAccount')}</button>
+    ${revealHtml}
+    `;
+  }
+  return `
+  <div><strong>${esc(t('hotelAccountTitle'))}</strong> — <code>${esc(account.username)}</code></div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+    <button class="btn btn-outline btn-sm" onclick="resetHotelAccountPassword('${h.id}')">${ic('lock_reset')}${t('resetHotelPassword')}</button>
+    <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteHotelAccount('${h.id}')">${ic('delete')}${t('deleteHotelAccount')}</button>
+  </div>
+  ${revealHtml}
+  `;
+}
+function toggleHotelAccountPanel(hotelId){
+  state.openHotelAccountId = state.openHotelAccountId===hotelId ? null : hotelId;
+  state.hotelAccountReveal = null;
+  render();
+}
+async function createHotelAccount(hotelId){
+  let result;
+  try{
+    result = await apiPost('/hotels/' + hotelId + '/account', {});
+  }catch(e){
+    alert((state.lang==='ar' ? 'تعذّر إنشاء الحساب: ' : 'Could not create account: ') + e.message);
+    return;
+  }
+  state.hotelAccounts[hotelId] = { id: result.id, username: result.username, name: result.name };
+  state.hotelAccountReveal = { hotelId, username: result.username, tempPassword: result.tempPassword };
+  render();
+}
+async function resetHotelAccountPassword(hotelId){
+  let result;
+  try{
+    result = await apiPost('/hotels/' + hotelId + '/account/reset-password', {});
+  }catch(e){
+    alert((state.lang==='ar' ? 'تعذّر إعادة تعيين كلمة المرور: ' : 'Could not reset password: ') + e.message);
+    return;
+  }
+  const account = state.hotelAccounts[hotelId];
+  state.hotelAccountReveal = { hotelId, username: account ? account.username : '', tempPassword: result.tempPassword };
+  render();
+}
+async function deleteHotelAccount(hotelId){
+  if(!confirm(t('confirmDeleteHotelAccount'))) return;
+  try{ await apiDelete('/hotels/' + hotelId + '/account'); }catch(e){
+    alert((state.lang==='ar' ? 'تعذّر حذف الحساب: ' : 'Could not delete account: ') + e.message);
+    return;
+  }
+  delete state.hotelAccounts[hotelId];
+  state.hotelAccountReveal = null;
+  render();
 }
 
 /* ---- Admin: Inspectors ---- */
@@ -1008,6 +1116,8 @@ async function deleteHotel(id){
   if(!confirm(t('confirmDelete'))) return;
   await apiDelete('/hotels/' + id);
   state.hotels = await apiGet('/hotels');
+  delete state.hotelAccounts[id]; // hotel-login account is cascade-deleted with the hotel server-side
+  if(state.openHotelAccountId===id) state.openHotelAccountId = null;
   render();
 }
 async function deleteAssignment(id){
@@ -1080,6 +1190,7 @@ function renderFullDetail(insp){
           <div class="fi-text">${ti(item)}${item.crit?`<span class="item-crit">${ic('priority_high')}${state.lang==='ar'?'جوهري':'Critical'}</span>`:''}</div>
           <span class="fi-tag" style="background:${CLASS_META[item.cls].color}">${tcls(item.cls)}</span>
           ${a.note?`<div class="fi-note">${esc(a.note)}</div>`:''}
+          ${a.photo?`<img class="photo-thumb" src="${a.photo}" alt="${esc(t('itemPhotoLabel'))}" onclick="openPhotoLightbox('${a.photo}')">`:''}
         </div>
         ${badge}
       </div>`;
@@ -1182,6 +1293,54 @@ function renderAdminReport(){
   const insp = inspectionById(state.currentInspectionId);
   if(!insp) return renderAdminOverview();
   return renderReportBody(insp, "go('admin-inspections')");
+}
+
+/* ===================== HOTEL SHELL (read-only report viewer) ===================== */
+function renderHotelShell(bodyHtml){
+  const user = currentUser();
+  return `
+  <div class="admin-shell">
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <h1>${ic('hotel')}${esc(state.view==='hotel-report' ? t('detailTitle') : t('hotelDashboardTitle'))}</h1>
+        <div class="tb-actions">
+          <span style="color:var(--muted);font-size:13px;">${esc(t('hotelWelcome'))}, ${esc(tl(user.name))}</span>
+          <button class="lang-toggle" onclick="toggleLang()">${ic('translate')}<span>${state.lang==='ar'?'English':'عربي'}</span></button>
+          <button class="btn btn-outline btn-sm" onclick="logout()">${ic('logout')}${t('logout')}</button>
+        </div>
+      </div>
+      <div class="admin-content">${bodyHtml}</div>
+    </div>
+  </div>`;
+}
+async function viewHotelReport(id){
+  state.currentInspectionId = id;
+  go('hotel-report');
+}
+function renderHotelReports(){
+  const list = state.inspections.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  const rows = list.map(insp=>{
+    const overall = insp.overall || 0;
+    const badge = `<span class="badge ${overall>=75?'badge-green':(overall>=60?'badge-amber':'badge-red')}">${overall}%</span>`;
+    return `<tr>
+      <td><strong>${esc(insp.property)}</strong></td>
+      <td>${esc(insp.visitDate||'')}</td>
+      <td>${badge}</td>
+      <td style="text-align:end;"><button class="btn btn-ghost btn-sm" onclick="viewHotelReport('${insp.id}')">${t('view')}</button></td>
+    </tr>`;
+  }).join('');
+  return `
+  <div class="page-head"><div><h2>${t('hotelDashboardTitle')}</h2></div></div>
+  <div class="card">
+    ${list.length===0 ? `<div class="empty"><div class="big">${ic('fact_check')}</div>${t('noReportsYet')}</div>` : `
+    <table><thead><tr><th>${t('colProperty')}</th><th>${t('colDate')}</th><th>${t('colScore')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
+  </div>
+  `;
+}
+function renderHotelReportDetail(){
+  const insp = inspectionById(state.currentInspectionId);
+  if(!insp) return renderHotelReports();
+  return renderReportBody(insp, "go('hotel-reports')");
 }
 
 /* ===================== THIRD REPORT: STANDARDS REFERENCE DOCUMENT ===================== */
@@ -1415,6 +1574,13 @@ function renderInspectorInspect(){
 
   const items = cat.items.map(item=>{
     const a = insp.answers[item.id] || {};
+    const photoHtml = a.photo
+      ? `<div class="photo-preview-row">
+          <img class="photo-thumb" src="${a.photo}" alt="" onclick="openPhotoLightbox('${a.photo}')">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('photoInput_${item.id}').click()">${ic('photo_camera')}${t('retakePhoto')}</button>
+          <button class="btn btn-ghost btn-sm" onclick="removePhotoM('${item.id}')">${ic('delete')}${t('removePhoto')}</button>
+        </div>`
+      : `<button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="document.getElementById('photoInput_${item.id}').click()">${ic('add_a_photo')}${t('addPhoto')}</button>`;
     return `
     <div class="mobile-item">
       <div class="mi-text">${ti(item)} ${item.crit?`<span class="item-crit">${ic('priority_high')}${state.lang==='ar'?'معيار جوهري':'Critical'}</span>`:''}</div>
@@ -1425,6 +1591,8 @@ function renderInspectorInspect(){
         <button class="ans-btn na ${a.value==='na'?'on':''}" onclick="setAnswerM('${item.id}','na')">${t('na')}</button>
       </div>
       <textarea class="note-input" placeholder="${t('noteHolder')}" onchange="setNoteM('${item.id}', this.value)">${a.note||''}</textarea>
+      ${photoHtml}
+      <input type="file" id="photoInput_${item.id}" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoInput('${item.id}', this)">
     </div>`;
   }).join('');
 
@@ -1465,6 +1633,72 @@ function setNoteM(itemId, note){
   insp.answers[itemId].note = note;
   apiPut('/inspections/' + insp.id + '/answers/' + itemId, { value: insp.answers[itemId].value || null, note })
     .catch(e=>console.error('failed to save note', itemId, e));
+}
+/* Resizes/compresses a photo client-side before upload — keeps mobile uploads fast and well
+   under the server's size cap, since raw phone-camera photos can be several MB each. */
+function compressPhotoFile(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('image_decode_failed'));
+      img.onload = () => {
+        const maxDim = 1280;
+        let w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          if(w >= h){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function handlePhotoInput(itemId, input){
+  const file = input.files && input.files[0];
+  input.value = '';
+  if(!file) return;
+  const insp = currentMobileInsp(); if(!insp) return;
+  let dataUrl;
+  try{
+    dataUrl = await compressPhotoFile(file);
+  }catch(e){
+    alert(t('photoSaveFailed'));
+    return;
+  }
+  if(!insp.answers[itemId]) insp.answers[itemId] = {};
+  insp.answers[itemId].photo = dataUrl;
+  render();
+  try{
+    await apiPut('/inspections/' + insp.id + '/answers/' + itemId, { photo: dataUrl });
+  }catch(e){
+    console.error('failed to save photo', itemId, e);
+    alert(t('photoSaveFailed'));
+  }
+}
+function removePhotoM(itemId){
+  const insp = currentMobileInsp(); if(!insp) return;
+  if(!insp.answers[itemId]) insp.answers[itemId] = {};
+  insp.answers[itemId].photo = '';
+  render();
+  apiPut('/inspections/' + insp.id + '/answers/' + itemId, { photo: '' })
+    .catch(e=>console.error('failed to remove photo', itemId, e));
+}
+function openPhotoLightbox(photoDataUrl){
+  if(!photoDataUrl) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'photo-lightbox no-print';
+  overlay.onclick = () => overlay.remove();
+  const img = document.createElement('img');
+  img.src = photoDataUrl;
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
 }
 function finishInspectionM(){ submitSignature(true); }
 
@@ -1566,6 +1800,8 @@ function render(){
     else if(state.view==='admin-settings') content = renderAdminSettings();
     else content = renderAdminOverview();
     html = renderAdminShell(content);
+  } else if(state.session.role==='hotel'){
+    html = renderHotelShell(state.view==='hotel-report' ? renderHotelReportDetail() : renderHotelReports());
   } else {
     if(state.view==='inspector-inspect') html = renderInspectorInspect();
     else if(state.view==='inspector-sign') html = renderInspectorSign();
@@ -1592,7 +1828,9 @@ async function boot(){
   document.documentElement.lang = state.lang;
   document.documentElement.dir = state.lang==='ar' ? 'rtl':'ltr';
   if(state.session){
-    state.view = state.session.role==='admin' ? 'admin-overview' : 'inspector-home';
+    state.view = state.session.role==='admin' ? 'admin-overview'
+      : state.session.role==='hotel' ? 'hotel-reports'
+      : 'inspector-home';
   }
   render();
 }
