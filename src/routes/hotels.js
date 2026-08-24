@@ -10,7 +10,8 @@ function toPublic(row) {
   return {
     id: row.id, name: { en: row.name_en, ar: row.name_ar },
     city: { en: row.city_en, ar: row.city_ar }, type: row.type,
-    contact: row.contact, phone: row.phone, createdAt: row.created_at
+    contact: row.contact, phone: row.phone, logo: row.logo_data || '',
+    createdAt: row.created_at
   };
 }
 
@@ -43,6 +44,24 @@ router.put('/:id', requireRole('admin'), (req, res) => {
 
 router.delete('/:id', requireRole('admin'), (req, res) => {
   db.prepare('DELETE FROM hotels WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// Hotel logo (admin only) — shown next to the property name on that hotel's inspection reports.
+// The client compresses/resizes the image before sending, but we still cap the stored size here
+// as a backstop against an oversized payload.
+router.put('/:id/logo', requireRole('admin'), (req, res) => {
+  const hotel = db.prepare('SELECT id FROM hotels WHERE id=?').get(req.params.id);
+  if (!hotel) return res.status(404).json({ error: 'not_found' });
+  const { logo } = req.body || {};
+  if (typeof logo !== 'string') return res.status(400).json({ error: 'invalid_logo' });
+  if (logo.length > 2 * 1024 * 1024) return res.status(400).json({ error: 'logo_too_large' });
+  db.prepare('UPDATE hotels SET logo_data=? WHERE id=?').run(logo, req.params.id);
+  res.json({ ok: true, logo });
+});
+
+router.delete('/:id/logo', requireRole('admin'), (req, res) => {
+  db.prepare("UPDATE hotels SET logo_data='' WHERE id=?").run(req.params.id);
   res.json({ ok: true });
 });
 

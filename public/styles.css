@@ -201,6 +201,9 @@
   .hotel-account-creds .cred-row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;}
   .hotel-account-creds .cred-row b{font-family:monospace;font-size:13.5px;}
 
+  .hotel-logo-thumb{width:32px;height:32px;object-fit:contain;border-radius:6px;border:1px solid var(--border);background:#fff;flex-shrink:0;}
+  .report-hotel-logo{max-width:120px;max-height:64px;object-fit:contain;margin-bottom:8px;}
+
   .icon-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px;display:inline-flex;min-height:36px;min-width:36px;align-items:center;justify-content:center;}
   .icon-btn:hover{background:#eef0f3;color:var(--navy);}
   .icon-btn.danger:hover{background:var(--red-bg);color:var(--red);}

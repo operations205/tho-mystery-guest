@@ -31,6 +31,12 @@ if (!columnExists('answers', 'photo')) {
   console.log('[migrate] answers.photo column added');
 }
 
+// hotels.logo_data — plain additive column, safe to ALTER TABLE directly.
+if (!columnExists('hotels', 'logo_data')) {
+  db.exec("ALTER TABLE hotels ADD COLUMN logo_data TEXT DEFAULT ''");
+  console.log('[migrate] hotels.logo_data column added');
+}
+
 // users: allow role='hotel' + hotel_id column. SQLite can't ALTER a CHECK constraint, so an
 // existing users table (created before this change) needs to be rebuilt.
 const usersTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get();

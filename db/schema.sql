@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS hotels (
   type INTEGER NOT NULL,
   contact TEXT DEFAULT '',
   phone TEXT DEFAULT '',
+  logo_data TEXT DEFAULT '',
   created_at INTEGER NOT NULL
 );
 

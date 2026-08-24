@@ -541,13 +541,15 @@ function renderAdminProperties(){
   const rows = state.hotels.map(h=>{
     const typeLabel = PROPERTY_TYPES[h.type] ? tl(PROPERTY_TYPES[h.type]) : '';
     return `<tr>
-      <td class="name-cell"><div class="avatar avatar-sm" style="background:var(--navy);color:#fff;">${ic('apartment')}</div><strong>${esc(tl(h.name))}</strong></td>
+      <td class="name-cell">${h.logo ? `<img class="hotel-logo-thumb" src="${h.logo}" alt="">` : `<div class="avatar avatar-sm" style="background:var(--navy);color:#fff;">${ic('apartment')}</div>`}<strong>${esc(tl(h.name))}</strong></td>
       <td>${esc(typeLabel)}</td>
       <td>${esc(tl(h.city))}</td>
       <td>${esc(h.contact||'')}<br><span style="color:var(--muted);font-size:12px;">${esc(h.phone||'')}</span></td>
       <td class="row-actions">
         <button class="icon-btn" onclick="openDrawer('property','${h.id}')" title="${t('edit')}">${ic('edit')}</button>
         <button class="icon-btn" onclick="toggleHotelAccountPanel('${h.id}')" title="${t('hotelAccountTitle')}">${ic('key')}</button>
+        <button class="icon-btn" onclick="uploadHotelLogo('${h.id}')" title="${t('uploadLogo')}">${ic('image')}</button>
+        ${h.logo ? `<button class="icon-btn" onclick="removeHotelLogo('${h.id}')" title="${t('removeLogo')}">${ic('hide_image')}</button>` : ''}
         <button class="icon-btn danger" onclick="deleteHotel('${h.id}')" title="${t('delete')}">${ic('delete')}</button>
       </td>
     </tr>
@@ -1222,6 +1224,7 @@ function renderReportBody(insp, backAction){
   const sc = computeScores(insp);
   const grade = gradeInfo(sc.overall, sc.criticalFails.length>0);
   const isDetailed = state.reportMode !== 'summary';
+  const reportHotel = (state.hotels || []).find(h => h.id === insp.hotelId);
 
   const alertHtml = sc.criticalFails.length>0
     ? `<div class="alert">${ic('warning')}<div><strong>${t('criticalAlert')}</strong><br>${sc.criticalFails.map(cf=>esc(ti(cf.item))).join(' · ')}</div></div>`
@@ -1263,6 +1266,7 @@ function renderReportBody(insp, backAction){
   <div class="score-hero">
     <div class="score-circle"><div class="n">${sc.overall}%</div><div class="p">${t('overallScore')}</div></div>
     <div class="score-meta">
+      ${reportHotel && reportHotel.logo ? `<img class="report-hotel-logo" src="${reportHotel.logo}" alt="">` : ''}
       <h2>${esc(insp.property)}</h2>
       <div class="row">${ic('apartment')}${esc(insp.propertyTypeLabel||'')} · ${esc(insp.city||'')}</div>
       <div class="row">${ic('badge')}${t('inspector')}: ${esc(insp.inspector)} · ${t('visitDate')}: ${esc(insp.visitDate||'')}</div>
@@ -1716,6 +1720,72 @@ function openPhotoLightbox(photoDataUrl){
   img.src = photoDataUrl;
   overlay.appendChild(img);
   document.body.appendChild(overlay);
+}
+
+/* ===================== Hotel logo (admin-managed) ===================== */
+// Smaller max dimension + higher quality than compressPhotoFile since this is a crisp
+// icon/wordmark shown at small size on the report, not a full inspection photo.
+function compressLogoFile(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('image_decode_failed'));
+      img.onload = () => {
+        const maxDim = 480;
+        let w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          if(w >= h){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function uploadHotelLogo(hotelId){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if(!file) return;
+    let dataUrl;
+    try{
+      dataUrl = await compressLogoFile(file);
+    }catch(e){
+      alert(t('logoSaveFailed'));
+      return;
+    }
+    try{
+      await apiPut('/hotels/' + hotelId + '/logo', { logo: dataUrl });
+    }catch(e){
+      alert((state.lang==='ar' ? 'تعذّر حفظ الشعار: ' : 'Could not save the logo: ') + e.message);
+      return;
+    }
+    const h = state.hotels.find(x=>x.id===hotelId);
+    if(h) h.logo = dataUrl;
+    render();
+  };
+  input.click();
+}
+async function removeHotelLogo(hotelId){
+  if(!confirm(t('confirmRemoveLogo'))) return;
+  try{
+    await apiDelete('/hotels/' + hotelId + '/logo');
+  }catch(e){
+    alert((state.lang==='ar' ? 'تعذّر حذف الشعار: ' : 'Could not remove the logo: ') + e.message);
+    return;
+  }
+  const h = state.hotels.find(x=>x.id===hotelId);
+  if(h) h.logo = '';
+  render();
 }
 function finishInspectionM(){ submitSignature(true); }
 

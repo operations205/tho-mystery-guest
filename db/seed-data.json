@@ -4294,6 +4294,22 @@
       "en": "Delete this report? This cannot be undone.",
       "ar": "متأكد إنك عايز تحذف التقرير ده؟ الإجراء ده مايتراجعش."
     },
+    "uploadLogo": {
+      "en": "Upload hotel logo",
+      "ar": "رفع شعار الفندق"
+    },
+    "removeLogo": {
+      "en": "Remove logo",
+      "ar": "حذف الشعار"
+    },
+    "confirmRemoveLogo": {
+      "en": "Remove this hotel's logo?",
+      "ar": "هل تريد حذف شعار هذا الفندق؟"
+    },
+    "logoSaveFailed": {
+      "en": "Could not save the logo. Please try a smaller image.",
+      "ar": "تعذّر حفظ الشعار. جرّب صورة أصغر."
+    },
     "hotelAccountHint": {
       "en": "Give this username and password to the hotel's responsible person so they can view their inspection reports.",
       "ar": "أعطِ اسم المستخدم وكلمة المرور دي للمسؤول في الفندق عشان يقدر يشوف تقارير التفتيش بتاعته."
