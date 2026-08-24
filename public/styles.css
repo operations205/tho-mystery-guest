@@ -21,7 +21,7 @@
     --dur:.18s;
   }
   *{box-sizing:border-box;}
-  html{-webkit-text-size-adjust:100%;}
+  html{-webkit-text-size-adjust:100%;overflow-x:hidden;}
   body{
     margin:0;
     font-family:'Cairo','Segoe UI', Tahoma, Arial, sans-serif;
@@ -29,6 +29,7 @@
     color:var(--text);
     min-height:100vh;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
   a{color:inherit;}
   .material-symbols-outlined{
@@ -65,7 +66,10 @@
   .btn:disabled{opacity:.45;cursor:not-allowed;}
   .btn:disabled:active{transform:none;}
   main{max-width:1180px;margin:0 auto;padding:26px 20px 60px;}
-  .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:22px;}
+  .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:22px;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  /* Tables keep their natural column widths and scroll sideways inside the card instead of
+     squeezing text or blowing out the page width on narrow phone screens. */
+  .card table{min-width:600px;}
   .grid{display:grid;gap:18px;}
   .hero{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:14px;}
   .hero h1{font-size:22px;margin:0 0 4px;}
