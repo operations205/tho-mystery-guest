@@ -4437,6 +4437,34 @@
     "backToReports": {
       "en": "Back to reports",
       "ar": "الرجوع للتقارير"
+    },
+    "loginWelcome": {
+      "en": "Welcome to",
+      "ar": "مرحباً بك في"
+    },
+    "loginDesc": {
+      "en": "Access your evaluation projects and guest experience reports.",
+      "ar": "الوصول إلى مشاريع التقييم وتقارير تجربة الضيف."
+    },
+    "roleHotelDesc": {
+      "en": "Track results and improvement plans",
+      "ar": "متابعة النتائج وخطط التحسين"
+    },
+    "roleInspectorDesc": {
+      "en": "Carry out visits and log evaluation results",
+      "ar": "تنفيذ الزيارات وتسجيل نتائج التقييم"
+    },
+    "roleAdminDesc": {
+      "en": "Manage projects, users and reports",
+      "ar": "إدارة المشاريع والمستخدمين والتقارير"
+    },
+    "forgotPassword": {
+      "en": "Forgot password?",
+      "ar": "نسيت كلمة المرور؟"
+    },
+    "forgotPasswordMsg": {
+      "en": "If you forgot your password, contact your system administrator to reset it.",
+      "ar": "لو نسيت كلمة المرور، تواصل مع مدير النظام لإعادة تعيينها."
     }
   },
   "defaultHotelsData": [

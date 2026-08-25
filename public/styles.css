@@ -112,29 +112,54 @@
 
   /* ===== LOGIN ===== */
   .login-wrap{min-height:100vh;display:flex;align-items:stretch;background:var(--bg);}
-  .login-brand-panel{flex:1 1 46%;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 55%,#000 100%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative;overflow:hidden;}
-  .login-brand-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(245,183,0,.18), transparent 45%),radial-gradient(circle at 10% 90%, rgba(245,183,0,.10), transparent 40%);}
-  /* Brand panel now shows the logo alone — no product-name/tagline/feature-list copy, which
-     was informational filler aimed at a first-time visitor, not something a returning user
-     needs to see on every login. Centered both ways since it's the sole element now. */
-  .login-brand-panel .lb-content{position:relative;z-index:1;max-width:430px;width:100%;text-align:center;}
-  .login-brand-panel img.lb-logo{height:64px;margin:0;}
+  /* Brand panel is a single photo (with the logo/tagline already composited into the image
+     itself) rather than live text over a gradient — simplest way to match the reference
+     design exactly without trying to hand-recreate its typography/spacing in CSS. */
+  .login-brand-panel{flex:1 1 46%;background-image:url('/login-brand.jpg');background-size:cover;background-position:center;}
+  /* Old embedded logos are superseded by the new topbar logo (/logo-black.png) and the
+     brand-panel photo (which already has the logo composited in) — hidden rather than
+     removed from the markup, to avoid touching the large inline base64 image data. */
+  .login-brand-panel .lb-content, .login-card .mono{display:none;}
   @media (max-width:860px){.login-brand-panel{display:none;}}
   .login-form-panel{flex:1 1 54%;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
-  .login-card{width:100%;max-width:400px;}
-  .login-card .mono{width:50px;height:50px;margin-bottom:20px;}
-  .login-card h2{font-size:22px;margin:0 0 6px;}
-  .login-card .sub{color:var(--muted);font-size:13.5px;margin:0 0 26px;}
-  .role-tabs{display:flex;gap:8px;background:#eef0f3;padding:5px;border-radius:12px;margin-bottom:24px;}
-  .role-tab{flex:1;text-align:center;padding:10px 8px;border-radius:9px;font-size:13.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;transition:background .2s,color .2s;border:none;background:transparent;font-family:inherit;}
-  .role-tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.12);}
-  .role-tab .material-symbols-outlined{font-size:18px;}
+  .login-card{width:100%;max-width:460px;}
+
+  .login-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:30px;}
+  .login-topbar-brand{display:flex;align-items:center;gap:10px;}
+  .login-topbar-brand img{height:30px;}
+  .login-topbar-name{font-weight:800;font-size:13.5px;color:var(--navy);line-height:1.3;}
+  .login-topbar-sub{font-size:11px;color:var(--muted);line-height:1.3;}
+  .lang-pill{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:20px;padding:8px 15px;font-size:12.5px;font-weight:700;color:var(--muted);background:#fff;font-family:inherit;cursor:pointer;}
+  .lang-pill span.active{color:var(--gold-dark,#9a6d00);}
+  .lang-pill .sep{color:var(--border);}
+
+  .login-welcome{color:var(--gold-dark,#9a6d00);font-size:13px;font-weight:700;margin:0 0 6px;}
+  .login-card h1{font-size:25px;margin:0 0 10px;font-weight:800;color:var(--navy);}
+  .login-card h2{font-size:16px;margin:0 0 8px;color:var(--navy);font-weight:700;}
+  .login-card .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px;line-height:1.65;}
+
+  .role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
+  .role-card{position:relative;border:1.5px solid var(--border);border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:#fff;font-family:inherit;}
+  .role-card:hover{border-color:#d8dbe0;}
+  .role-card.active{border-color:var(--gold);background:#fffdf5;}
+  .role-card-check{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15);}
+  .role-card-check .material-symbols-outlined{font-size:14px;}
+  .role-card-icon{width:40px;height:40px;border-radius:10px;background:#f4f5f7;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:var(--navy);}
+  .role-card.active .role-card-icon{background:var(--gold-soft);color:var(--gold-dark,#9a6d00);}
+  .role-card-icon .material-symbols-outlined{font-size:20px;}
+  .role-card-title{font-weight:800;font-size:13px;color:var(--navy);margin-bottom:3px;}
+  .role-card-desc{font-size:10.5px;color:var(--muted);line-height:1.4;}
+
+  .field-icon-wrap{position:relative;margin-bottom:14px;}
+  .field-icon-wrap .fi-icon{position:absolute;top:50%;transform:translateY(-50%);inset-inline-start:14px;color:var(--muted);pointer-events:none;}
+  .field-icon-wrap .fi-icon .material-symbols-outlined{font-size:19px;}
+  .field-icon-wrap input{padding-inline-start:42px;}
+  .field-icon-wrap.pw-field-wrap input{padding-inline-end:42px;}
+
+  .login-forgot{text-align:end;margin:-4px 0 18px;}
+  .login-forgot a{font-size:12.5px;color:var(--gold-dark,#9a6d00);font-weight:700;cursor:pointer;}
+
   .login-error{background:var(--red-bg);color:var(--red);border-radius:9px;padding:10px 13px;font-size:13px;margin-bottom:14px;display:flex;gap:8px;align-items:center;}
-  .demo-box{margin-top:22px;background:#f8f9fb;border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted);}
-  .demo-box b{color:var(--navy);}
-  .demo-cred-row{display:flex;justify-content:space-between;padding:4px 0;}
-  .demo-cred-row button{background:transparent;border:none;color:var(--gold-dark,#9a6d00);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:0;}
-  .login-lang{position:fixed;top:18px;inset-inline-end:20px;z-index:5;}
 
   /* ===== ADMIN SHELL ===== */
   .admin-shell{display:flex;min-height:100vh;}
