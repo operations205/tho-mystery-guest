@@ -285,7 +285,10 @@ async function loadData(){
     apiGet('/settings'),
     apiGet('/templates'),
     apiGet('/clients'),
-    apiGet('/documents'),
+    // Client proposals/contracts are admin-only server-side now (they contain pricing an
+    // inspector has no business need to see) — skip the call entirely for non-admins so boot()
+    // doesn't fail on a 403 from Promise.all.
+    me.role === 'admin' ? apiGet('/documents') : Promise.resolve([]),
     me.role === 'admin' ? apiGet('/hotels/accounts') : Promise.resolve({})
   ]);
   STANDARDS = standardsMeta.STANDARDS;
@@ -597,7 +600,7 @@ function renderAdminProperties(){
   const rows = state.hotels.map(h=>{
     const typeLabel = PROPERTY_TYPES[h.type] ? tl(PROPERTY_TYPES[h.type]) : '';
     return `<tr>
-      <td class="name-cell">${h.logo ? `<img class="hotel-logo-thumb" src="${h.logo}" alt="">` : `<div class="avatar avatar-sm" style="background:var(--navy);color:#fff;">${ic('apartment')}</div>`}<strong>${esc(tl(h.name))}</strong></td>
+      <td class="name-cell">${h.logo ? `<img class="hotel-logo-thumb" src="${esc(h.logo)}" alt="">` : `<div class="avatar avatar-sm" style="background:var(--navy);color:#fff;">${ic('apartment')}</div>`}<strong>${esc(tl(h.name))}</strong></td>
       <td>${esc(typeLabel)}</td>
       <td>${esc(tl(h.city))}</td>
       <td>${esc(h.contact||'')}<br><span style="color:var(--muted);font-size:12px;">${esc(h.phone||'')}</span></td>
@@ -819,7 +822,7 @@ function renderAdminSettings(){
     <div class="field" style="max-width:360px;">
       <label>${t('settingsLogo')}</label>
       <div style="display:flex;align-items:center;gap:14px;">
-        <div class="logo-preview">${s.logo ? `<img src="${s.logo}" alt="logo">` : ic('image')}</div>
+        <div class="logo-preview">${s.logo ? `<img src="${esc(s.logo)}" alt="logo">` : ic('image')}</div>
         <label class="btn btn-outline btn-sm" style="cursor:pointer;">${ic('upload')}${t('settingsUploadLogo')}<input type="file" accept="image/*" style="display:none;" onchange="pickLogoFile(this)"></label>
       </div>
     </div>
@@ -1064,7 +1067,7 @@ function renderDrawer(){
     body = `
       <div class="logo-upload-row">
         <div class="logo-upload" onclick="pickHotelLogoFile()" title="${t('uploadLogo')}">
-          ${logoSrc ? `<img src="${logoSrc}" alt="">` : `<div class="logo-upload-empty">${ic('apartment')}</div>`}
+          ${logoSrc ? `<img src="${esc(logoSrc)}" alt="">` : `<div class="logo-upload-empty">${ic('apartment')}</div>`}
           <div class="logo-upload-badge">${ic('photo_camera')}</div>
         </div>
         <div class="logo-upload-actions">
@@ -1327,7 +1330,7 @@ function setReportMode(mode){ state.reportMode = mode; render(); }
 function renderSignatureBlock(insp){
   const dateStr = insp.completedAt ? new Date(insp.completedAt).toISOString().slice(0,10) : (insp.visitDate||'');
   const sigHtml = insp.signature
-    ? `<img class="sig-image" src="${insp.signature}" alt="signature">`
+    ? `<img class="sig-image" src="${esc(insp.signature)}" alt="signature">`
     : `<div class="sig-blank"></div>`;
   return `
   <div class="sig-block">
@@ -1375,7 +1378,7 @@ function renderFullDetail(insp){
           <div class="fi-text">${ti(item)}${item.crit?`<span class="item-crit">${ic('priority_high')}${state.lang==='ar'?'جوهري':'Critical'}</span>`:''}</div>
           <span class="fi-tag" style="background:${CLASS_META[item.cls].color}">${tcls(item.cls)}</span>
           ${a.note?`<div class="fi-note">${esc(a.note)}</div>`:''}
-          ${a.photo?`<img class="photo-thumb" src="${a.photo}" alt="${esc(t('itemPhotoLabel'))}" onclick="openPhotoLightbox('${a.photo}')">`:''}
+          ${a.photo?`<img class="photo-thumb" src="${esc(a.photo)}" alt="${esc(t('itemPhotoLabel'))}" onclick="openPhotoLightbox('${esc(a.photo)}')">`:''}
         </div>
         ${badge}
       </div>`;
@@ -1433,7 +1436,7 @@ function renderReportBody(insp, backAction){
   <div class="score-hero">
     <div class="score-circle"><div class="n">${sc.overall}%</div><div class="p">${t('overallScore')}</div></div>
     <div class="score-meta">
-      ${reportHotel && reportHotel.logo ? `<img class="report-hotel-logo" src="${reportHotel.logo}" alt="">` : ''}
+      ${reportHotel && reportHotel.logo ? `<img class="report-hotel-logo" src="${esc(reportHotel.logo)}" alt="">` : ''}
       <h2>${esc(insp.property)}</h2>
       <div class="row">${ic('apartment')}${esc(insp.propertyTypeLabel||'')} · ${esc(insp.city||'')}</div>
       <div class="row">${ic('badge')}${t('inspector')}: ${esc(insp.inspector)} · ${t('visitDate')}: ${esc(insp.visitDate||'')}</div>
@@ -1764,7 +1767,7 @@ function renderInspectorInspect(){
     const a = insp.answers[item.id] || {};
     const photoHtml = a.photo
       ? `<div class="photo-preview-row">
-          <img class="photo-thumb" src="${a.photo}" alt="" onclick="openPhotoLightbox('${a.photo}')">
+          <img class="photo-thumb" src="${esc(a.photo)}" alt="" onclick="openPhotoLightbox('${esc(a.photo)}')">
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('photoInput_${item.id}').click()">${ic('photo_camera')}${t('retakePhoto')}</button>
           <button class="btn btn-ghost btn-sm" onclick="removePhotoM('${item.id}')">${ic('delete')}${t('removePhoto')}</button>
         </div>`

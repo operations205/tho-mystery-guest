@@ -2,6 +2,9 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const db = require('../../db/db');
 const { requireAuth, requireRole } = require('../middleware/auth');
+const { isValidImageDataUrl } = require('../utils/validateImage');
+const { withinLength } = require('../utils/validate');
+const { generateTempPassword } = require('../utils/tempPassword');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -26,6 +29,10 @@ router.get('/', (req, res) => {
 router.post('/', requireRole('admin'), (req, res) => {
   const { name_en, name_ar, city_en, city_ar, type, contact, phone } = req.body || {};
   if (!name_en || !name_ar) return res.status(400).json({ error: 'missing_fields' });
+  if (![name_en, name_ar, city_en, city_ar].every(v => withinLength(v, 200))
+    || !withinLength(contact, 200) || !withinLength(phone, 50)) {
+    return res.status(400).json({ error: 'field_too_long' });
+  }
   const id = 'h_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   db.prepare(`INSERT INTO hotels (id, name_en, name_ar, city_en, city_ar, type, contact, phone, created_at)
     VALUES (?,?,?,?,?,?,?,?,?)`).run(id, name_en, name_ar, city_en || '', city_ar || '', type || 0, contact || '', phone || '', Date.now());
@@ -36,6 +43,10 @@ router.put('/:id', requireRole('admin'), (req, res) => {
   const { name_en, name_ar, city_en, city_ar, type, contact, phone } = req.body || {};
   const existing = db.prepare('SELECT * FROM hotels WHERE id=?').get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'not_found' });
+  if (![name_en, name_ar, city_en, city_ar].every(v => withinLength(v, 200))
+    || !withinLength(contact, 200) || !withinLength(phone, 50)) {
+    return res.status(400).json({ error: 'field_too_long' });
+  }
   db.prepare(`UPDATE hotels SET name_en=?, name_ar=?, city_en=?, city_ar=?, type=?, contact=?, phone=? WHERE id=?`)
     .run(name_en ?? existing.name_en, name_ar ?? existing.name_ar, city_en ?? existing.city_en, city_ar ?? existing.city_ar,
       type ?? existing.type, contact ?? existing.contact, phone ?? existing.phone, req.params.id);
@@ -54,8 +65,10 @@ router.put('/:id/logo', requireRole('admin'), (req, res) => {
   const hotel = db.prepare('SELECT id FROM hotels WHERE id=?').get(req.params.id);
   if (!hotel) return res.status(404).json({ error: 'not_found' });
   const { logo } = req.body || {};
-  if (typeof logo !== 'string') return res.status(400).json({ error: 'invalid_logo' });
-  if (logo.length > 2 * 1024 * 1024) return res.status(400).json({ error: 'logo_too_large' });
+  if (typeof logo !== 'string' || logo.length > 2 * 1024 * 1024) return res.status(400).json({ error: 'logo_too_large' });
+  // Rendered straight into <img src="..."> on report/dashboard views (including the hotel
+  // account's own report viewer), so it must actually be an image data URL.
+  if (!isValidImageDataUrl(logo)) return res.status(400).json({ error: 'invalid_logo' });
   db.prepare('UPDATE hotels SET logo_data=? WHERE id=?').run(logo, req.params.id);
   res.json({ ok: true, logo });
 });
@@ -107,7 +120,7 @@ router.post('/:id/account', requireRole('admin'), (req, res) => {
     uname = base + (++n);
   }
   const id = 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const tempPassword = Math.random().toString(36).slice(2, 10);
+  const tempPassword = generateTempPassword();
   db.prepare(`INSERT INTO users (id, role, username, password_hash, name_en, name_ar, hotel_id, created_at)
     VALUES (?, 'hotel', ?, ?, ?, ?, ?, ?)`)
     .run(id, uname, bcrypt.hashSync(tempPassword, 10), name_en || hotel.name_en, name_ar || hotel.name_ar, req.params.id, Date.now());
@@ -118,7 +131,7 @@ router.post('/:id/account', requireRole('admin'), (req, res) => {
 router.post('/:id/account/reset-password', requireRole('admin'), (req, res) => {
   const row = db.prepare("SELECT * FROM users WHERE role='hotel' AND hotel_id=?").get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
-  const tempPassword = Math.random().toString(36).slice(2, 10);
+  const tempPassword = generateTempPassword();
   db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(bcrypt.hashSync(tempPassword, 10), row.id);
   res.json({ ok: true, tempPassword });
 });

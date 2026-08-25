@@ -47,13 +47,14 @@ npm install
 npm start
 ```
 
-Then open `http://localhost:3000`. On first boot it seeds demo data automatically (same as before: admin/demo123, sara/omar/lama with demo123).
+Then open `http://localhost:3000`. On first boot it seeds demo accounts (1 admin + 3 inspectors) with a temporary password — **change every one of these passwords immediately** from the app (profile menu → change password for your own account; Properties/Inspectors → reset password for others) before sharing the URL with anyone. The temporary password is only printed in the server's local startup log, never committed to source control.
 
 Environment variables (set these in production):
 
-- `JWT_SECRET` — any long random string. If not set, a random one is generated each restart, which will log everyone out on every deploy. **Must be set for production.**
+- `JWT_SECRET` — any long random string (e.g. `openssl rand -hex 32`). **Required** — the server refuses to start without it, on purpose, so a missing secret is an obvious boot error instead of everyone silently getting logged out on every restart.
 - `PORT` — defaults to 3000; most hosts set this automatically.
 - `DATA_DIR` — where the SQLite file is stored (defaults to `./data`). On Render this should point at the attached persistent disk so data survives redeploys.
+- `ALLOWED_ORIGINS` — comma-separated list of origins allowed to make credentialed cross-origin requests (defaults to the production domain + localhost). Only relevant if you serve the frontend from a different origin than the API.
 
 ## Data model
 

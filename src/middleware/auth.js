@@ -1,10 +1,15 @@
 const jwt = require('jsonwebtoken');
 const db = require('../../db/db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'CHANGE_ME_IN_PRODUCTION_' + Math.random().toString(36);
+// A missing JWT_SECRET used to silently fall back to a random per-process value — meaning every
+// restart/deploy invalidated every session with no clear error, and (if ever scaled to more than
+// one instance) different instances would mint mutually-incompatible tokens. Failing fast here
+// turns that into an obvious boot-time error instead of a confusing "everyone got logged out".
 if (!process.env.JWT_SECRET) {
-  console.warn('[auth] WARNING: JWT_SECRET not set in environment — using a random one-time secret. Set JWT_SECRET in your hosting environment variables for stable sessions across restarts.');
+  console.error('[auth] FATAL: JWT_SECRET is not set. Set it in your hosting environment variables (Render: Environment tab) before starting the server.');
+  process.exit(1);
 }
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function signToken(user) {
   return jwt.sign(

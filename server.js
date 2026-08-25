@@ -2,6 +2,8 @@ const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const helmet = require('helmet');
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 
 const { seed } = require('./db/seed');
 seed();
@@ -19,10 +21,58 @@ const templatesRoutes = require('./src/routes/templates');
 const documentsRoutes = require('./src/routes/documents');
 
 const app = express();
+
+// Security headers. The app renders most of its UI via inline onclick="" handlers and inline
+// style="" attributes (a vanilla-JS single-file SPA), so a strict default CSP would break the
+// whole app — script-src/style-src need 'unsafe-inline'. This still meaningfully restricts where
+// scripts/frames/connections can come from, blocks MIME-sniffing, and sets a sane referrer policy.
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Chart.js is now self-hosted under /vendor, no external script CDN needed
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      imgSrc: ["'self'", 'data:', 'blob:'],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'self'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// Only the app's own known origins may make credentialed cross-origin requests. Set
+// ALLOWED_ORIGINS (comma-separated) in the hosting environment to override/extend this list;
+// falls back to the production domain + localhost dev ports if unset.
+const allowedOrigins = (process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
+  : ['https://thehotelieroffice.org', 'https://www.thehotelieroffice.org', 'http://localhost:3000']);
+app.use(cors({
+  origin(origin, callback) {
+    // requests with no Origin header (same-origin, curl, server-to-server) are always allowed
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('not allowed by CORS'));
+  },
+  credentials: true,
+}));
+
 app.use(express.json({ limit: '8mb' })); // signatures + logo are base64 images
 app.use(cookieParser());
-app.use(cors({ origin: true, credentials: true }));
 
+// Brute-force protection on login: a handful of attempts per IP+username pair every 15 minutes.
+// Keyed on IP alone would let an attacker lock out a legitimate user by spamming their username
+// from elsewhere, so scope the counter to the (ip, username) pair instead.
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `${ipKeyGenerator(req.ip)}:${(req.body && req.body.username) || ''}`,
+  message: { error: 'too_many_attempts' },
+});
+
+app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/hotels', hotelRoutes);
 app.use('/api/inspectors', inspectorRoutes);
@@ -39,6 +89,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'not_found' });
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Final error handler — must be registered last, after all routes. Express only reaches this for
+// errors passed to next(err) or thrown inside synchronous route handlers (this app's routes are
+// synchronous, so that covers them). Logs the real error server-side but never leaks stack traces
+// or internal details to the client, regardless of NODE_ENV.
+app.use((err, req, res, next) => {
+  if (err && err.message === 'not allowed by CORS') {
+    return res.status(403).json({ error: 'origin_not_allowed' });
+  }
+  console.error('[unhandled error]', err);
+  // Genuine 4xx client errors (e.g. body-parser rejecting malformed JSON) keep their real status
+  // code so the client knows it was their request, not us — but the message is always a generic,
+  // safe label, never the raw error text/stack.
+  const status = (err && typeof err.status === 'number' && err.status >= 400 && err.status < 500) ? err.status : 500;
+  res.status(status).json({ error: status < 500 ? 'bad_request' : 'internal_error' });
 });
 
 const PORT = process.env.PORT || 3000;

@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const db = require('./db');
+const { generateTempPassword } = require('../src/utils/tempPassword');
 
 const seedData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seed-data.json'), 'utf8'));
 
@@ -20,14 +21,21 @@ function seed() {
     (id, role, username, password_hash, name_en, name_ar, title_en, title_ar, created_at)
     VALUES (@id, @role, @username, @password_hash, @name_en, @name_ar, @title_en, @title_ar, @created_at)`);
 
+  // Real, random one-time passwords instead of the fixed demo123 that used to ship with every
+  // install — printed once to the local server console below, never written to source control or
+  // shown in the UI. Change every one of these from the app as soon as you log in.
+  const seededCredentials = [];
+
   db.exec('BEGIN');
   try {
     seedData.USERS.forEach(u => {
+      const tempPassword = generateTempPassword();
+      seededCredentials.push({ username: u.username, role: u.role, password: tempPassword });
       insertUser.run({
         id: u.id,
         role: u.role,
         username: u.username,
-        password_hash: bcrypt.hashSync(u.password, 10),
+        password_hash: bcrypt.hashSync(tempPassword, 10),
         name_en: u.name.en,
         name_ar: u.name.ar,
         title_en: (u.title && u.title.en) || '',
@@ -80,7 +88,8 @@ function seed() {
     db.exec('ROLLBACK');
     throw e;
   }
-  console.log('[seed] done.');
+  console.log('[seed] done. One-time login passwords (change these immediately from the app):');
+  seededCredentials.forEach(c => console.log(`[seed]   ${c.username} (${c.role}): ${c.password}`));
 }
 
 module.exports = { seed };

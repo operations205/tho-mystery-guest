@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../../db/db');
 const { requireAuth, requireRole } = require('../middleware/auth');
+const { isValidImageDataUrl } = require('../utils/validateImage');
 const { computeScores, catsForStandard } = require('../lib/standards');
 
 const router = express.Router();
@@ -104,8 +105,16 @@ router.put('/:id/answers/:itemId', requireRole('inspector'), (req, res) => {
   if (body.value !== null && body.value !== undefined && !['yes', 'no', 'na'].includes(body.value)) {
     return res.status(400).json({ error: 'invalid_value' });
   }
-  if (body.photo !== undefined && body.photo !== null && typeof body.photo === 'string' && body.photo.length > 6 * 1024 * 1024) {
-    return res.status(400).json({ error: 'photo_too_large' });
+  if (body.photo !== undefined && body.photo !== null && body.photo !== '') {
+    if (typeof body.photo !== 'string' || body.photo.length > 6 * 1024 * 1024) {
+      return res.status(400).json({ error: 'photo_too_large' });
+    }
+    // Must actually be an image data URL — this field gets rendered back into an <img src> and
+    // an inline onclick handler on the report views, so anything that isn't a real image data
+    // URL is rejected here rather than trusted to the frontend's HTML-escaping alone.
+    if (!isValidImageDataUrl(body.photo)) {
+      return res.status(400).json({ error: 'invalid_photo' });
+    }
   }
 
   // This endpoint is called separately for value changes, note changes, and photo changes —
@@ -129,7 +138,11 @@ router.post('/:id/complete', requireRole('inspector'), (req, res) => {
   const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!insp) return res.status(404).json({ error: 'not_found' });
   if (insp.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
+  if (insp.status === 'completed') return res.status(400).json({ error: 'already_completed' });
   const { signature } = req.body || {}; // base64 PNG data URL, or null if skipped
+  if (signature !== undefined && signature !== null && signature !== '' && !isValidImageDataUrl(signature)) {
+    return res.status(400).json({ error: 'invalid_signature' });
+  }
   const now = Date.now();
   db.prepare("UPDATE inspections SET status='completed', signature=?, completed_at=? WHERE id=?")
     .run(signature || null, now, req.params.id);

@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../../db/db');
 const { requireAuth, requireRole } = require('../middleware/auth');
+const { withinLength } = require('../utils/validate');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -24,6 +25,10 @@ router.get('/', (req, res) => {
 router.post('/', requireRole('admin'), (req, res) => {
   const { name_en, name_ar, hotel_name_en, hotel_name_ar, contact, phone, email } = req.body || {};
   if (!name_en || !name_ar) return res.status(400).json({ error: 'missing_fields' });
+  if (![name_en, name_ar, hotel_name_en, hotel_name_ar].every(v => withinLength(v, 200))
+    || !withinLength(contact, 200) || !withinLength(phone, 50) || !withinLength(email, 200)) {
+    return res.status(400).json({ error: 'field_too_long' });
+  }
   const id = 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   db.prepare(`INSERT INTO clients (id, name_en, name_ar, hotel_name_en, hotel_name_ar, contact, phone, email, created_at)
     VALUES (?,?,?,?,?,?,?,?,?)`)
@@ -35,6 +40,10 @@ router.put('/:id', requireRole('admin'), (req, res) => {
   const { name_en, name_ar, hotel_name_en, hotel_name_ar, contact, phone, email } = req.body || {};
   const existing = db.prepare('SELECT * FROM clients WHERE id=?').get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'not_found' });
+  if (![name_en, name_ar, hotel_name_en, hotel_name_ar].every(v => withinLength(v, 200))
+    || !withinLength(contact, 200) || !withinLength(phone, 50) || !withinLength(email, 200)) {
+    return res.status(400).json({ error: 'field_too_long' });
+  }
   db.prepare(`UPDATE clients SET name_en=?, name_ar=?, hotel_name_en=?, hotel_name_ar=?, contact=?, phone=?, email=? WHERE id=?`)
     .run(
       name_en ?? existing.name_en, name_ar ?? existing.name_ar,
