@@ -114,13 +114,11 @@
   .login-wrap{min-height:100vh;display:flex;align-items:stretch;background:var(--bg);}
   .login-brand-panel{flex:1 1 46%;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 55%,#000 100%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative;overflow:hidden;}
   .login-brand-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(245,183,0,.18), transparent 45%),radial-gradient(circle at 10% 90%, rgba(245,183,0,.10), transparent 40%);}
-  .login-brand-panel .lb-content{position:relative;z-index:1;max-width:430px;}
-  .login-brand-panel img.lb-logo{height:38px;margin-bottom:42px;}
-  .login-brand-panel h1{font-size:28px;line-height:1.4;margin:0 0 14px;font-weight:800;}
-  .login-brand-panel p{color:#c9c9c9;font-size:14.5px;line-height:1.75;margin:0 0 30px;}
-  .lb-badges{display:flex;flex-direction:column;gap:13px;}
-  .lb-badge{display:flex;align-items:center;gap:11px;font-size:13px;color:#e5e5e5;}
-  .lb-badge .material-symbols-outlined{color:var(--gold);font-size:20px;flex-shrink:0;}
+  /* Brand panel now shows the logo alone — no product-name/tagline/feature-list copy, which
+     was informational filler aimed at a first-time visitor, not something a returning user
+     needs to see on every login. Centered both ways since it's the sole element now. */
+  .login-brand-panel .lb-content{position:relative;z-index:1;max-width:430px;width:100%;text-align:center;}
+  .login-brand-panel img.lb-logo{height:64px;margin:0;}
   @media (max-width:860px){.login-brand-panel{display:none;}}
   .login-form-panel{flex:1 1 54%;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
   .login-card{width:100%;max-width:400px;}
