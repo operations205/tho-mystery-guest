@@ -1056,7 +1056,22 @@ function renderDrawer(){
     const editing = d.editId ? hotelById(d.editId) : null;
     title = editing ? t('editProperty') : t('addProperty');
     const typeOptions = PROPERTY_TYPES.map((pt,idx)=>`<option value="${idx}" ${editing && editing.type===idx?'selected':''}>${esc(tl(pt))}</option>`).join('');
+    // Logo preview: an explicit pendingLogo on the drawer (set by pickHotelLogoFile / cleared by
+    // clearPendingHotelLogo) always wins — including an explicit '' meaning "remove on save".
+    // Falls back to the hotel's already-saved logo when nothing has been touched this session.
+    const hasPending = Object.prototype.hasOwnProperty.call(d, 'pendingLogo');
+    const logoSrc = hasPending ? d.pendingLogo : (editing ? editing.logo : '');
     body = `
+      <div class="logo-upload-row">
+        <div class="logo-upload" onclick="pickHotelLogoFile()" title="${t('uploadLogo')}">
+          ${logoSrc ? `<img src="${logoSrc}" alt="">` : `<div class="logo-upload-empty">${ic('apartment')}</div>`}
+          <div class="logo-upload-badge">${ic('photo_camera')}</div>
+        </div>
+        <div class="logo-upload-actions">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="pickHotelLogoFile()">${ic('image')}${t('uploadLogo')}</button>
+          ${logoSrc ? `<button type="button" class="btn btn-ghost btn-sm" onclick="clearPendingHotelLogo()">${ic('hide_image')}${t('removeLogo')}</button>` : ''}
+        </div>
+      </div>
       <div class="field"><label>${t('propNameEn')}</label><input id="pf_name_en" value="${esc(editing?editing.name.en:'')}"></div>
       <div class="field"><label>${t('propNameAr')}</label><input id="pf_name_ar" value="${esc(editing?editing.name.ar:'')}"></div>
       <div class="field"><label>${t('propType')}</label><select id="pf_type">${typeOptions}</select></div>
@@ -1150,8 +1165,19 @@ async function submitDrawer(){
       const phone = document.getElementById('pf_phone').value.trim();
       if(!name_en || !name_ar){ alert(t('required')); return; }
       const body = { name_en, name_ar, city_en, city_ar, type, contact, phone };
-      if(d.editId){ await apiPut('/hotels/' + d.editId, body); }
-      else { await apiPost('/hotels', body); }
+      let hotelId = d.editId;
+      if(hotelId){ await apiPut('/hotels/' + hotelId, body); }
+      else { const created = await apiPost('/hotels', body); hotelId = created.id; }
+      // A logo picked (or explicitly cleared) in this drawer session is staged on
+      // state.drawer.pendingLogo — save it now that the hotel definitely has an id.
+      if(Object.prototype.hasOwnProperty.call(d, 'pendingLogo')){
+        try{
+          if(d.pendingLogo){ await apiPut('/hotels/' + hotelId + '/logo', { logo: d.pendingLogo }); }
+          else { await apiDelete('/hotels/' + hotelId + '/logo'); }
+        }catch(e){
+          alert(t('logoSaveFailed'));
+        }
+      }
       state.hotels = await apiGet('/hotels');
     } else if(d.type==='inspector'){
       const name_en = document.getElementById('if_name_en').value.trim();
@@ -1889,6 +1915,31 @@ function compressLogoFile(file){
     };
     reader.readAsDataURL(file);
   });
+}
+function pickHotelLogoFile(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if(!file) return;
+    let dataUrl;
+    try{
+      dataUrl = await compressLogoFile(file);
+    }catch(e){
+      alert(t('logoSaveFailed'));
+      return;
+    }
+    if(state.drawer) state.drawer.pendingLogo = dataUrl;
+    render();
+  };
+  input.click();
+}
+// '' (empty string) is a deliberate marker meaning "remove the logo on save" — distinct from
+// undefined/absent, which means "leave whatever the hotel already has untouched".
+function clearPendingHotelLogo(){
+  if(state.drawer) state.drawer.pendingLogo = '';
+  render();
 }
 function uploadHotelLogo(hotelId){
   const input = document.createElement('input');
