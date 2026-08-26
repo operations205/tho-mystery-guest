@@ -31,6 +31,10 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"], // Chart.js is now self-hosted under /vendor, no external script CDN needed
+      // Helmet defaults script-src-attr to 'none', which silently overrides scriptSrc's
+      // 'unsafe-inline' specifically for onclick="" etc. attributes — without this the whole
+      // app's inline event handlers are inert (buttons render but do nothing on click).
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
       imgSrc: ["'self'", 'data:', 'blob:'],
