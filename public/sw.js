@@ -7,7 +7,7 @@
 // app.js/index.html would keep being served instantly from cache on every normal load,
 // and only get silently replaced in the background for the *next* load after that.)
 const CACHE_NAME = 'tho-shell-v5';
-const SHELL_FILES = ['/', '/styles.css', '/app.js', '/manifest.json'];
+const SHELL_FILES = ['/', '/styles.css', '/app.js', '/manifest.json', '/vendor/fonts/fonts.css'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

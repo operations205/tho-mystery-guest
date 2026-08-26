@@ -35,8 +35,8 @@ app.use(helmet({
       // 'unsafe-inline' specifically for onclick="" etc. attributes — without this the whole
       // app's inline event handlers are inert (buttons render but do nothing on click).
       scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      styleSrc: ["'self'", "'unsafe-inline'"], // fonts are self-hosted under /vendor/fonts now, no external font CDN needed
+      fontSrc: ["'self'", 'data:'],
       imgSrc: ["'self'", 'data:', 'blob:'],
       connectSrc: ["'self'"],
       objectSrc: ["'none'"],
