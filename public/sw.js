@@ -1,6 +1,12 @@
-// Minimal PWA service worker — caches the static app shell for fast/offline load.
+// Minimal PWA service worker — caches the static app shell for offline fallback only.
 // API calls (/api/...) always go to the network since they're live data.
-const CACHE_NAME = 'tho-shell-v4';
+//
+// Strategy: NETWORK-FIRST for the shell files, falling back to cache only when offline.
+// (Previously this was cache-first-with-background-update, which meant every deploy
+// required users to hard-refresh (Ctrl+Shift+R) to see the new version — the old cached
+// app.js/index.html would keep being served instantly from cache on every normal load,
+// and only get silently replaced in the background for the *next* load after that.)
+const CACHE_NAME = 'tho-shell-v5';
 const SHELL_FILES = ['/', '/styles.css', '/app.js', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
@@ -25,17 +31,14 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const network = fetch(event.request)
-        .then((res) => {
-          if (res && res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
+    fetch(event.request)
+      .then((res) => {
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return res;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
