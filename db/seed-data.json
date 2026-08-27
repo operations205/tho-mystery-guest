@@ -4406,6 +4406,10 @@
       "en": "Couldn't save photo. Please try again.",
       "ar": "تعذر حفظ الصورة. حاول مرة أخرى."
     },
+    "answerSaveFailed": {
+      "en": "Couldn't save — check your connection.",
+      "ar": "تعذر الحفظ — تحقق من الاتصال بالإنترنت."
+    },
     "itemPhotoLabel": {
       "en": "Photo",
       "ar": "صورة"

@@ -51,7 +51,7 @@ app.use(helmet({
 // falls back to the production domain + localhost dev ports if unset.
 const allowedOrigins = (process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
-  : ['https://thehotelieroffice.org', 'https://www.thehotelieroffice.org', 'http://localhost:3000']);
+  : ['https://thehotelieroffice.org', 'https://www.thehotelieroffice.org', 'https://tho-mystery-guest.onrender.com', 'http://localhost:3000']);
 app.use(cors({
   origin(origin, callback) {
     // requests with no Origin header (same-origin, curl, server-to-server) are always allowed

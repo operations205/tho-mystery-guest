@@ -1742,12 +1742,31 @@ async function startInspectionFromAssignment(assignmentId){
 async function resumeInspection(assignmentId){
   const as = assignmentById(assignmentId); if(!as) return;
   state.currentAssignmentId = as.id;
-  state.currentInspectionId = as.inspectionId;
   state.activeCatIndex = 0;
-  try{ await loadInspectionDetail(as.inspectionId); }catch(e){}
+  // Must fetch the full inspection (with saved answers) before opening the checklist — the
+  // list endpoint used elsewhere omits answers, so if this silently failed and we proceeded
+  // anyway, the inspector would see a checklist that LOOKS blank even though their previously
+  // saved answers are still safe on the server. Block and alert instead of guessing.
+  try{
+    await loadInspectionDetail(as.inspectionId);
+  }catch(e){
+    alert(state.lang==='ar'
+      ? 'تعذّر تحميل التفتيش المحفوظ. إجاباتك السابقة ما زالت محفوظة على السيرفر — تأكد من الاتصال بالإنترنت وحاول تاني.'
+      : "Could not load the saved inspection. Your previous answers are still safe on the server — check your connection and try again.");
+    return;
+  }
+  state.currentInspectionId = as.inspectionId;
   go('inspector-inspect');
 }
-function currentMobileInsp(){ return inspectionById(state.currentInspectionId); }
+function currentMobileInsp(){
+  const insp = inspectionById(state.currentInspectionId);
+  // Defense in depth: every render/handler below assumes insp.answers is an object. If an
+  // inspection ever gets into local state without it (e.g. from the lightweight list endpoint,
+  // which omits answers), fail safe with an empty object instead of throwing and looking like
+  // the whole inspection vanished.
+  if(insp && !insp.answers) insp.answers = {};
+  return insp;
+}
 
 /* ---- Inspector: mobile inspect flow ---- */
 function renderInspectorInspect(){
@@ -1816,14 +1835,20 @@ function setAnswerM(itemId, value){
   insp.answers[itemId].value = newVal;
   render();
   apiPut('/inspections/' + insp.id + '/answers/' + itemId, { value: newVal, note: insp.answers[itemId].note || '' })
-    .catch(e=>console.error('failed to save answer', itemId, e));
+    .catch(e=>{
+      console.error('failed to save answer', itemId, e);
+      showToast(t('answerSaveFailed'), 'error');
+    });
 }
 function setNoteM(itemId, note){
   const insp = currentMobileInsp(); if(!insp) return;
   if(!insp.answers[itemId]) insp.answers[itemId] = {};
   insp.answers[itemId].note = note;
   apiPut('/inspections/' + insp.id + '/answers/' + itemId, { value: insp.answers[itemId].value || null, note })
-    .catch(e=>console.error('failed to save note', itemId, e));
+    .catch(e=>{
+      console.error('failed to save note', itemId, e);
+      showToast(t('answerSaveFailed'), 'error');
+    });
 }
 /* Resizes/compresses a photo client-side before upload — keeps mobile uploads fast and well
    under the server's size cap, since raw phone-camera photos can be several MB each. */
