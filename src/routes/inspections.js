@@ -139,6 +139,19 @@ router.post('/:id/complete', requireRole('inspector'), (req, res) => {
   if (!insp) return res.status(404).json({ error: 'not_found' });
   if (insp.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
   if (insp.status === 'completed') return res.status(400).json({ error: 'already_completed' });
+
+  // Guard against the score formula's blind spot: overall% = yes/(yes+no), which silently
+  // excludes unanswered items from the denominator. Without this check, an inspector could
+  // submit a checklist that's mostly blank and still get a misleading 100% report. Every item
+  // must carry a real answer (yes/no/na — na is a legitimate "not applicable" answer) before
+  // the inspection can be marked complete.
+  const answers = getAnswers(req.params.id);
+  const allItems = catsForStandard(insp.standard_id).flatMap(c => c.items);
+  const unansweredCount = allItems.filter(it => !answers[it.id] || !answers[it.id].value).length;
+  if (unansweredCount > 0) {
+    return res.status(400).json({ error: 'incomplete', unansweredCount, totalItems: allItems.length });
+  }
+
   const { signature } = req.body || {}; // base64 PNG data URL, or null if skipped
   if (signature !== undefined && signature !== null && signature !== '' && !isValidImageDataUrl(signature)) {
     return res.status(400).json({ error: 'invalid_signature' });

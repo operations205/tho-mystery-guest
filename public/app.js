@@ -1817,10 +1817,33 @@ function renderInspectorInspect(){
   <div class="sticky-footnav no-print">
     <button class="btn btn-ghost btn-sm" ${state.activeCatIndex===0?'disabled':''} onclick="shiftCatM(-1)">${t('prevCat')}</button>
     ${state.activeCatIndex===cats.length-1
-      ? `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="go('inspector-sign')">${ic('task_alt')}${t('finishBtn')}</button>`
+      ? `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="attemptFinishInspection()">${ic('task_alt')}${t('finishBtn')}</button>`
       : `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="shiftCatM(1)">${t('nextCat')}</button>`}
   </div>
   `;
+}
+// Blocks moving on to the signature screen while any checklist item is unanswered. The
+// overall score formula (yes / (yes+no)) silently drops unanswered items from the denominator,
+// so a mostly-blank checklist could otherwise submit and still show a misleading 100% report.
+// This jumps the inspector straight to the first category that still needs attention.
+function attemptFinishInspection(){
+  const insp = currentMobileInsp(); if(!insp) return;
+  const cats = catsForStandard(insp.standardId || 'audit4');
+  for(let idx=0; idx<cats.length; idx++){
+    const hasUnanswered = cats[idx].items.some(it => !insp.answers[it.id] || !insp.answers[it.id].value);
+    if(hasUnanswered){
+      const sc = computeScores(insp);
+      const remaining = sc.totalItems - sc.answeredCount;
+      alert(state.lang==='ar'
+        ? `لسه فيه ${remaining} بند بدون إجابة. لازم تجاوب على كل البنود (أو تحددها "لا ينطبق") قبل إرسال التقرير.`
+        : `${remaining} item(s) still need an answer. Every item must be answered (or marked N/A) before submitting.`);
+      state.activeCatIndex = idx;
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
+  go('inspector-sign');
 }
 function setCatM(idx){ state.activeCatIndex = idx; render(); }
 function shiftCatM(dir){
@@ -2061,6 +2084,16 @@ function clearSigPad(){
 }
 async function submitSignature(skip){
   const insp = currentMobileInsp(); if(!insp) return;
+  // Defense-in-depth: attemptFinishInspection() already blocks reaching this screen while
+  // incomplete, but re-check here too in case this is ever called from another path.
+  const scCheck = computeScores(insp);
+  if(scCheck.answeredCount < scCheck.totalItems){
+    alert(state.lang==='ar'
+      ? `لسه فيه ${scCheck.totalItems - scCheck.answeredCount} بند بدون إجابة. لازم تجاوب على كل البنود قبل الإرسال.`
+      : `${scCheck.totalItems - scCheck.answeredCount} item(s) still need an answer before submitting.`);
+    go('inspector-inspect');
+    return;
+  }
   const canvas = document.getElementById('sigCanvas');
   let signature = null;
   if(!skip && canvas && sigHasInk){
@@ -2070,7 +2103,10 @@ async function submitSignature(skip){
   try{
     updated = await apiPost('/inspections/' + insp.id + '/complete', { signature });
   }catch(e){
-    alert((state.lang==='ar' ? 'تعذّر إرسال التقرير: ' : 'Could not submit the report: ') + e.message);
+    const msg = (e.data && e.data.error === 'incomplete')
+      ? (state.lang==='ar' ? `لسه فيه ${e.data.unansweredCount} بند بدون إجابة.` : `${e.data.unansweredCount} item(s) still need an answer.`)
+      : e.message;
+    alert((state.lang==='ar' ? 'تعذّر إرسال التقرير: ' : 'Could not submit the report: ') + msg);
     return;
   }
   const idx = state.inspections.findIndex(i => i.id === insp.id);
