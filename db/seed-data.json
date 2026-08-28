@@ -4469,6 +4469,66 @@
     "forgotPasswordMsg": {
       "en": "If you forgot your password, contact your system administrator to reset it.",
       "ar": "لو نسيت كلمة المرور، تواصل مع مدير النظام لإعادة تعيينها."
+    },
+    "forgotPasswordTitle": {
+      "en": "Reset your password",
+      "ar": "استرجاع كلمة السر"
+    },
+    "forgotPasswordDesc": {
+      "en": "Enter your username and, if there's an email on file for your account, we'll send a reset link.",
+      "ar": "اكتب اليوزرنيم بتاعك — لو فيه إيميل مسجل على حسابك، هيوصلك رابط لإعادة تعيين كلمة السر."
+    },
+    "forgotPasswordSentMsg": {
+      "en": "If that account has an email on file, a reset link was just sent to it. Check your inbox (and spam folder).",
+      "ar": "لو الحساب ده عليه إيميل مسجل، وصله رابط استرجاع دلوقتي. تحقق من صندوق الوارد (والـ Spam)."
+    },
+    "sendResetLink": {
+      "en": "Send reset link",
+      "ar": "ابعت رابط الاسترجاع"
+    },
+    "backToLogin": {
+      "en": "Back to login",
+      "ar": "رجوع لتسجيل الدخول"
+    },
+    "resetPasswordTitle": {
+      "en": "Set a new password",
+      "ar": "اختار كلمة سر جديدة"
+    },
+    "newPasswordLabel": {
+      "en": "New password",
+      "ar": "كلمة السر الجديدة"
+    },
+    "confirmPasswordLabel": {
+      "en": "Confirm new password",
+      "ar": "تأكيد كلمة السر الجديدة"
+    },
+    "resetPasswordBtn": {
+      "en": "Reset password",
+      "ar": "إعادة تعيين كلمة السر"
+    },
+    "resetSuccessMsg": {
+      "en": "Your password has been reset. You can now log in with your new password.",
+      "ar": "تم تغيير كلمة السر بنجاح. تقدر تدخل دلوقتي بكلمة السر الجديدة."
+    },
+    "resetInvalidTokenMsg": {
+      "en": "This reset link is invalid or has expired. Please request a new one.",
+      "ar": "رابط الاسترجاع ده مش صالح أو انتهت صلاحيته. اطلب رابط جديد."
+    },
+    "passwordTooShort": {
+      "en": "Password must be at least 6 characters.",
+      "ar": "كلمة السر لازم تكون 6 حروف على الأقل."
+    },
+    "passwordMismatch": {
+      "en": "Passwords do not match.",
+      "ar": "كلمتا السر مش متطابقتين."
+    },
+    "inspEmailHint": {
+      "en": "Used only for \"forgot password\" reset links.",
+      "ar": "بيتستخدم بس لرابط استرجاع كلمة السر."
+    },
+    "profileEmailHint": {
+      "en": "Used to send you a \"forgot password\" reset link if you're ever locked out.",
+      "ar": "بيتستخدم عشان نبعتلك رابط استرجاع كلمة السر لو اتقفلت برة حسابك."
     }
   },
   "defaultHotelsData": [

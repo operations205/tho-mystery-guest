@@ -9,10 +9,26 @@ CREATE TABLE IF NOT EXISTS users (
   name_ar TEXT NOT NULL,
   title_en TEXT DEFAULT '',
   title_ar TEXT DEFAULT '',
+  email TEXT DEFAULT '',
   hotel_id TEXT REFERENCES hotels(id) ON DELETE CASCADE,
   token_version INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL
 );
+
+-- Self-service "forgot password" reset tokens. Only a hash of the raw token is stored (like
+-- password_hash) so a DB read alone can never be used to reset an account. Tokens are single-use
+-- (used flag) and short-lived (expires_at); requesting a new one for the same user should
+-- invalidate any earlier unused tokens (enforced in the route, not here).
+CREATE TABLE IF NOT EXISTS password_resets (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
+CREATE INDEX IF NOT EXISTS idx_password_resets_hash ON password_resets(token_hash);
 
 CREATE TABLE IF NOT EXISTS hotels (
   id TEXT PRIMARY KEY,

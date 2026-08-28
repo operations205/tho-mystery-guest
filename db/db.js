@@ -50,6 +50,13 @@ if (!columnExists('users', 'token_version')) {
   console.log('[migrate] users.token_version column added — all existing sessions will need to log in again');
 }
 
+// users.email — additive column for self-service "forgot password" (sends a reset link to
+// whatever's on file here). Existing accounts simply have '' until an admin fills it in.
+if (!columnExists('users', 'email')) {
+  db.exec("ALTER TABLE users ADD COLUMN email TEXT DEFAULT ''");
+  console.log('[migrate] users.email column added');
+}
+
 // users: allow role='hotel' + hotel_id column. SQLite can't ALTER a CHECK constraint, so an
 // existing users table (created before this change) needs to be rebuilt.
 const usersTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get();
@@ -71,11 +78,15 @@ if (usersTableSql && !usersTableSql.sql.includes("'hotel'")) {
       name_ar TEXT NOT NULL,
       title_en TEXT DEFAULT '',
       title_ar TEXT DEFAULT '',
+      email TEXT DEFAULT '',
       hotel_id TEXT REFERENCES hotels(id) ON DELETE CASCADE,
+      token_version INTEGER NOT NULL DEFAULT 0,
       created_at INTEGER NOT NULL
     )`);
-    db.exec(`INSERT INTO users (id, role, username, password_hash, name_en, name_ar, title_en, title_ar, hotel_id, created_at)
-      SELECT id, role, username, password_hash, name_en, name_ar, title_en, title_ar, NULL, created_at FROM users_old`);
+    const oldHasEmail = columnExists('users_old', 'email');
+    const oldHasTokenVersion = columnExists('users_old', 'token_version');
+    db.exec(`INSERT INTO users (id, role, username, password_hash, name_en, name_ar, title_en, title_ar, email, hotel_id, token_version, created_at)
+      SELECT id, role, username, password_hash, name_en, name_ar, title_en, title_ar, ${oldHasEmail ? 'email' : "''"}, NULL, ${oldHasTokenVersion ? 'token_version' : '0'}, created_at FROM users_old`);
     db.exec('DROP TABLE users_old');
     db.exec('COMMIT');
     console.log('[migrate] users table upgraded — hotel role + hotel_id column added');

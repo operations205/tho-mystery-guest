@@ -297,7 +297,7 @@ async function loadData(){
   PROPERTY_TYPES = standardsMeta.PROPERTY_TYPES;
   CATS = audit4Cats;
   CATS_PLUS_EXTRA = plus5Cats.slice(audit4Cats.length); // plus5 endpoint already returns audit4+extra; keep only the extra part
-  USERS = [ { id: me.id, role: me.role, username: me.username, name: me.name, title: me.title }, ...inspectors ];
+  USERS = [ { id: me.id, role: me.role, username: me.username, name: me.name, title: me.title, email: me.email }, ...inspectors ];
   state.hotels = hotels;
   state.assignments = assignments;
   state.inspections = inspections;
@@ -485,7 +485,7 @@ function renderLogin(){
           <input id="f_password" type="password" style="text-align:left;" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${t('password')}" aria-label="${t('password')}" onkeydown="if(event.key==='Enter')attemptLogin()">
           <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('f_password', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
         </div>
-        <div class="login-forgot"><a onclick="showToast(t('forgotPasswordMsg'))">${t('forgotPassword')}</a></div>
+        <div class="login-forgot"><a onclick="go('forgot-password')">${t('forgotPassword')}</a></div>
         <button class="btn btn-primary btn-block" onclick="attemptLogin()">${ic('arrow_forward')}${t('loginBtn')}</button>
         ${state.loginRole==='hotel' ? `
         <p style="font-size:12px;color:var(--muted);margin-top:16px;text-align:center;">${t('hotelLoginHint')}</p>
@@ -494,6 +494,87 @@ function renderLogin(){
       </div>
     </div>
   </div>`;
+}
+
+function renderAuthCard(inner){
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4f6f9;padding:20px;">
+    <div style="max-width:400px;width:100%;background:#fff;border-radius:14px;padding:32px 28px;box-shadow:0 10px 30px rgba(0,0,0,.08);">
+      <img src="/logo-black.png" alt="THO" style="height:34px;margin-bottom:20px;">
+      ${inner}
+    </div>
+  </div>`;
+}
+
+function renderForgotPassword(){
+  const body = state.fpSent
+    ? `<div class="alert" style="background:var(--gold-soft);color:#7a5600;border-color:#f0dca0;margin-bottom:16px;">${ic('mail')}<div>${t('forgotPasswordSentMsg')}</div></div>`
+    : `
+      <div class="field-icon-wrap" dir="ltr">
+        <span class="fi-icon">${ic('person')}</span>
+        <input id="fp_username" type="text" style="text-align:left;" autocapitalize="off" autocomplete="username" placeholder="${t('username')}" aria-label="${t('username')}" onkeydown="if(event.key==='Enter')submitForgotPassword()">
+      </div>
+      ${state.fpError ? `<div class="login-error">${ic('error')}${esc(state.fpError)}</div>` : ''}
+      <button class="btn btn-primary btn-block" onclick="submitForgotPassword()">${ic('mail')}${t('sendResetLink')}</button>
+    `;
+  return renderAuthCard(`
+    <h2 style="margin:0 0 8px;">${t('forgotPasswordTitle')}</h2>
+    <p style="margin:0 0 20px;color:var(--muted);font-size:14px;">${t('forgotPasswordDesc')}</p>
+    ${body}
+    <div class="login-forgot" style="margin-top:16px;"><a onclick="state.fpSent=false;state.fpError='';go('login')">${t('backToLogin')}</a></div>
+  `);
+}
+async function submitForgotPassword(){
+  const username = (document.getElementById('fp_username')||{}).value || '';
+  if(!username.trim()) return;
+  state.fpError = '';
+  try{
+    await apiPost('/auth/forgot-password', { username: username.trim() });
+  }catch(e){
+    state.fpError = (state.lang==='ar' ? 'حصل خطأ، حاول تاني.' : 'Something went wrong, try again.');
+    render();
+    return;
+  }
+  state.fpSent = true;
+  render();
+}
+
+function renderResetPassword(){
+  const body = state.rpDone
+    ? `<div class="alert" style="background:var(--gold-soft);color:#7a5600;border-color:#f0dca0;margin-bottom:16px;">${ic('check_circle')}<div>${t('resetSuccessMsg')}</div></div>
+       <button class="btn btn-primary btn-block" onclick="go('login')">${t('backToLogin')}</button>`
+    : `
+      <div class="field"><label>${t('newPasswordLabel')}</label>${pwField('rp_new_pw','new-password')}</div>
+      <div class="field"><label>${t('confirmPasswordLabel')}</label>${pwField('rp_confirm_pw','new-password')}</div>
+      ${state.rpError ? `<div class="login-error">${ic('error')}${esc(state.rpError)}</div>` : ''}
+      <button class="btn btn-primary btn-block" onclick="submitResetPassword()">${ic('lock_reset')}${t('resetPasswordBtn')}</button>
+    `;
+  return renderAuthCard(`
+    <h2 style="margin:0 0 8px;">${t('resetPasswordTitle')}</h2>
+    ${body}
+    ${!state.rpDone ? `<div class="login-forgot" style="margin-top:16px;"><a onclick="go('login')">${t('backToLogin')}</a></div>` : ''}
+  `);
+}
+async function submitResetPassword(){
+  const newPw = (document.getElementById('rp_new_pw')||{}).value || '';
+  const confirmPw = (document.getElementById('rp_confirm_pw')||{}).value || '';
+  state.rpError = '';
+  if(newPw.length < 6){
+    state.rpError = t('passwordTooShort') || (state.lang==='ar' ? 'كلمة السر لازم تكون 6 حروف على الأقل.' : 'Password must be at least 6 characters.');
+    render(); return;
+  }
+  if(newPw !== confirmPw){
+    state.rpError = t('passwordMismatch') || (state.lang==='ar' ? 'كلمتا السر مش متطابقتين.' : 'Passwords do not match.');
+    render(); return;
+  }
+  try{
+    await apiPost('/auth/reset-password', { token: state.resetToken, new_password: newPw });
+  }catch(e){
+    state.rpError = t('resetInvalidTokenMsg');
+    render(); return;
+  }
+  state.rpDone = true;
+  render();
 }
 
 /* ===================== ADMIN SHELL ===================== */
@@ -1092,6 +1173,9 @@ function renderDrawer(){
       <div class="field"><label>${t('inspUsername')}</label><input id="if_username" dir="ltr" style="text-align:left;" autocapitalize="off" value="${esc(editing?editing.username:'')}">${editing ? `<div class="hint">${t('usernameEditHint')}</div>` : ''}</div>
       <div class="field"><label>${t('inspTitleEn')}</label><input id="if_title_en" value="${esc(editing?editing.title.en:'Inspector')}"></div>
       <div class="field"><label>${t('inspTitleAr')}</label><input id="if_title_ar" value="${esc(editing?editing.title.ar:'مفتش')}"></div>
+      <div class="field"><label>${t('settingsEmail')}</label><input id="if_email" type="email" dir="ltr" style="text-align:left;" value="${esc(editing?editing.email:'')}">
+        <div class="hint">${t('inspEmailHint')}</div>
+      </div>
       ${!editing ? `<div class="field"><div class="hint">${t('tempPassHint')}</div></div>` : ''}
     `;
   } else if(d.type==='assignment'){
@@ -1136,6 +1220,9 @@ function renderDrawer(){
     body = `
       <div class="field"><label>${t('profileNameEn')}</label><input id="mf_name_en" value="${esc(me.name.en)}"></div>
       <div class="field"><label>${t('profileNameAr')}</label><input id="mf_name_ar" value="${esc(me.name.ar)}"></div>
+      <div class="field"><label>${t('settingsEmail')}</label><input id="mf_email" type="email" dir="ltr" style="text-align:left;" value="${esc(me.email||'')}">
+        <div class="hint">${t('profileEmailHint')}</div>
+      </div>
       <hr style="margin:20px 0 16px;border:none;border-top:1px solid var(--border);">
       <h4 style="margin:0 0 10px;">${t('changePasswordBtn')}</h4>
       <div class="field"><label>${t('currentPassword')}</label>${pwField('mf_cur_pw','current-password')}</div>
@@ -1187,12 +1274,13 @@ async function submitDrawer(){
       const name_ar = document.getElementById('if_name_ar').value.trim();
       const title_en = document.getElementById('if_title_en').value.trim();
       const title_ar = document.getElementById('if_title_ar').value.trim();
+      const email = document.getElementById('if_email').value.trim();
       if(!name_en || !name_ar){ alert(t('required')); return; }
       const username = document.getElementById('if_username').value.trim();
       if(d.editId){
-        await apiPut('/inspectors/' + d.editId, { name_en, name_ar, title_en, title_ar, username });
+        await apiPut('/inspectors/' + d.editId, { name_en, name_ar, title_en, title_ar, username, email });
       } else {
-        const created = await apiPost('/inspectors', { name_en, name_ar, username, title_en, title_ar });
+        const created = await apiPost('/inspectors', { name_en, name_ar, username, title_en, title_ar, email });
         alert((state.lang==='ar' ? 'كلمة المرور المؤقتة للمفتش الجديد: ' : 'Temporary password for the new inspector: ') + created.tempPassword);
       }
       const inspectors = await apiGet('/inspectors');
@@ -1224,10 +1312,11 @@ async function submitDrawer(){
     } else if(d.type==='profile'){
       const name_en = document.getElementById('mf_name_en').value.trim();
       const name_ar = document.getElementById('mf_name_ar').value.trim();
+      const email = document.getElementById('mf_email').value.trim();
       if(!name_en || !name_ar){ alert(t('required')); return; }
-      const result = await apiPut('/auth/me', { name_en, name_ar });
+      const result = await apiPut('/auth/me', { name_en, name_ar, email });
       const me = USERS.find(u=>u.id===state.session.userId);
-      if(me) me.name = result.user.name;
+      if(me){ me.name = result.user.name; me.email = result.user.email; }
       // If the password fields were filled in, honor them too instead of silently dropping
       // them just because the user clicked the main Save button instead of the small inline
       // "change password" button (see tryChangePassword's comment for the full bug this fixes).
@@ -2129,7 +2218,11 @@ function renderInspectorReport(){
 /* ===================== ROOT RENDER ===================== */
 function render(){
   let html = '';
-  if(!state.session || state.view==='login'){
+  if(state.view==='forgot-password'){
+    html = renderForgotPassword();
+  } else if(state.view==='reset-password'){
+    html = renderResetPassword();
+  } else if(!state.session || state.view==='login'){
     html = renderLogin();
   } else if(state.session.role==='admin'){
     let content = '';
@@ -2170,7 +2263,12 @@ async function boot(){
   }
   document.documentElement.lang = state.lang;
   document.documentElement.dir = state.lang==='ar' ? 'rtl':'ltr';
-  if(state.session){
+  const urlParams = new URLSearchParams(window.location.search);
+  const resetToken = window.location.pathname === '/reset-password' ? urlParams.get('token') : null;
+  if(resetToken){
+    state.view = 'reset-password';
+    state.resetToken = resetToken;
+  } else if(state.session){
     state.view = state.session.role==='admin' ? 'admin-overview'
       : state.session.role==='hotel' ? 'hotel-reports'
       : 'inspector-home';
