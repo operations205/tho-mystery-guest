@@ -8,6 +8,26 @@ const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const { seed } = require('./db/seed');
 seed();
 
+// Break-glass admin password recovery. There is no self-service "forgot password" flow yet
+// (that's a separate feature), so a locked-out admin has no way back in without direct DB
+// access. If ADMIN_RESET_PASSWORD is set at boot, the oldest admin account's password is force
+// -reset to it and every existing session for that account is invalidated (token_version bump)
+// so old/leaked sessions can't linger. This is meant to be set for exactly one restart and then
+// removed immediately — leaving it set means anyone who discovers the value could reset the
+// admin password again on the next restart.
+if (process.env.ADMIN_RESET_PASSWORD) {
+  const bcrypt = require('bcryptjs');
+  const db = require('./db/db');
+  const admin = db.prepare("SELECT * FROM users WHERE role='admin' ORDER BY created_at ASC LIMIT 1").get();
+  if (admin) {
+    const hash = bcrypt.hashSync(process.env.ADMIN_RESET_PASSWORD, 10);
+    db.prepare('UPDATE users SET password_hash=?, token_version = token_version + 1 WHERE id=?').run(hash, admin.id);
+    console.log(`[recovery] password for admin account '${admin.username}' was reset via ADMIN_RESET_PASSWORD. REMOVE THIS ENV VAR NOW.`);
+  } else {
+    console.log('[recovery] ADMIN_RESET_PASSWORD was set but no admin user exists.');
+  }
+}
+
 const authRoutes = require('./src/routes/auth');
 const hotelRoutes = require('./src/routes/hotels');
 const inspectorRoutes = require('./src/routes/inspectors');
