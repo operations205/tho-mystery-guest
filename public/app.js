@@ -1807,13 +1807,22 @@ function renderCharts(sc, cats){
   const catCanvas = document.getElementById('chartCat');
   const clsCanvas = document.getElementById('chartCls');
   if(catCanvas){
-    const labels = cats.map(c=>tc(c));
-    const data = cats.map(c=> sc.catScores[c.id]===null ? 0 : sc.catScores[c.id]);
+    // Charting all 43-60 raw categories as individual horizontal bars packed this chart's
+    // print-mode height (capped small so the charts-row fits on one page) down to a few px per
+    // bar, which anti-aliased into an illegible striped mess rather than readable bars. Every
+    // category's exact score is already shown as a % header on its own section further down in
+    // the report, so this summary chart rolls categories up into the same 6 operational key
+    // areas used on the cover page instead -- a fixed, small bar count that stays legible at any
+    // print size and matches the story already told on the cover.
+    const keyAreaScores = computeKeyAreaScores(sc, cats);
+    const areaIds = Object.keys(KEY_AREAS);
+    const labels = areaIds.map(id=>tl(KEY_AREAS[id]));
+    const data = areaIds.map(id=> keyAreaScores[id]===null ? 0 : keyAreaScores[id]);
     const colors = data.map(v=> v>=85?'#1c8a4b':(v>=65?'#c98a13':'#c0392b'));
     chartRefs.push(new Chart(catCanvas, {
       type:'bar',
       data:{labels, datasets:[{data, backgroundColor:colors, borderRadius:5}]},
-      options:{animation:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100}}, indexAxis:'y'}
+      options:{animation:false, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100}, y:{ticks:{autoSkip:false}}}, indexAxis:'y'}
     }));
   }
   if(clsCanvas){
@@ -1827,7 +1836,7 @@ function renderCharts(sc, cats){
     chartRefs.push(new Chart(clsCanvas, {
       type:'bar',
       data:{labels, datasets:[{data, backgroundColor:colors, borderRadius:5}]},
-      options:{animation:false, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100}}, indexAxis:'y'}
+      options:{animation:false, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100}, y:{ticks:{autoSkip:false}}}, indexAxis:'y'}
     }));
   }
 }

@@ -628,7 +628,7 @@
 
     .charts-row{grid-template-columns:1fr 1fr !important;gap:8px;margin-bottom:8px;page-break-inside:avoid;}
     .chart-card{padding:6px 8px;page-break-inside:avoid;}
-    .chart-card canvas{max-height:95px !important;}
+    .chart-card canvas{max-height:150px !important;}
     .chart-card h3{font-size:10px;margin:0 0 4px;}
 
     /* ---- Cover page: a real standalone executive-summary page. The detailed, item-by-item

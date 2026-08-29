@@ -3507,8 +3507,8 @@
       "ar": "تم رصد إخفاق في معيار جوهري - يتطلب تدخل الإدارة فورًا."
     },
     "byCategory": {
-      "en": "Score by Category",
-      "ar": "النتيجة حسب الفئة"
+      "en": "Score by Key Area",
+      "ar": "النتيجة حسب المحاور الرئيسية"
     },
     "byClassification": {
       "en": "Score by Standard Type",
