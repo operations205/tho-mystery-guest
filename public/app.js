@@ -1604,10 +1604,13 @@ function renderCharts(sc, cats){
     const labels = keys.map(k=>tcls(k));
     const data = keys.map(k=>sc.clsPct[k]);
     const colors = keys.map(k=>CLASS_META[k].color);
+    // Horizontal bars, same as the by-category chart above -- a vertical layout left the
+    // Arabic classification labels (e.g. "جودة الخدمة") too long to fit under narrow columns,
+    // so Chart.js's tick auto-skip was silently dropping most of them.
     chartRefs.push(new Chart(clsCanvas, {
       type:'bar',
       data:{labels, datasets:[{data, backgroundColor:colors, borderRadius:5}]},
-      options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100}}}
+      options:{plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100}}, indexAxis:'y'}
     }));
   }
 }
