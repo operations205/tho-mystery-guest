@@ -1414,6 +1414,9 @@ async function changeMyPassword(){
 
 /* ===================== SHARED: REPORT VIEW (dual-mode: detailed / summary) ===================== */
 let chartRefs = [];
+// Print export awaits this instead of a guessed timeout (see boot()'s print-only branch and
+// the note on renderCharts() below) so PDF generation never races Chart.js's own drawing.
+let chartsRenderPromise = null;
 function setReportMode(mode){ state.reportMode = mode; render(); }
 
 function renderSignatureBlock(insp){
@@ -1543,7 +1546,10 @@ function renderReportBody(insp, backAction){
         + (weakestCat ? ` Top priority for improvement: <strong>${esc(tc(weakestCat))}</strong> (${weakestScore}%).` : '')
   }</p>`;
 
-  setTimeout(()=>renderCharts(sc, catsForStandard(insp.standardId || 'audit4')), 30);
+  chartsRenderPromise = new Promise(resolve => setTimeout(()=>{
+    renderCharts(sc, catsForStandard(insp.standardId || 'audit4'));
+    resolve();
+  }, 0));
 
   return `
   <div class="top-actions no-print">
@@ -1596,7 +1602,7 @@ function renderCharts(sc, cats){
     chartRefs.push(new Chart(catCanvas, {
       type:'bar',
       data:{labels, datasets:[{data, backgroundColor:colors, borderRadius:5}]},
-      options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100}}, indexAxis:'y'}
+      options:{animation:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100}}, indexAxis:'y'}
     }));
   }
   if(clsCanvas){
@@ -1610,7 +1616,7 @@ function renderCharts(sc, cats){
     chartRefs.push(new Chart(clsCanvas, {
       type:'bar',
       data:{labels, datasets:[{data, backgroundColor:colors, borderRadius:5}]},
-      options:{plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100}}, indexAxis:'y'}
+      options:{animation:false, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100}}, indexAxis:'y'}
     }));
   }
 }
@@ -2331,12 +2337,18 @@ async function boot(){
     state.view = 'print-only';
     document.body.classList.add('print-mode');
     render();
-    // Wait for the (self-hosted) Material Symbols icon font to actually finish loading before
-    // telling Puppeteer it's safe to snapshot -- otherwise the very first render in a cold
-    // headless Chrome instance captures the icon ligature names as literal text (e.g. "badge",
-    // "warning") instead of the glyphs, because the @font-face swap hasn't applied yet.
+    // Wait for charts to actually finish drawing (not a guessed delay -- see chartsRenderPromise
+    // above) and for the (self-hosted) Material Symbols icon font to finish loading, before
+    // telling Puppeteer it's safe to snapshot. A fixed timeout here previously raced Chart.js's
+    // own async rendering on slower hardware: it was long enough in local testing but not
+    // reliably long enough on the production instance, which is exactly why this bug looked
+    // intermittent -- correct locally, broken live.
     const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-    fontsReady.then(()=>{ setTimeout(()=>{ window.__printReady = true; }, 300); });
+    await Promise.all([fontsReady, chartsRenderPromise || Promise.resolve()]);
+    // One more animation frame so the just-finished chart draw has actually been composited to
+    // the screen before Puppeteer captures it.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    window.__printReady = true;
     return;
   } else if(state.session){
     state.view = state.session.role==='admin' ? 'admin-overview'
