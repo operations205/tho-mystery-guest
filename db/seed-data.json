@@ -3478,6 +3478,10 @@
       "en": "Print / Export PDF",
       "ar": "طباعة / تصدير PDF"
     },
+    "exportPdfBtn": {
+      "en": "Export PDF",
+      "ar": "تصدير PDF"
+    },
     "overallScore": {
       "en": "Overall Score",
       "ar": "النتيجة الإجمالية"
@@ -4324,7 +4328,7 @@
     },
     "resetPasswordBtn": {
       "en": "Reset password",
-      "ar": "إعادة تعيين كلمة المرور"
+      "ar": "إعادة تعيين كلمة السر"
     },
     "confirmResetInspectorPassword": {
       "en": "Reset this inspector's password? A new temporary password will be generated.",
@@ -4351,12 +4355,12 @@
       "ar": "تغيير كلمة المرور"
     },
     "passwordMismatch": {
-      "en": "New passwords don't match.",
-      "ar": "كلمتا المرور الجديدتان غير متطابقتين."
+      "en": "Passwords do not match.",
+      "ar": "كلمتا السر مش متطابقتين."
     },
     "passwordTooShort": {
       "en": "Password must be at least 6 characters.",
-      "ar": "كلمة المرور لازم تكون 6 حروف على الأقل."
+      "ar": "كلمة السر لازم تكون 6 حروف على الأقل."
     },
     "passwordChanged": {
       "en": "Password changed successfully.",
@@ -4502,10 +4506,6 @@
       "en": "Confirm new password",
       "ar": "تأكيد كلمة السر الجديدة"
     },
-    "resetPasswordBtn": {
-      "en": "Reset password",
-      "ar": "إعادة تعيين كلمة السر"
-    },
     "resetSuccessMsg": {
       "en": "Your password has been reset. You can now log in with your new password.",
       "ar": "تم تغيير كلمة السر بنجاح. تقدر تدخل دلوقتي بكلمة السر الجديدة."
@@ -4513,14 +4513,6 @@
     "resetInvalidTokenMsg": {
       "en": "This reset link is invalid or has expired. Please request a new one.",
       "ar": "رابط الاسترجاع ده مش صالح أو انتهت صلاحيته. اطلب رابط جديد."
-    },
-    "passwordTooShort": {
-      "en": "Password must be at least 6 characters.",
-      "ar": "كلمة السر لازم تكون 6 حروف على الأقل."
-    },
-    "passwordMismatch": {
-      "en": "Passwords do not match.",
-      "ar": "كلمتا السر مش متطابقتين."
     },
     "inspEmailHint": {
       "en": "Used only for \"forgot password\" reset links.",

@@ -3,6 +3,8 @@ const db = require('../../db/db');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { isValidImageDataUrl } = require('../utils/validateImage');
 const { computeScores, catsForStandard } = require('../lib/standards');
+const { renderInspectionPdf } = require('../lib/pdfExport');
+const { resolveAppOrigin } = require('../utils/origin');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -58,6 +60,37 @@ router.get('/:id', (req, res) => {
   if (req.user.role === 'inspector' && row.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
   if (req.user.role === 'hotel' && !hotelCanSee(row, req.user)) return res.status(403).json({ error: 'forbidden' });
   res.json(toPublic(row, true));
+});
+
+// PDF export -- same visibility rule as GET /:id (admin sees all, inspector sees own,
+// hotel sees own *completed* reports), then hands off to a headless-Chrome render of the
+// exact same report the browser shows, so Arabic/RTL content comes out correctly.
+router.get('/:id/pdf', async (req, res) => {
+  const row = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  if (req.user.role === 'inspector' && row.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
+  if (req.user.role === 'hotel' && !hotelCanSee(row, req.user)) return res.status(403).json({ error: 'forbidden' });
+
+  try {
+    // Navigate Puppeteer to the app's own public origin rather than a bare loopback address.
+    // The server's CORS allowlist checks the Origin header on every request -- including
+    // same-page font/asset fetches, which browsers always send in CORS mode regardless of
+    // same-origin-ness -- so a loopback origin like http://127.0.0.1:PORT that isn't on that
+    // allowlist gets its own fonts blocked with a 403, breaking icons in the render. Reusing
+    // resolveAppOrigin keeps this in lockstep with whatever's actually configured as allowed.
+    const pdf = await renderInspectionPdf({
+      origin: resolveAppOrigin(req),
+      cookieName: 'tho_token',
+      cookieValue: req.cookies.tho_token,
+      inspectionId: row.id
+    });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="report-${row.id}.pdf"`);
+    res.send(Buffer.from(pdf));
+  } catch (e) {
+    console.error('[pdf-export] failed', e.message);
+    res.status(500).json({ error: 'pdf_generation_failed' });
+  }
 });
 
 router.get('/:id/score', (req, res) => {

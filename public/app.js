@@ -1479,6 +1479,11 @@ function renderFullDetail(insp){
   }).join('');
 }
 
+function exportReportPdf(id){
+  // A same-origin GET download carries the existing session cookie automatically, so this
+  // just needs to open the export route -- no fetch/blob plumbing required.
+  window.open('/api/inspections/' + id + '/pdf', '_blank');
+}
 function renderReportBody(insp, backAction){
   const sc = computeScores(insp);
   const grade = gradeInfo(sc.overall, sc.criticalFails.length>0);
@@ -1505,12 +1510,34 @@ function renderReportBody(insp, backAction){
         <div class="stat"><div class="stat-ic" style="${sc.criticalFails.length>0?'background:var(--red-bg);color:var(--red);':''}">${ic('report')}</div><div><div class="num" style="color:${sc.criticalFails.length>0?'var(--red)':'var(--navy)'}">${sc.criticalFails.length}</div><div class="lbl">${t('criticalCountLabel')}</div></div></div>
       </div>`;
 
+  // Weakest-scoring category, used to give the exec summary one concrete, prioritized pointer
+  // instead of just restating the headline number.
+  const catList = catsForStandard(insp.standardId || 'audit4');
+  let weakestCat = null, weakestScore = 101;
+  catList.forEach(c=>{
+    const s = sc.catScores[c.id];
+    if(s!==null && s < weakestScore){ weakestScore = s; weakestCat = c; }
+  });
+  const execSummaryHtml = `<p class="exec-summary">${
+    state.lang==='ar'
+      ? `شمل هذا التفتيش ${sc.totalItems} معيارًا موزعة على ${catList.length} فئة في ${esc(insp.property)}، وجاءت النتيجة الإجمالية ${sc.overall}% (${grade.label}).`
+        + (sc.criticalFails.length>0
+            ? ` رُصدت ${sc.criticalFails.length} نقطة حرجة تستدعي معالجة فورية.`
+            : ' لم تُرصد أي نقاط حرجة خلال الزيارة.')
+        + (weakestCat ? ` أعلى أولوية للتحسين: <strong>${esc(tc(weakestCat))}</strong> (${weakestScore}%).` : '')
+      : `This inspection covered ${sc.totalItems} criteria across ${catList.length} categories at ${esc(insp.property)}, with an overall score of ${sc.overall}% (${grade.label}).`
+        + (sc.criticalFails.length>0
+            ? ` ${sc.criticalFails.length} critical issue(s) require immediate attention.`
+            : ' No critical issues were found during the visit.')
+        + (weakestCat ? ` Top priority for improvement: <strong>${esc(tc(weakestCat))}</strong> (${weakestScore}%).` : '')
+  }</p>`;
+
   setTimeout(()=>renderCharts(sc, catsForStandard(insp.standardId || 'audit4')), 30);
 
   return `
   <div class="top-actions no-print">
     <button class="btn btn-ghost btn-sm" onclick="${backAction}">${ic('arrow_back')}${t('backDash')}</button>
-    <button class="btn btn-primary btn-sm" onclick="window.print()">${ic('print')}${t('printBtn')}</button>
+    <button class="btn btn-primary btn-sm" onclick="exportReportPdf('${insp.id}')">${ic('picture_as_pdf')}${t('exportPdfBtn')}</button>
     ${state.session && state.session.role==='admin' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteInspectionReport('${insp.id}')">${ic('delete')}${t('delete')}</button>` : ''}
   </div>
   <div class="report-mode-tabs no-print">
@@ -1533,6 +1560,7 @@ function renderReportBody(insp, backAction){
       <span class="grade-pill" style="background:var(--navy);color:#fff;margin-inline-start:6px;">${ic('workspace_premium')}${standardName(insp.standardId || 'audit4')}</span>
     </div>
   </div>
+  ${execSummaryHtml}
   ${renderMetaStrip(insp)}
   ${alertHtml}
   ${chartsHtml}
@@ -2217,6 +2245,13 @@ function renderInspectorReport(){
 
 /* ===================== ROOT RENDER ===================== */
 function render(){
+  if(state.view==='print-only'){
+    const insp = inspectionById(state.currentInspectionId);
+    document.getElementById('app').innerHTML = insp
+      ? `<div class="print-only-wrap">${renderReportBody(insp, '')}</div>`
+      : '<div style="padding:60px 20px;text-align:center;color:#c0392b;font-family:sans-serif;">Report not found</div>';
+    return;
+  }
   let html = '';
   if(state.view==='forgot-password'){
     html = renderForgotPassword();
@@ -2268,6 +2303,24 @@ async function boot(){
   if(resetToken){
     state.view = 'reset-password';
     state.resetToken = resetToken;
+  } else if(urlParams.get('printReport') && state.session){
+    // Dedicated headless-render mode used by the server's PDF export (Puppeteer navigates here
+    // with the same session cookie). Renders just the report card, no shell/nav, and flips
+    // window.__printReady once charts have had time to paint so Puppeteer knows when to snapshot.
+    const printId = urlParams.get('printReport');
+    state.reportMode = 'detailed';
+    try{ await loadInspectionDetail(printId); }catch(e){}
+    state.currentInspectionId = printId;
+    state.view = 'print-only';
+    document.body.classList.add('print-mode');
+    render();
+    // Wait for the (self-hosted) Material Symbols icon font to actually finish loading before
+    // telling Puppeteer it's safe to snapshot -- otherwise the very first render in a cold
+    // headless Chrome instance captures the icon ligature names as literal text (e.g. "badge",
+    // "warning") instead of the glyphs, because the @font-face swap hasn't applied yet.
+    const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    fontsReady.then(()=>{ setTimeout(()=>{ window.__printReady = true; }, 300); });
+    return;
   } else if(state.session){
     state.view = state.session.role==='admin' ? 'admin-overview'
       : state.session.role==='hotel' ? 'hotel-reports'

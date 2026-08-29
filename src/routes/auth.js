@@ -6,6 +6,7 @@ const db = require('../../db/db');
 const { signToken, requireAuth } = require('../middleware/auth');
 const { sendPasswordResetEmail, isConfigured: mailerConfigured } = require('../lib/mailer');
 const { withinLength } = require('../utils/validate');
+const { resolveAppOrigin } = require('../utils/origin');
 
 const router = express.Router();
 
@@ -41,15 +42,6 @@ function hashResetToken(rawToken) {
 // the app is reachable at both the custom domain and the onrender.com URL (see the CORS
 // allowlist in server.js), so trust the request's own Origin header when it's one of the
 // allowed ones instead of hardcoding a single base URL.
-function resolveAppOrigin(req) {
-  const allowedOrigins = (process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
-    : ['https://thehotelieroffice.org', 'https://www.thehotelieroffice.org', 'https://tho-mystery-guest.onrender.com', 'http://localhost:3000']);
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) return origin;
-  return allowedOrigins[0];
-}
-
 router.post('/login', (req, res) => {
   const { username, password, role } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: 'missing_fields' });
