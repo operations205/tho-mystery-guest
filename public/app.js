@@ -1462,7 +1462,7 @@ function renderFullDetail(insp){
       if(a.value==='yes') badge = `<span class="badge badge-green fi-badge">${t('yes')}</span>`;
       else if(a.value==='no') badge = `<span class="badge badge-red fi-badge">${t('no')}</span>`;
       else if(a.value==='na') badge = `<span class="badge badge-gray fi-badge">${t('na')}</span>`;
-      return `<div class="full-item-row">
+      return `<div class="full-item-row" style="border-inline-start:4px solid ${CLASS_META[item.cls].color}">
         <div class="fi-left">
           <div class="fi-text">${ti(item)}${item.crit?`<span class="item-crit">${ic('priority_high')}${state.lang==='ar'?'جوهري':'Critical'}</span>`:''}</div>
           <span class="fi-tag" style="background:${CLASS_META[item.cls].color}">${tcls(item.cls)}</span>

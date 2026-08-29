@@ -332,43 +332,6 @@
   .detail-item{padding:11px 16px;border-top:1px solid var(--border);font-size:13.5px;display:flex;justify-content:space-between;gap:10px;}
   .detail-item .note{color:var(--muted);font-size:12.5px;margin-top:3px;}
   .top-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
-  @media print{
-    .no-print{display:none !important;}
-    body{background:#fff;}
-    .admin-shell,.insp-app-outer{display:block !important;}
-    .admin-sidebar,.insp-topbar,.insp-bottomnav,.admin-topbar{display:none !important;}
-    .admin-content{padding:0;max-width:100%;}
-    .card,.chart-card{border:none;box-shadow:none;}
-
-    /* Compact, dense report layout — the default sizes/spacing are tuned for on-screen reading
-       and were producing wildly over-long printouts (~40 pages for a full checklist). Print
-       specifically gets a smaller base size and tighter padding throughout the report. */
-    body,.card,.full-item-row,.detail-item,.exec-summary,.report-meta-strip,.chart-card{font-size:12px;}
-    .full-item-row{padding:5px 0;}
-    .detail-item{padding:6px 0;}
-    .fc-head{padding:6px 2px;}
-    .score-hero{padding:14px 16px;margin-bottom:10px;}
-    .score-circle{width:76px;height:76px;border-width:4px;}
-    .score-circle .n{font-size:20px;}
-    .exec-summary{margin:0 0 12px;line-height:1.5;}
-    .report-meta-strip{margin-bottom:10px;}
-    .charts-row{grid-template-columns:1fr 1fr !important;gap:10px;margin-bottom:12px;page-break-inside:avoid;}
-    .chart-card{padding:8px 10px;page-break-inside:avoid;}
-    .chart-card canvas{max-height:130px !important;}
-    .chart-card h3{font-size:11px;margin:0 0 6px;}
-    /* Category sections legitimately run long (up to dozens of items) -- forcing the whole
-       section to avoid breaking just pushes it, and a big trailing gap, onto the next page over
-       and over. Instead: keep each header glued to what follows it (no orphaned heading alone at
-       the bottom of a page) and keep individual item rows from splitting mid-row, but let a
-       section's body flow across a page break like any normal multi-page document section. */
-    .full-detail-cat{margin-bottom:6px;break-inside:auto;page-break-inside:auto;}
-    .fc-head{page-break-after:avoid;}
-    .full-item-row{page-break-inside:avoid;}
-    .card > h3{page-break-after:avoid;}
-    .report-letterhead{margin-bottom:8px;padding-bottom:8px;}
-    .score-circle{width:92px;height:92px;}
-    .score-circle .p{font-size:8.5px;}
-  }
   /* Belt-and-suspenders hide for the dedicated PDF-export render mode (server drives this via
      Puppeteer with print media emulated already, but this keeps the on-screen chrome gone even
      if that mode is ever loaded outside of print emulation, e.g. for debugging). */
@@ -514,3 +477,90 @@
   .toast.toast-success{background:var(--green);}
   .toast.toast-error{background:var(--red);}
   .toast .material-symbols-outlined{font-size:19px;}
+
+  /* Print / PDF-export overrides -- kept last in the file on purpose: several base rules
+     above (fi-tag, full-item-row, full-detail-cat, report-meta-strip, exec-summary...) set
+     the same properties this block needs to override for print, and CSS resolves equal-
+     specificity conflicts by source order, not by @media-query-ness. A rule declared later
+     in the file always wins a tie, print block or not -- so this must physically be the last
+     thing in the stylesheet or a later base rule will silently cancel parts of it (this bit
+     us once already with page-break-inside; same mechanism, different property this time). */
+  @media print{
+    .no-print{display:none !important;}
+    body{background:#fff;}
+    .admin-shell,.insp-app-outer{display:block !important;}
+    .admin-sidebar,.insp-topbar,.insp-bottomnav,.admin-topbar{display:none !important;}
+    .admin-content{padding:0;max-width:100%;}
+    /* The on-screen report lives inside a big white rounded "card" panel -- that reads as a UI
+       widget, not a printed document. Strip it down to flat page content: no border, no shadow,
+       no rounding, no padding of its own (the page margins from the PDF export already provide
+       the margin). */
+    .card,.chart-card{border:none;box-shadow:none;}
+    .card{padding:0;border-radius:0;background:transparent;}
+    .card > h3{display:none;}
+
+    /* Dense report layout. Base size is 12px throughout; the goal is a document that reads like
+       a real inspection report (LQA/Forbes-style) instead of a printed screenshot of the app --
+       one flowing page, not a stack of separate boxed widgets with gaps between them. */
+    body,.full-item-row,.detail-item,.exec-summary,.chart-card{font-size:12px;}
+
+    /* ---- Letterhead: one slim branded rule at the very top, not its own boxed block ---- */
+    .report-letterhead{display:flex;margin-bottom:6px;padding-bottom:5px;border-bottom:1.5px solid var(--gold);}
+    .report-letterhead img{height:14px;}
+    .report-letterhead span{font-size:9px;}
+
+    /* ---- Header: hotel name + score + key facts as one compact flat strip, not a big padded,
+       rounded gradient card. This is the single most-condensed part of the redesign since it
+       used to be four stacked blocks (letterhead / hero / exec-summary / meta-strip) each with
+       their own background and margins. ---- */
+    .score-hero{padding:10px 14px;margin-bottom:8px;border-radius:6px;gap:14px;}
+    .score-circle{width:52px;height:52px;border-width:3px;}
+    .score-circle .n{font-size:15px;}
+    .score-circle .p{font-size:6.5px;}
+    .score-meta h2{font-size:15px;margin:0 0 2px;}
+    .score-meta .row{font-size:10px;margin-top:2px;gap:4px;}
+    .score-meta .row .material-symbols-outlined{font-size:12px;}
+    .grade-pill{padding:2px 9px;font-size:9px;margin-top:4px;gap:4px;}
+    .grade-pill .material-symbols-outlined{font-size:11px;}
+
+    /* Every fact that used to live in the separate meta-strip box (property type, city,
+       inspector, visit date, report date, reference) is already shown on the header rows above
+       -- the boxed strip under it was pure duplication, so drop it instead of shrinking it. */
+    .report-meta-strip{display:none !important;}
+
+    /* ---- Critical alert: one slim line instead of a tall padded red panel ---- */
+    .alert{padding:5px 10px;border-radius:6px;margin-bottom:8px;font-size:10.5px;line-height:1.4;gap:8px;}
+    .alert .material-symbols-outlined{font-size:14px;}
+
+    .exec-summary{margin:0 0 8px;padding:8px 12px;line-height:1.5;font-size:11.5px;}
+
+    .charts-row{grid-template-columns:1fr 1fr !important;gap:8px;margin-bottom:8px;page-break-inside:avoid;}
+    .chart-card{padding:6px 8px;page-break-inside:avoid;}
+    .chart-card canvas{max-height:95px !important;}
+    .chart-card h3{font-size:10px;margin:0 0 4px;}
+
+    /* ---- Checklist rows: this is what needed to change most. Each row used to stack the
+       criterion text, then the category tag on its own line below it, then any note/photo --
+       three lines of vertical space for what is usually one short sentence. Laying the text and
+       tag out as a single wrapping line (only actually wrapping to a 2nd line when the text is
+       long) plus cutting the padding gets well over 20 rows on a page instead of ~9. ---- */
+    .full-detail-cat{margin-bottom:0;border-inline:none;border-top:none;border-radius:0;overflow:visible;break-inside:auto;page-break-inside:auto;}
+    .full-detail-cat + .full-detail-cat{border-top:2px solid var(--navy);}
+    .fc-head{padding:4px 6px;font-size:11px;page-break-after:avoid;}
+    .fc-head .material-symbols-outlined{font-size:13px;}
+    /* Row: badge + text on ONE line. The per-row classification tag used to force a second
+       line under every single item (a full-width sentence never leaves room for a pill next to
+       it) -- that alone was the biggest cause of short pages. The row's left border (set inline
+       per-item from the same classification color) carries that same information now, so the
+       text pill is dropped from print entirely rather than shrunk. */
+    .full-item-row{padding:2px 6px 2px 10px;gap:8px;page-break-inside:avoid;align-items:center;}
+    .full-item-row .fi-left{display:block;}
+    .full-item-row .fi-text{line-height:1.3;}
+    .full-item-row .fi-tag{display:none;}
+    .full-item-row .fi-note{font-size:9px;margin-top:0;}
+    .full-item-row .fi-badge{padding:1.5px 8px;font-size:9px;}
+    .full-item-row .photo-thumb{width:28px;height:28px;}
+    .item-crit{font-size:9px;margin-inline-start:5px;}
+    .item-crit .material-symbols-outlined{font-size:11px;}
+  }
+
