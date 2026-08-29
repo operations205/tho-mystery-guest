@@ -65,6 +65,15 @@ async function renderInspectionPdf({ origin, cookieName, cookieValue, inspection
         secure: url.protocol === 'https:'
       });
       await page.setViewport({ width: 1000, height: 1400 });
+      // Switch to print media BEFORE the page loads, not after. Chart.js sizes each canvas
+      // responsively off its container's actual box size, and the print stylesheet caps that
+      // box to a much shorter height than the on-screen layout. Flipping media type only after
+      // the charts had already been created/laid out at the larger on-screen size meant Chart.js
+      // had to redo that layout via its ResizeObserver right before the PDF snapshot -- a race
+      // that sometimes finished in time (full, legible axis labels) and sometimes didn't (most
+      // labels silently dropped by Chart.js's tick auto-skip, mid-relayout). Emulating print
+      // first means the charts are only ever created once, already at their final print size.
+      await page.emulateMediaType('print');
       await page.goto(`${origin}/?printReport=${encodeURIComponent(inspectionId)}`, {
         waitUntil: 'networkidle0',
         timeout: 30000
@@ -72,7 +81,6 @@ async function renderInspectionPdf({ origin, cookieName, cookieValue, inspection
       // Set by boot() in app.js once the report markup and its Chart.js canvases have had time
       // to actually paint (see the print-only branch there).
       await page.waitForFunction('window.__printReady === true', { timeout: 15000 });
-      await page.emulateMediaType('print');
       const pdf = await page.pdf({
         format: 'A4',
         printBackground: true,
