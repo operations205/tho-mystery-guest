@@ -1793,9 +1793,6 @@ function renderReportBody(insp, backAction){
   </div>
   ${chartsHtml}
   ${bodyHtml}
-  ${renderSignatureBlock(insp)}  </div>
-  ${chartsHtml}
-  ${bodyHtml}
   ${renderSignatureBlock(insp)}
   </div>
   `;
