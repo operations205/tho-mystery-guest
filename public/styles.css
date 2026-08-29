@@ -319,6 +319,12 @@
   .grade-pill{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 18px;border-radius:20px;font-weight:800;font-size:13px;}
   .grade-pill .material-symbols-outlined{font-size:16px;}
   .alert{display:flex;gap:12px;align-items:flex-start;background:var(--red-bg);border:1px solid #f0c2ba;color:var(--red);padding:15px 16px;border-radius:12px;margin-bottom:20px;font-size:13.5px;line-height:1.6;}
+  /* On-screen base for the cover-page category scorecard (print gets a denser override below). */
+  .cat-scoregrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:4px;}
+  .csg-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;}
+  .csg-name{display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .csg-name .material-symbols-outlined{font-size:16px;color:#9a6d00;flex-shrink:0;}
+  .csg-score{font-weight:800;flex-shrink:0;}
   .alert .material-symbols-outlined{font-size:22px;flex-shrink:0;}
   .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
   @media (max-width:800px){.charts-row{grid-template-columns:1fr;}}
@@ -538,6 +544,19 @@
     .chart-card{padding:6px 8px;page-break-inside:avoid;}
     .chart-card canvas{max-height:95px !important;}
     .chart-card h3{font-size:10px;margin:0 0 4px;}
+
+    /* ---- Cover page: a real standalone executive-summary page. The detailed, item-by-item
+       checklist starts fresh on its own page after this one instead of the first category
+       flowing up into whatever space happened to be left under the charts. The per-category
+       scorecard grid below gives this page genuine content (a real "at a glance" summary a
+       manager can read in isolation) instead of it being mostly blank once the checklist moves
+       off it. ---- */
+    .report-cover-page{page-break-after:always;}
+    .cat-scoregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px 10px;margin-top:2px;}
+    .csg-item{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;font-size:9.5px;}
+    .csg-name{display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .csg-name .material-symbols-outlined{font-size:11px;color:#9a6d00;flex-shrink:0;}
+    .csg-score{font-weight:800;flex-shrink:0;}
 
     /* ---- Checklist rows: this is what needed to change most. Each row used to stack the
        criterion text, then the category tag on its own line below it, then any note/photo --
