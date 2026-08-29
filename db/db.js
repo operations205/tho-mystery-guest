@@ -37,6 +37,15 @@ if (!columnExists('hotels', 'logo_data')) {
   console.log('[migrate] hotels.logo_data column added');
 }
 
+// hotels.photo_data — a real photo of the property (building/exterior), shown on the report
+// cover next to the logo. Separate column from logo_data since they serve different visual
+// roles on the report (small mark vs. a large hero image) and a hotel may want one without
+// the other.
+if (!columnExists('hotels', 'photo_data')) {
+  db.exec("ALTER TABLE hotels ADD COLUMN photo_data TEXT DEFAULT ''");
+  console.log('[migrate] hotels.photo_data column added');
+}
+
 // users.token_version — closes a real security gap: JWTs are stateless and were valid for
 // their full 30-day life regardless of a later password/username change, so a session/cookie
 // obtained before a credential change (e.g. during the earlier demo-credentials incident)

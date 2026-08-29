@@ -14,6 +14,7 @@ function toPublic(row) {
     id: row.id, name: { en: row.name_en, ar: row.name_ar },
     city: { en: row.city_en, ar: row.city_ar }, type: row.type,
     contact: row.contact, phone: row.phone, logo: row.logo_data || '',
+    photo: row.photo_data || '',
     createdAt: row.created_at
   };
 }
@@ -75,6 +76,24 @@ router.put('/:id/logo', requireRole('admin'), (req, res) => {
 
 router.delete('/:id/logo', requireRole('admin'), (req, res) => {
   db.prepare("UPDATE hotels SET logo_data='' WHERE id=?").run(req.params.id);
+  res.json({ ok: true });
+});
+
+// Hotel building/exterior photo (admin only) — a real photo of the property, shown on the
+// report cover next to the logo (mockup requested this so the cover looks like a real
+// magazine-style audit report instead of just text). Same validation/size cap pattern as logo.
+router.put('/:id/photo', requireRole('admin'), (req, res) => {
+  const hotel = db.prepare('SELECT id FROM hotels WHERE id=?').get(req.params.id);
+  if (!hotel) return res.status(404).json({ error: 'not_found' });
+  const { photo } = req.body || {};
+  if (typeof photo !== 'string' || photo.length > 3 * 1024 * 1024) return res.status(400).json({ error: 'photo_too_large' });
+  if (!isValidImageDataUrl(photo)) return res.status(400).json({ error: 'invalid_photo' });
+  db.prepare('UPDATE hotels SET photo_data=? WHERE id=?').run(photo, req.params.id);
+  res.json({ ok: true, photo });
+});
+
+router.delete('/:id/photo', requireRole('admin'), (req, res) => {
+  db.prepare("UPDATE hotels SET photo_data='' WHERE id=?").run(req.params.id);
   res.json({ ok: true });
 });
 

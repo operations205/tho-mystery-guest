@@ -434,6 +434,63 @@
   .report-meta-strip .rm-item{display:flex;flex-direction:column;gap:2px;}
   .report-meta-strip .rm-label{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;}
   .report-meta-strip .rm-value{font-weight:700;color:var(--navy);}
+
+  /* ===== REPORT COVER: bilingual header / hero / KPI strip / key areas / insights ===== */
+  .bl-ar{display:block;font-family:'Cairo',sans-serif;}
+  .bl-en{display:block;font-size:.86em;opacity:.82;font-weight:600;}
+  .rc-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--gold);}
+  .rc-header-logo{height:30px;width:auto;flex-shrink:0;}
+  .rc-header-title{flex:1;text-align:center;}
+  .rc-title-ar{font-size:15px;font-weight:800;color:var(--navy);font-family:'Cairo',sans-serif;}
+  .rc-title-en{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+  .rc-header-hotel-logo{max-height:38px;max-width:110px;object-fit:contain;flex-shrink:0;}
+  .rc-header-spacer{width:38px;flex-shrink:0;}
+  .rc-hero{display:flex;gap:18px;padding:22px;border-radius:var(--radius);background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;margin-bottom:16px;flex-wrap:wrap;}
+  .rc-hero-info{flex:1;min-width:220px;}
+  .rc-hotel-name{font-size:19px;font-weight:800;line-height:1.35;margin-bottom:8px;}
+  .rc-hotel-name .bl-en{color:#d8dde6;}
+  .rc-stars{margin-bottom:10px;color:#f2c85b;}
+  .rc-stars .material-symbols-outlined{font-size:19px;}
+  .rc-hero-meta{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+  .rc-hero-meta-row{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:#d5d9e0;line-height:1.5;}
+  .rc-hero-meta-row .material-symbols-outlined{font-size:16px;opacity:.85;margin-top:1px;}
+  .rc-hero-badges{display:flex;gap:8px;flex-wrap:wrap;}
+  .rc-hero-photo{width:200px;height:140px;border-radius:10px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;}
+  .rc-hero-photo img{width:100%;height:100%;object-fit:cover;}
+  .rc-hero-photo-empty{color:rgba(255,255,255,.45);}
+  .rc-hero-photo-empty .material-symbols-outlined{font-size:40px;}
+  .rc-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+  @media (max-width:700px){.rc-kpi-strip{grid-template-columns:repeat(2,1fr);}}
+  .rc-kpi-card{background:#f8f9fb;border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;}
+  .rc-kpi-num{font-size:22px;font-weight:800;color:var(--navy);line-height:1.15;}
+  .rc-kpi-num-sm{font-size:12.5px;line-height:1.4;}
+  .rc-kpi-lbl{margin-top:5px;}
+  .rc-kpi-lbl .bl-ar{font-size:10.5px;font-weight:700;color:var(--muted);}
+  .rc-kpi-lbl .bl-en{font-size:9px;text-transform:uppercase;letter-spacing:.3px;}
+  .rc-key-areas{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:18px;}
+  .rc-section-title{margin:0 0 10px;}
+  .rc-section-title .bl-ar{font-size:13.5px;font-weight:800;color:var(--navy);}
+  .rc-section-title .bl-en{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;}
+  .rc-area-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
+  .rc-area-row + .rc-area-row{border-top:1px solid var(--border);}
+  .rc-area-name{display:flex;align-items:center;gap:8px;width:190px;flex-shrink:0;}
+  .rc-area-name .material-symbols-outlined{font-size:17px;color:#9a6d00;flex-shrink:0;}
+  .rc-area-name .bl-ar{font-size:12px;font-weight:700;}
+  .rc-area-name .bl-en{font-size:10px;}
+  .rc-area-bar{flex:1;height:8px;border-radius:4px;background:#eef0f3;overflow:hidden;}
+  .rc-area-bar-fill{height:100%;border-radius:4px;}
+  .rc-area-score{width:40px;flex-shrink:0;text-align:end;font-weight:800;font-size:12.5px;}
+  .rc-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+  @media (max-width:800px){.rc-insights{grid-template-columns:1fr;}}
+  .rc-insight-card{border-radius:12px;padding:12px 14px;font-size:11.5px;line-height:1.6;border:1px solid var(--border);}
+  .rc-insight-strength{background:#f0f9f0;border-color:#bfe4bf;}
+  .rc-insight-opportunity{background:#fff8ec;border-color:#eed9ad;}
+  .rc-insight-critical{background:var(--red-bg);border-color:#f0c2ba;}
+  .rc-insight-head{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .rc-insight-head .material-symbols-outlined{font-size:17px;}
+  .rc-insight-head .bl-ar{font-size:12px;font-weight:800;}
+  .rc-insight-head .bl-en{font-size:9.5px;text-transform:uppercase;letter-spacing:.3px;}
+  .rc-insight-body{color:var(--ink);}
   .summary-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
   @media (max-width:700px){.summary-kpis{grid-template-columns:repeat(2,1fr);}}
   .full-detail-cat{margin-bottom:14px;border:1px solid var(--border);border-radius:12px;overflow:hidden;break-inside:avoid;page-break-inside:avoid;}
@@ -581,5 +638,51 @@
     .full-item-row .photo-thumb{width:28px;height:28px;}
     .item-crit{font-size:9px;margin-inline-start:5px;}
     .item-crit .material-symbols-outlined{font-size:11px;}
+
+    /* ---- Report cover redesign: print-density versions of the bilingual header / hero /
+       KPI strip / key-area bars / insight cards. Same "shrink padding + font-size, keep every
+       element" approach as the rest of this print block, so the cover stays a genuine
+       one-page executive summary instead of spilling onto page 2. ---- */
+    .rc-header{gap:8px;margin-bottom:6px;padding-bottom:5px;border-bottom:1.5px solid var(--gold);}
+    .rc-header-logo{height:16px;}
+    .rc-title-ar{font-size:10.5px;}
+    .rc-title-en{font-size:7.5px;}
+    .rc-header-hotel-logo{max-height:20px;max-width:60px;}
+    .rc-header-spacer{width:20px;}
+    .rc-hero{padding:9px 12px;gap:10px;margin-bottom:7px;border-radius:6px;}
+    .rc-hotel-name{font-size:13px;margin-bottom:4px;}
+    .rc-stars{margin-bottom:5px;}
+    .rc-stars .material-symbols-outlined{font-size:12px;}
+    .rc-hero-meta{gap:2px;margin-bottom:6px;}
+    .rc-hero-meta-row{font-size:9px;gap:4px;}
+    .rc-hero-meta-row .material-symbols-outlined{font-size:11px;}
+    .rc-hero-badges{gap:5px;}
+    .rc-hero-badges .grade-pill{padding:2px 9px;font-size:9px;}
+    .rc-hero-photo{width:110px;height:78px;border-radius:6px;}
+    .rc-hero-photo-empty .material-symbols-outlined{font-size:22px;}
+    .rc-kpi-strip{gap:6px;margin-bottom:7px;}
+    .rc-kpi-card{padding:6px 5px;border-radius:7px;}
+    .rc-kpi-num{font-size:14px;}
+    .rc-kpi-num-sm{font-size:8.5px;}
+    .rc-kpi-lbl{margin-top:2px;}
+    .rc-kpi-lbl .bl-ar{font-size:7.5px;}
+    .rc-kpi-lbl .bl-en{font-size:6.5px;}
+    .rc-key-areas{padding:6px 10px;margin-bottom:7px;border-radius:7px;page-break-inside:avoid;}
+    .rc-section-title{margin:0 0 4px;}
+    .rc-section-title .bl-ar{font-size:10px;}
+    .rc-section-title .bl-en{font-size:7.5px;}
+    .rc-area-row{gap:6px;padding:2.5px 0;}
+    .rc-area-name{width:130px;gap:4px;}
+    .rc-area-name .material-symbols-outlined{font-size:12px;}
+    .rc-area-name .bl-ar{font-size:8.5px;}
+    .rc-area-name .bl-en{font-size:7px;}
+    .rc-area-bar{height:5px;}
+    .rc-area-score{width:28px;font-size:8.5px;}
+    .rc-insights{gap:6px;margin-bottom:8px;page-break-inside:avoid;}
+    .rc-insight-card{padding:6px 8px;border-radius:7px;font-size:8.5px;line-height:1.4;}
+    .rc-insight-head{margin-bottom:3px;gap:4px;}
+    .rc-insight-head .material-symbols-outlined{font-size:12px;}
+    .rc-insight-head .bl-ar{font-size:8.5px;}
+    .rc-insight-head .bl-en{font-size:6.5px;}
   }
 
