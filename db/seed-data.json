@@ -4521,6 +4521,10 @@
     "profileEmailHint": {
       "en": "Used to send you a \"forgot password\" reset link if you're ever locked out.",
       "ar": "بيتستخدم عشان نبعتلك رابط استرجاع كلمة السر لو اتقفلت برة حسابك."
+    },
+    "addSignatureAdmin": {
+      "en": "Add Inspector Signature",
+      "ar": "إضافة توقيع المفتش"
     }
   },
   "defaultHotelsData": [

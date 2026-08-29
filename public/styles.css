@@ -542,6 +542,11 @@
   .sig-cursive{font-family:'Dancing Script',cursive;font-size:34px;color:var(--navy);line-height:1;margin-bottom:2px;}
   .sig-cursive.ar{font-family:'Aref Ruqaa',serif;font-size:30px;}
   .sig-blank{height:60px;}
+  .sig-blank-admin{height:auto;display:flex;align-items:center;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(15,20,30,.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
+  .modal-card{background:#fff;border-radius:var(--radius);padding:22px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+  .modal-card .sigpad-wrap{border:1.5px dashed var(--border);border-radius:8px;background:#fafafa;}
+  .modal-card #adminSigCanvas{width:100%;height:180px;display:block;touch-action:none;}
   /* standards reference document */
   .pillars-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px;}
   @media (max-width:900px){.pillars-grid{grid-template-columns:repeat(2,1fr);}}

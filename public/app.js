@@ -697,6 +697,7 @@ function renderAdminShell(contentHtml){
     </div>
   </div>
   ${renderDrawer()}
+  ${renderAdminSigModal()}
   `;
 }
 
@@ -1511,9 +1512,12 @@ function setReportMode(mode){ state.reportMode = mode; render(); }
 
 function renderSignatureBlock(insp){
   const dateStr = insp.completedAt ? new Date(insp.completedAt).toISOString().slice(0,10) : (insp.visitDate||'');
+  const canAdminSign = !insp.signature && state.session && state.session.role==='admin';
   const sigHtml = insp.signature
     ? `<img class="sig-image" src="${esc(insp.signature)}" alt="signature">`
-    : `<div class="sig-blank"></div>`;
+    : canAdminSign
+      ? `<div class="sig-blank sig-blank-admin no-print"><button class="btn btn-outline btn-sm" onclick="openAdminSigCapture('${insp.id}')">${ic('draw')}${t('addSignatureAdmin')}</button></div>`
+      : `<div class="sig-blank"></div>`;
   return `
   <div class="sig-block">
     <div class="sig-col">
@@ -1530,6 +1534,90 @@ function renderSignatureBlock(insp){
   </div>
   <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:16px;">${t('certifiedBy')}</p>
   `;
+}
+
+/* ---- Admin-only: attach a signature to an already-completed inspection that never got one
+   (inspector skipped, or an earlier bug meant nothing was captured) but the client is waiting
+   on a signed report now. Mirrors the inspector's own sign-pad capture code below, but as a
+   small modal instead of a full-screen step, and posts to the admin-only PUT .../signature
+   route instead of the one-time /complete route. */
+let adminSigCtx = null, adminSigDrawing = false, adminSigHasInk = false;
+function openAdminSigCapture(inspId){
+  state.adminSigModalInspId = inspId;
+  render();
+}
+function closeAdminSigCapture(){
+  state.adminSigModalInspId = null;
+  render();
+}
+function renderAdminSigModal(){
+  if(!state.adminSigModalInspId) return '';
+  return `
+  <div class="modal-overlay no-print" onclick="if(event.target===this) closeAdminSigCapture()">
+    <div class="modal-card" style="max-width:460px;">
+      <h3 style="margin-top:0;">${t('addSignatureAdmin')}</h3>
+      <p class="sig-hint">${t('signHint')}</p>
+      <div class="sigpad-wrap"><canvas id="adminSigCanvas"></canvas></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn btn-ghost btn-sm" onclick="clearAdminSigPad()">${ic('backspace')}${t('clearSig')}</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeAdminSigCapture()">${t('cancelBtn')}</button>
+        <button class="btn btn-primary btn-sm" style="margin-inline-start:auto;" onclick="submitAdminSignature()">${ic('task_alt')}${t('save')}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function initAdminSigPad(){
+  const canvas = document.getElementById('adminSigCanvas');
+  if(!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  const cssHeight = 180;
+  canvas.width = Math.max(1, Math.round(rect.width * ratio));
+  canvas.height = Math.round(cssHeight * ratio);
+  adminSigCtx = canvas.getContext('2d');
+  adminSigCtx.scale(ratio, ratio);
+  adminSigCtx.lineWidth = 2.4;
+  adminSigCtx.lineCap = 'round';
+  adminSigCtx.lineJoin = 'round';
+  adminSigCtx.strokeStyle = '#050000';
+  adminSigHasInk = false;
+  function pos(e){
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches && e.touches[0];
+    const cx = (t ? t.clientX : e.clientX) - r.left;
+    const cy = (t ? t.clientY : e.clientY) - r.top;
+    return {x:cx, y:cy};
+  }
+  function start(e){ adminSigDrawing = true; const p = pos(e); adminSigCtx.beginPath(); adminSigCtx.moveTo(p.x, p.y); if(e.cancelable) e.preventDefault(); }
+  function move(e){ if(!adminSigDrawing) return; const p = pos(e); adminSigCtx.lineTo(p.x, p.y); adminSigCtx.stroke(); adminSigHasInk = true; if(e.cancelable) e.preventDefault(); }
+  function end(){ adminSigDrawing = false; }
+  canvas.onmousedown = start; canvas.onmousemove = move; window.onmouseup = end;
+  canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = end;
+}
+function clearAdminSigPad(){
+  const canvas = document.getElementById('adminSigCanvas');
+  if(!canvas || !adminSigCtx) return;
+  adminSigCtx.clearRect(0, 0, canvas.width, canvas.height);
+  adminSigHasInk = false;
+}
+async function submitAdminSignature(){
+  const inspId = state.adminSigModalInspId; if(!inspId) return;
+  const canvas = document.getElementById('adminSigCanvas');
+  if(!canvas || !adminSigHasInk){
+    showToast(state.lang==='ar' ? 'ارسم التوقيع أولاً' : 'Draw a signature first', 'error');
+    return;
+  }
+  const signature = canvas.toDataURL('image/png');
+  try{
+    const updated = await apiPut('/inspections/' + inspId + '/signature', { signature });
+    const idx = state.inspections.findIndex(i => i.id === inspId);
+    if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
+    state.adminSigModalInspId = null;
+    render();
+    showToast(state.lang==='ar' ? 'تم حفظ التوقيع' : 'Signature saved', 'success');
+  }catch(e){
+    showToast((state.lang==='ar' ? 'تعذّر حفظ التوقيع: ' : 'Could not save signature: ') + e.message, 'error');
+  }
 }
 
 function renderMetaStrip(insp){
@@ -2614,6 +2702,9 @@ function render(){
   document.getElementById('app').innerHTML = html;
   if(state.session && state.session.role==='inspector' && state.view==='inspector-sign'){
     setTimeout(initSigPad, 30);
+  }
+  if(state.adminSigModalInspId){
+    setTimeout(initAdminSigPad, 30);
   }
 }
 

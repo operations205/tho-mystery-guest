@@ -198,6 +198,25 @@ router.post('/:id/complete', requireRole('inspector'), (req, res) => {
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });
 
+// Admin-only: attach or replace the certifying inspector's signature on an inspection after
+// the fact. Exists for cases where a report was already finalized (inspector skipped, or an
+// earlier bug meant nothing was captured) but the client is waiting on a signed report now --
+// completed inspections can't be reopened and re-walked through the whole checklist just to
+// recollect a signature, so this is a narrow, audited way to patch just that one field.
+router.put('/:id/signature', requireRole('admin'), (req, res) => {
+  const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!insp) return res.status(404).json({ error: 'not_found' });
+  const { signature } = req.body || {};
+  if (!signature || typeof signature !== 'string' || signature.length > 2 * 1024 * 1024) {
+    return res.status(400).json({ error: 'invalid_signature' });
+  }
+  if (!isValidImageDataUrl(signature)) {
+    return res.status(400).json({ error: 'invalid_signature' });
+  }
+  db.prepare('UPDATE inspections SET signature=? WHERE id=?').run(signature, req.params.id);
+  res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
+});
+
 // Delete a report (admin only) — e.g. to remove test/mistaken inspections. If it was started
 // from an assignment, hand that assignment back to pending (cleared of the deleted inspection)
 // instead of leaving it pointing at a now-missing report.
