@@ -78,11 +78,16 @@ router.get('/:id/pdf', async (req, res) => {
     // same-origin-ness -- so a loopback origin like http://127.0.0.1:PORT that isn't on that
     // allowlist gets its own fonts blocked with a 403, breaking icons in the render. Reusing
     // resolveAppOrigin keeps this in lockstep with whatever's actually configured as allowed.
+    // Pass through the language the client asked for (see exportReportPdf() in app.js) so the
+    // export renders in whichever language was selected on screen, instead of always defaulting
+    // to Arabic. Only 'ar'/'en' are valid -- anything else falls back to the default.
+    const lang = (req.query.lang === 'en') ? 'en' : (req.query.lang === 'ar' ? 'ar' : undefined);
     const pdf = await renderInspectionPdf({
       origin: resolveAppOrigin(req),
       cookieName: 'tho_token',
       cookieValue: req.cookies.tho_token,
-      inspectionId: row.id
+      inspectionId: row.id,
+      lang
     });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="report-${row.id}.pdf"`);

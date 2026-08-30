@@ -45,7 +45,7 @@ function footerTemplate() {
   </div>`;
 }
 
-async function renderInspectionPdf({ origin, cookieName, cookieValue, inspectionId }) {
+async function renderInspectionPdf({ origin, cookieName, cookieValue, inspectionId, lang }) {
   const run = async () => {
     const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
@@ -74,7 +74,8 @@ async function renderInspectionPdf({ origin, cookieName, cookieValue, inspection
       // labels silently dropped by Chart.js's tick auto-skip, mid-relayout). Emulating print
       // first means the charts are only ever created once, already at their final print size.
       await page.emulateMediaType('print');
-      await page.goto(`${origin}/?printReport=${encodeURIComponent(inspectionId)}`, {
+      const langParam = lang ? `&lang=${encodeURIComponent(lang)}` : '';
+      await page.goto(`${origin}/?printReport=${encodeURIComponent(inspectionId)}${langParam}`, {
         waitUntil: 'networkidle0',
         timeout: 30000
       });

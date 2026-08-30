@@ -1669,7 +1669,13 @@ function renderFullDetail(insp){
 function exportReportPdf(id){
   // A same-origin GET download carries the existing session cookie automatically, so this
   // just needs to open the export route -- no fetch/blob plumbing required.
-  window.open('/api/inspections/' + id + '/pdf', '_blank');
+  // Pass the CURRENTLY SELECTED UI language through: the export route renders the report in a
+  // brand-new headless browser session on the server, which starts from state's default
+  // language (Arabic) and has no way to know which language this admin/inspector had toggled
+  // to on screen. Without this, "export PDF" silently ignored the on-screen language toggle
+  // and always produced an Arabic PDF -- a real problem when a client specifically asked for
+  // an English-only report.
+  window.open('/api/inspections/' + id + '/pdf?lang=' + encodeURIComponent(state.lang), '_blank');
 }
 function renderReportBody(insp, backAction){
   const sc = computeScores(insp);
@@ -2756,6 +2762,16 @@ async function boot(){
     // with the same session cookie). Renders just the report card, no shell/nav, and flips
     // window.__printReady once charts have had time to paint so Puppeteer knows when to snapshot.
     const printId = urlParams.get('printReport');
+    // Respect whichever language the admin/inspector had selected on screen when they clicked
+    // Export PDF (see exportReportPdf()) -- this print-only page is a brand-new session that
+    // otherwise defaults to state's initial 'ar', silently ignoring the on-screen toggle and
+    // always producing an Arabic PDF even when someone explicitly switched to English first.
+    const printLang = urlParams.get('lang');
+    if(printLang === 'ar' || printLang === 'en'){
+      state.lang = printLang;
+      document.documentElement.lang = state.lang;
+      document.documentElement.dir = state.lang==='ar' ? 'rtl':'ltr';
+    }
     state.reportMode = 'detailed';
     try{ await loadInspectionDetail(printId); }catch(e){}
     state.currentInspectionId = printId;
