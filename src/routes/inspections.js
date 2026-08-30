@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../../db/db');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { isValidImageDataUrl } = require('../utils/validateImage');
+const { withinLength } = require('../utils/validate');
 const { computeScores, catsForStandard } = require('../lib/standards');
 const { renderInspectionPdf } = require('../lib/pdfExport');
 const { resolveAppOrigin } = require('../utils/origin');
@@ -142,6 +143,13 @@ router.put('/:id/answers/:itemId', requireRole('inspector'), (req, res) => {
   if (!item) return res.status(400).json({ error: 'invalid_item' });
   if (body.value !== null && body.value !== undefined && !['yes', 'no', 'na'].includes(body.value)) {
     return res.status(400).json({ error: 'invalid_value' });
+  }
+  // The only free-text field on this route -- every other free-text field in the app (hotel/
+  // inspector/client/settings names, contact info, etc.) already got a length cap; this one was
+  // missed. 5000 chars is generous for a checklist observation note while still ruling out
+  // someone stuffing multi-megabyte blobs into a single item.
+  if (!withinLength(body.note, 5000)) {
+    return res.status(400).json({ error: 'note_too_long' });
   }
   if (body.photo !== undefined && body.photo !== null && body.photo !== '') {
     if (typeof body.photo !== 'string' || body.photo.length > 6 * 1024 * 1024) {

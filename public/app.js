@@ -2267,7 +2267,7 @@ function renderInspectorInspect(){
         <button class="ans-btn no ${a.value==='no'?'on':''}" onclick="setAnswerM('${item.id}','no')">${t('no')}</button>
         <button class="ans-btn na ${a.value==='na'?'on':''}" onclick="setAnswerM('${item.id}','na')">${t('na')}</button>
       </div>
-      <textarea class="note-input" placeholder="${t('noteHolder')}" onchange="setNoteM('${item.id}', this.value)">${a.note||''}</textarea>
+      <textarea class="note-input" placeholder="${t('noteHolder')}" onchange="setNoteM('${item.id}', this.value)">${esc(a.note||'')}</textarea>
       ${photoHtml}
       <input type="file" id="photoInput_${item.id}" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoInput('${item.id}', this)">
     </div>`;

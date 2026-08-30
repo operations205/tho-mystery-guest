@@ -151,7 +151,9 @@ router.post('/:id/account/reset-password', requireRole('admin'), (req, res) => {
   const row = db.prepare("SELECT * FROM users WHERE role='hotel' AND hotel_id=?").get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
   const tempPassword = generateTempPassword();
-  db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(bcrypt.hashSync(tempPassword, 10), row.id);
+  // token_version bump forces out any device still logged in under the old password -- same
+  // protection the equivalent inspector reset-password route already has (see inspectors.js).
+  db.prepare('UPDATE users SET password_hash=?, token_version = token_version + 1 WHERE id=?').run(bcrypt.hashSync(tempPassword, 10), row.id);
   res.json({ ok: true, tempPassword });
 });
 

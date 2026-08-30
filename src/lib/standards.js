@@ -33,10 +33,20 @@ function itemById(standardId, itemId) {
 }
 
 // Port of the client-side computeScores() — operates on a plain {itemId: {value, note}} answers map.
+// MIN_SAMPLE_FOR_FLAGGING mirrors the client-side computeScores() in public/app.js: a
+// category score of yes/(yes+no) off a single answered item (as few as 5 items exist in some
+// categories) can produce a stark, misleading 0%/100% that isn't really a pattern. catCounts
+// lets any caller apply the same "don't headline a category as weakest/flagged off fewer than
+// N real answers" guard the client already applies -- this used to be a plain duplicate of the
+// client function with no such guard, which meant any future feature reading catScores straight
+// from here (a dashboard card, a sort/filter) would silently reintroduce that exact bug.
+const MIN_SAMPLE_FOR_FLAGGING = 2;
+
 function computeScores(standardId, answers) {
   const cats = catsForStandard(standardId);
   let yes = 0, no = 0, na = 0;
   const catScores = {};
+  const catCounts = {};
   const clsScores = {};
   const criticalFails = [];
 
@@ -53,6 +63,7 @@ function computeScores(standardId, answers) {
     });
     const catTotal = cy + cn;
     catScores[cat.id] = catTotal > 0 ? Math.round((cy / catTotal) * 100) : null;
+    catCounts[cat.id] = catTotal;
   });
 
   function clsAdd(cls, y, total) {
@@ -67,10 +78,10 @@ function computeScores(standardId, answers) {
   const answeredCount = yes + no + na;
   const totalItems = cats.reduce((s, c) => s + c.items.length, 0);
 
-  return { overall, catScores, clsPct, criticalFails, answeredCount, totalItems, yes, no, na };
+  return { overall, catScores, catCounts, clsPct, criticalFails, answeredCount, totalItems, yes, no, na };
 }
 
 module.exports = {
   CATS, CATS_PLUS_EXTRA, CLASS_META, PILLAR_DESC, STANDARDS, PROPERTY_TYPES, S,
-  catsForStandard, allItemIds, itemById, computeScores
+  catsForStandard, allItemIds, itemById, computeScores, MIN_SAMPLE_FOR_FLAGGING
 };
