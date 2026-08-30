@@ -1951,6 +1951,11 @@ function renderHotelShell(bodyHtml){
 }
 async function viewHotelReport(id){
   state.currentInspectionId = id;
+  // The list endpoint that populates state.inspections at load time omits each inspection's
+  // answers (deliberately, so the dashboard list stays light) -- without re-fetching full
+  // detail here, computeScores() would see an empty answers object and silently render the
+  // report as a false 0%/Critical instead of the real score. Same fix as viewAdminReport().
+  try{ await loadInspectionDetail(id); }catch(e){}
   go('hotel-report');
 }
 function renderHotelReports(){
@@ -2099,7 +2104,7 @@ function renderAssignmentsBody(){
     const typeLabel = hotel && PROPERTY_TYPES[hotel.type] ? tl(PROPERTY_TYPES[hotel.type]) : '';
     let actionBtn = '';
     if(as.status==='completed'){
-      actionBtn = `<button class="btn btn-ghost btn-sm ac-btn" onclick="state.currentInspectionId='${as.inspectionId}';go('inspector-report')">${ic('description')}${t('viewReportBtn')}</button>`;
+      actionBtn = `<button class="btn btn-ghost btn-sm ac-btn" onclick="viewInspectorReport('${as.inspectionId}')">${ic('description')}${t('viewReportBtn')}</button>`;
     } else if(as.status==='in_progress'){
       actionBtn = `<button class="btn btn-primary btn-sm ac-btn" onclick="resumeInspection('${as.id}')">${ic('play_arrow')}${t('continueInspection')}</button>`;
     } else {
@@ -2655,6 +2660,16 @@ async function submitSignature(skip){
   go('inspector-report');
 }
 
+async function viewInspectorReport(id){
+  state.currentInspectionId = id;
+  // Same fix as viewAdminReport()/viewHotelReport(): the assignments list only ever populated
+  // state.inspections from the lightweight list endpoint (no answers), so jumping straight to
+  // the report view here without re-fetching full detail could silently show a false 0%/
+  // Critical score instead of what the inspector actually submitted.
+  try{ await loadInspectionDetail(id); }catch(e){}
+  state.reportMode = 'detailed';
+  go('inspector-report');
+}
 function renderInspectorReport(){
   const insp = currentMobileInsp();
   if(!insp) return renderInspectorHome();
