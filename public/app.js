@@ -2762,6 +2762,88 @@ async function boot(){
     // One more animation frame so the just-finished chart draw has actually been composited to
     // the screen before Puppeteer captures it.
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    // Headless Chrome's Print-to-PDF pipeline has a real, reproducible bug with TWO similar
+    // raster images (canvases, or even plain <img>s baked from them) on the same printed page:
+    // whichever one is second consistently loses its text/fine detail in the exported PDF only
+    // -- never on screen, never in a plain screenshot of the identical live DOM, and the baked
+    // PNG file itself (saved to disk and opened directly) is provably correct pixel-for-pixel.
+    // Converting each chart canvas to its own separate <img> was not enough to dodge this --
+    // it's specifically about there being a *second* similar image on the page, canvas or not.
+    // Real fix: merge every chart canvas inside a .charts-row into ONE combined image before
+    // Puppeteer snapshots, so there is only ever one such image per page for this bug to affect.
+    async function swapCanvasForImage(canvas, dataUrl, widthPx, heightPx){
+      return new Promise(resolve => {
+        const img = document.createElement('img');
+        img.alt = '';
+        img.style.width = widthPx ? widthPx + 'px' : '100%';
+        img.style.height = heightPx ? heightPx + 'px' : 'auto';
+        img.style.display = 'block';
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = dataUrl;
+        canvas.replaceWith(img);
+      });
+    }
+    const swapPromises = [];
+    document.querySelectorAll('.charts-row').forEach(chartsRow => {
+      const canvases = Array.from(chartsRow.querySelectorAll('canvas'));
+      if(canvases.length === 0) return;
+      if(canvases.length === 1){
+        const c = canvases[0];
+        const r = c.getBoundingClientRect();
+        swapPromises.push(swapCanvasForImage(c, c.toDataURL('image/png'), r.width, r.height));
+        return;
+      }
+      try{
+        const dpr = window.devicePixelRatio || 1;
+        const gap = 18;
+        const rects = canvases.map(c => c.getBoundingClientRect());
+        const totalW = rects.reduce((s, r) => s + r.width, 0) + gap * (canvases.length - 1);
+        const maxH = Math.max(...rects.map(r => r.height));
+        const merged = document.createElement('canvas');
+        merged.width = Math.max(1, Math.round(totalW * dpr));
+        merged.height = Math.max(1, Math.round(maxH * dpr));
+        const mctx = merged.getContext('2d');
+        mctx.scale(dpr, dpr);
+        // canvases are in DOM order; the RTL grid shows the FIRST dom canvas on the right and
+        // the SECOND on the left, so draw in reverse DOM order to keep the same visual
+        // left-to-right arrangement once flattened into one plain (always-LTR-drawn) image.
+        let x = 0;
+        canvases.slice().reverse().forEach(c => {
+          const r = c.getBoundingClientRect();
+          mctx.drawImage(c, x, 0, r.width, r.height);
+          x += r.width + gap;
+        });
+        const dataUrl = merged.toDataURL('image/png');
+        const titles = Array.from(chartsRow.querySelectorAll('.chart-card h3')).map(h => h.textContent);
+        const titleCells = titles.map(txt => `<div class="chart-card" style="padding-bottom:0;"><h3>${esc(txt)}</h3></div>`).join('');
+        // The original .charts-row class forces `display:grid;grid-template-columns:1fr 1fr
+        // !important` (a print-mode rule) -- that !important beats any inline style we could
+        // set here, so it would otherwise force our two new children (the title row and the
+        // image below it) to sit side-by-side as grid columns instead of stacking. Drop the
+        // class so our own inline layout takes over cleanly instead of fighting it.
+        chartsRow.classList.remove('charts-row');
+        chartsRow.style.marginBottom = '22px';
+        chartsRow.innerHTML = `
+          <div style="display:grid;grid-template-columns:repeat(${canvases.length},1fr);gap:${gap}px;">${titleCells}</div>
+          <div style="margin-top:4px;"><img alt="" style="width:100%;display:block;" src="${dataUrl}"></div>`;
+        const mergedImg = chartsRow.querySelector('img');
+        swapPromises.push(new Promise(resolve => {
+          if(mergedImg.complete){ resolve(); return; }
+          mergedImg.onload = () => resolve();
+          mergedImg.onerror = () => resolve();
+        }));
+      }catch(e){ console.error('chart merge -> image conversion failed', e); }
+    });
+    // Any remaining lone canvas outside a .charts-row (the single-chart "summary" report mode).
+    document.querySelectorAll('canvas').forEach(c => {
+      const r = c.getBoundingClientRect();
+      swapPromises.push(swapCanvasForImage(c, c.toDataURL('image/png'), r.width, r.height));
+    });
+    await Promise.all(swapPromises);
+    // One more settle frame after the image swap so the new <img> elements are actually
+    // composited before Puppeteer captures the PDF.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     window.__printReady = true;
     return;
   } else if(state.session){
