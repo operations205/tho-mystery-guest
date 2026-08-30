@@ -425,6 +425,7 @@ function computeScores(insp){
   let yes=0, no=0, na=0;
   let critYes=0, critAnswered=0;
   const catScores = {};
+  const catCounts = {};
   const clsScores = {};
   let criticalFails = [];
   cats.forEach(cat=>{
@@ -440,6 +441,11 @@ function computeScores(insp){
     });
     const catTotal = cy+cn;
     catScores[cat.id] = catTotal>0 ? Math.round((cy/catTotal)*100) : null;
+    // How many yes/no answers this category's percentage is actually based on -- a category
+    // where only 1 item was applicable (rest N/A) can swing to a stark 0% or 100% off a single
+    // answer. Callers that headline "the weakest area" or count it as a flagged opportunity
+    // need this to avoid spotlighting a single data point as if it were a real pattern.
+    catCounts[cat.id] = catTotal;
   });
   function clsAdd(cls,y,total){
     if(!clsScores[cls]) clsScores[cls]={y:0,t:0};
@@ -454,7 +460,7 @@ function computeScores(insp){
   // Mandatory/critical-item compliance: null (shown as "-") when no mandatory item was
   // answered yet, rather than a misleading 100%.
   const mandatoryCompliance = critAnswered>0 ? Math.round((critYes/critAnswered)*100) : null;
-  return {overall, catScores, clsPct, criticalFails, answeredCount, totalItems, yes, no, na, mandatoryCompliance};
+  return {overall, catScores, catCounts, clsPct, criticalFails, answeredCount, totalItems, yes, no, na, mandatoryCompliance};
 }
 function gradeInfo(overall, hasCritical){
   if(hasCritical) return {label:t('gradeCritical'), cls:'badge-red'};
@@ -1692,12 +1698,16 @@ function renderReportBody(insp, backAction){
       </div>`;
 
   // Weakest-scoring category, used to give the exec summary one concrete, prioritized pointer
-  // instead of just restating the headline number.
+  // instead of just restating the headline number. Requires at least MIN_SAMPLE answered
+  // (yes/no) items -- without this guard, a category where only one item was applicable (the
+  // rest marked N/A) could swing to a stark 0% off that single answer and get headlined as
+  // "the weakest area", which reads as a much bigger finding than one data point supports.
+  const MIN_SAMPLE_FOR_FLAGGING = 2;
   const catList = catsForStandard(insp.standardId || 'audit4');
   let weakestCat = null, weakestScore = 101;
   catList.forEach(c=>{
     const s = sc.catScores[c.id];
-    if(s!==null && s < weakestScore){ weakestScore = s; weakestCat = c; }
+    if(s!==null && sc.catCounts[c.id] >= MIN_SAMPLE_FOR_FLAGGING && s < weakestScore){ weakestScore = s; weakestCat = c; }
   });
   // 6-key-area executive rollup for the cover page (replaces the old 43-item grid): each
   // area's score is the average of its member categories' scores, skipping unanswered ones.
@@ -1707,11 +1717,12 @@ function renderReportBody(insp, backAction){
     const s = keyAreaScores[id];
     if(s!==null && s < weakestAreaScore){ weakestAreaScore = s; weakestAreaId = id; }
   });
-  // "Improvement opportunities" = categories that were actually scored (not N/A-only) and
-  // fell short of a strong-performance bar.
+  // "Improvement opportunities" = categories that were actually scored on a real sample (not
+  // N/A-only, and not just one lone answer -- see MIN_SAMPLE_FOR_FLAGGING above) and fell
+  // short of a strong-performance bar.
   const improvementOpportunities = catList.filter(c=>{
     const s = sc.catScores[c.id];
-    return s!==null && s < 80;
+    return s!==null && sc.catCounts[c.id] >= MIN_SAMPLE_FOR_FLAGGING && s < 80;
   }).length;
   const starsOutOf5 = Math.round((sc.overall/100)*5*2)/2;
   const starsHtml = (()=>{
