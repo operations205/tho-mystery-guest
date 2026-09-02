@@ -92,7 +92,16 @@ router.get('/:id/download', requireRole('admin'), (req, res) => {
   if (!row) return res.status(404).json({ error: 'not_found' });
   const buf = Buffer.from(row.file_data, 'base64');
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-  res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(row.file_name)}"`);
+  // fileName is built in the /generate route as e.g. "Proposal_<client name>_<date>.docx", and
+  // client names are frequently Arabic -- encodeURIComponent() inside a plain filename="..."
+  // isn't a real encoding scheme for that quoted-string param (RFC 6266/2616), so several
+  // browsers show the literal percent-escaped text ("Proposal_%D9%81...docx") as the saved
+  // filename instead of decoding it. Send both: an ASCII-safe filename= fallback (non-ASCII
+  // bytes stripped) for any client that ignores filename*=, and the correct RFC 5987
+  // filename*=UTF-8''<percent-encoded> form that every modern browser actually uses.
+  const asciiFallback = row.file_name.replace(/[^\x20-\x7E]/g, '_').replace(/"/g, "'") || 'document.docx';
+  res.setHeader('Content-Disposition',
+    `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodeURIComponent(row.file_name)}`);
   res.send(buf);
 });
 

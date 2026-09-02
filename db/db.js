@@ -109,4 +109,49 @@ if (usersTableSql && !usersTableSql.sql.includes("'hotel'")) {
   db.exec('PRAGMA foreign_keys = ON');
 }
 
+// inspections.inspector_id: change ON DELETE CASCADE to ON DELETE SET NULL (and drop the
+// NOT NULL) so that deleting an inspector's user account no longer cascades into silently
+// destroying every completed inspection report they ever filed. See the comment on this
+// column in schema.sql for the full rationale. SQLite can't ALTER a foreign key's ON DELETE
+// action in place, so an existing inspections table (created before this fix) needs to be
+// rebuilt, same rename/recreate/copy/drop approach used for the users table migration above.
+const inspectionsTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='inspections'").get();
+if (inspectionsTableSql && inspectionsTableSql.sql.includes('inspector_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE')) {
+  db.exec('PRAGMA foreign_keys = OFF');
+  db.exec('PRAGMA legacy_alter_table = ON');
+  db.exec('BEGIN');
+  try {
+    db.exec('ALTER TABLE inspections RENAME TO inspections_old');
+    db.exec(`CREATE TABLE inspections (
+      id TEXT PRIMARY KEY,
+      assignment_id TEXT REFERENCES assignments(id) ON DELETE SET NULL,
+      hotel_id TEXT NOT NULL REFERENCES hotels(id) ON DELETE CASCADE,
+      inspector_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+      standard_id TEXT NOT NULL DEFAULT 'audit4' CHECK(standard_id IN ('audit4','plus5')),
+      property_name TEXT,
+      property_type_label TEXT,
+      city TEXT,
+      inspector_name TEXT,
+      visit_date TEXT,
+      ref TEXT DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'in_progress' CHECK(status IN ('in_progress','completed')),
+      signature TEXT,
+      completed_at INTEGER,
+      created_at INTEGER NOT NULL
+    )`);
+    db.exec(`INSERT INTO inspections (id, assignment_id, hotel_id, inspector_id, standard_id, property_name, property_type_label, city, inspector_name, visit_date, ref, status, signature, completed_at, created_at)
+      SELECT id, assignment_id, hotel_id, inspector_id, standard_id, property_name, property_type_label, city, inspector_name, visit_date, ref, status, signature, completed_at, created_at FROM inspections_old`);
+    db.exec('DROP TABLE inspections_old');
+    db.exec('COMMIT');
+    console.log('[migrate] inspections.inspector_id changed from ON DELETE CASCADE to ON DELETE SET NULL -- deleting an inspector no longer deletes their past reports');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    db.exec('PRAGMA legacy_alter_table = OFF');
+    db.exec('PRAGMA foreign_keys = ON');
+    throw e;
+  }
+  db.exec('PRAGMA legacy_alter_table = OFF');
+  db.exec('PRAGMA foreign_keys = ON');
+}
+
 module.exports = db;
