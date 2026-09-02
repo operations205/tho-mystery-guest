@@ -422,7 +422,16 @@ async function removeHotelLogo(hotelId){
 /* ===================== Hotel building/exterior photo (admin-managed) ===================== */
 // Larger max dimension + wider JPEG compression than compressLogoFile since this is a full
 // hero photo shown large on the report cover, not a small crisp icon/wordmark.
-function compressPhotoFile(file){
+// Named distinctly from the compressPhotoFile() above (used for checklist item photos) --
+// this file and app-inspector.js's other sections all share one global scope (see index.html's
+// script-tag ordering comment), so two `function` declarations with the same name in that scope
+// silently collide: the second one overwrites the first for every call site, not just its own.
+// That's exactly what happened here before this rename -- checklist item photos were silently
+// getting compressed with THIS function's larger 1600px/0.85-quality settings instead of their
+// own intended lighter 1280px/0.7 ones, because this later declaration in the file order won.
+// No visible symptom (uploads still worked, just larger than intended), which is why it went
+// unnoticed until specifically diffing the two functions' settings against their doc comments.
+function compressHotelPhotoFile(file){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
     reader.onerror = () => reject(reader.error);
@@ -455,7 +464,7 @@ function pickHotelPhotoFile(){
     if(!file) return;
     let dataUrl;
     try{
-      dataUrl = await compressPhotoFile(file);
+      dataUrl = await compressHotelPhotoFile(file);
     }catch(e){
       alert(state.lang==='ar' ? 'تعذّر معالجة الصورة' : 'Could not process the photo');
       return;
@@ -480,7 +489,7 @@ function uploadHotelPhoto(hotelId){
     if(!file) return;
     let dataUrl;
     try{
-      dataUrl = await compressPhotoFile(file);
+      dataUrl = await compressHotelPhotoFile(file);
     }catch(e){
       alert(state.lang==='ar' ? 'تعذّر معالجة الصورة' : 'Could not process the photo');
       return;
