@@ -109,14 +109,18 @@ if (usersTableSql && !usersTableSql.sql.includes("'hotel'")) {
   db.exec('PRAGMA foreign_keys = ON');
 }
 
-// inspections.inspector_id: change ON DELETE CASCADE to ON DELETE SET NULL (and drop the
-// NOT NULL) so that deleting an inspector's user account no longer cascades into silently
-// destroying every completed inspection report they ever filed. See the comment on this
-// column in schema.sql for the full rationale. SQLite can't ALTER a foreign key's ON DELETE
-// action in place, so an existing inspections table (created before this fix) needs to be
-// rebuilt, same rename/recreate/copy/drop approach used for the users table migration above.
+// inspections.hotel_id and inspections.inspector_id: change ON DELETE CASCADE to
+// ON DELETE SET NULL (and drop the NOT NULL) so that deleting a hotel property or an
+// inspector's user account no longer cascades into silently destroying every completed
+// inspection report tied to it. See the comment on these columns in schema.sql for the full
+// rationale. Keyed off hotel_id's old clause specifically -- an inspector_id-only fix already
+// shipped once before this one, so on a database that already went through that migration,
+// hotel_id is the only column still carrying the old CASCADE clause; on a database that never
+// migrated at all, both columns still have it and this rebuild fixes both in one pass. SQLite
+// can't ALTER a foreign key's ON DELETE action in place, so the table needs to be rebuilt, same
+// rename/recreate/copy/drop approach used for the users table migration above.
 const inspectionsTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='inspections'").get();
-if (inspectionsTableSql && inspectionsTableSql.sql.includes('inspector_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE')) {
+if (inspectionsTableSql && inspectionsTableSql.sql.includes('hotel_id TEXT NOT NULL REFERENCES hotels(id) ON DELETE CASCADE')) {
   db.exec('PRAGMA foreign_keys = OFF');
   db.exec('PRAGMA legacy_alter_table = ON');
   db.exec('BEGIN');
@@ -125,7 +129,7 @@ if (inspectionsTableSql && inspectionsTableSql.sql.includes('inspector_id TEXT N
     db.exec(`CREATE TABLE inspections (
       id TEXT PRIMARY KEY,
       assignment_id TEXT REFERENCES assignments(id) ON DELETE SET NULL,
-      hotel_id TEXT NOT NULL REFERENCES hotels(id) ON DELETE CASCADE,
+      hotel_id TEXT REFERENCES hotels(id) ON DELETE SET NULL,
       inspector_id TEXT REFERENCES users(id) ON DELETE SET NULL,
       standard_id TEXT NOT NULL DEFAULT 'audit4' CHECK(standard_id IN ('audit4','plus5')),
       property_name TEXT,
@@ -143,7 +147,7 @@ if (inspectionsTableSql && inspectionsTableSql.sql.includes('inspector_id TEXT N
       SELECT id, assignment_id, hotel_id, inspector_id, standard_id, property_name, property_type_label, city, inspector_name, visit_date, ref, status, signature, completed_at, created_at FROM inspections_old`);
     db.exec('DROP TABLE inspections_old');
     db.exec('COMMIT');
-    console.log('[migrate] inspections.inspector_id changed from ON DELETE CASCADE to ON DELETE SET NULL -- deleting an inspector no longer deletes their past reports');
+    console.log('[migrate] inspections.hotel_id/inspector_id changed from ON DELETE CASCADE to ON DELETE SET NULL -- deleting a hotel or inspector no longer deletes their past reports');
   } catch (e) {
     db.exec('ROLLBACK');
     db.exec('PRAGMA legacy_alter_table = OFF');

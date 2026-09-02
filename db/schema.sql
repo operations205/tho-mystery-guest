@@ -58,14 +58,17 @@ CREATE TABLE IF NOT EXISTS assignments (
 CREATE TABLE IF NOT EXISTS inspections (
   id TEXT PRIMARY KEY,
   assignment_id TEXT REFERENCES assignments(id) ON DELETE SET NULL,
-  hotel_id TEXT NOT NULL REFERENCES hotels(id) ON DELETE CASCADE,
-  -- inspector_id is nullable with ON DELETE SET NULL (not CASCADE) deliberately: this table is
-  -- the actual audit record. property_name/inspector_name/etc. below are already a denormalized
-  -- snapshot captured at creation time specifically so the report keeps rendering correctly even
-  -- if the hotel or inspector record it referenced is later renamed or removed. inspector_id
-  -- cascading to delete the whole inspection would mean removing an inspector who has since left
-  -- the company silently destroys every completed report they ever filed -- see the db.js
-  -- migration that rebuilds this table for databases created before this fix.
+  -- hotel_id and inspector_id are both nullable with ON DELETE SET NULL (not CASCADE)
+  -- deliberately: this table is the actual audit record. property_name/inspector_name/city/etc.
+  -- below are already a denormalized snapshot captured at creation time specifically so the
+  -- report keeps rendering correctly even if the hotel or inspector record it referenced is
+  -- later renamed or removed (the client's renderReportBody() already falls back to these
+  -- snapshot fields whenever the live hotel lookup comes back empty -- see reportHotel in
+  -- public/js/app-report.js). Cascading either FK to delete the whole inspection would mean
+  -- deleting a hotel property, or an inspector who has since left the company, silently
+  -- destroys every completed report tied to it -- see the db.js migration that rebuilds this
+  -- table for databases created before this fix.
+  hotel_id TEXT REFERENCES hotels(id) ON DELETE SET NULL,
   inspector_id TEXT REFERENCES users(id) ON DELETE SET NULL,
   standard_id TEXT NOT NULL DEFAULT 'audit4' CHECK(standard_id IN ('audit4','plus5')),
   property_name TEXT,
