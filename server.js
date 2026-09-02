@@ -39,8 +39,19 @@ const settingsRoutes = require('./src/routes/settings');
 const clientsRoutes = require('./src/routes/clients');
 const templatesRoutes = require('./src/routes/templates');
 const documentsRoutes = require('./src/routes/documents');
+const backupsRoutes = require('./src/routes/backups');
+const { scheduleBackups } = require('./src/lib/backup');
 
 const app = express();
+
+// Render's HTTP(S) traffic reaches this process through exactly one reverse proxy hop (their
+// edge/load balancer). Without this, req.ip is always that proxy's own IP for every request --
+// which collapses every visitor into the SAME bucket for the login/forgot-password rate limiters
+// below (one abusive IP could lock out every real user at once) and makes X-Forwarded-For
+// unusable for anything that needs the real client IP. "1" (not `true`) trusts exactly the
+// nearest hop and no further, so a client can't spoof extra X-Forwarded-For entries to fake a
+// different apparent IP.
+app.set('trust proxy', 1);
 
 // Security headers. The app renders most of its UI via inline onclick="" handlers and inline
 // style="" attributes (a vanilla-JS single-file SPA), so a strict default CSP would break the
@@ -108,6 +119,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/clients', clientsRoutes);
 app.use('/api/templates', templatesRoutes);
 app.use('/api/documents', documentsRoutes);
+app.use('/api/backups', backupsRoutes);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
@@ -134,4 +146,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`THO Mystery Guest platform running on port ${PORT}`);
+  // Periodic SQLite backups (see src/lib/backup.js) -- first one shortly after boot, then daily.
+  // Off by default in a plain `npm test`/CI run via SKIP_BACKUPS, so nothing writes to disk or
+  // schedules timers that would keep a short-lived process alive during automated testing.
+  if (!process.env.SKIP_BACKUPS) scheduleBackups();
 });

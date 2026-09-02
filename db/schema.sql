@@ -135,3 +135,16 @@ CREATE TABLE IF NOT EXISTS generated_documents (
   created_by TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_documents_client ON generated_documents(client_id);
+
+-- One-time delivery for seeded demo-account passwords (see db/seed.js). Only the admin
+-- bootstrap credential still goes to the process console (it's the only way to log in before
+-- any session exists) -- every OTHER seeded account's temp password is stashed here instead of
+-- being blasted into logs that Render retains indefinitely. The admin views this list exactly
+-- once from an authenticated in-app screen after their first login; the route that serves it
+-- deletes every row it returns, so it's gone from the DB the moment it's been shown.
+CREATE TABLE IF NOT EXISTS seed_credentials (
+  username TEXT PRIMARY KEY,
+  role TEXT NOT NULL,
+  password TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);

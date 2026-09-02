@@ -34,7 +34,20 @@
 </head>
 <body>
 <div id="app"></div>
-<script src="/app.js"></script>
+<!-- Split from a single 2800+ line app.js into ordered, non-module <script> files -- each
+       still lands in the same shared global `window` scope classic scripts always have (no
+       import/export needed), so every inline onclick="" handler and every window.X hook the
+       PDF-export Puppeteer path relies on keeps working completely unchanged. Load order matters
+       only in that a file must not be EXECUTED before something it calls is defined -- since
+       nothing actually runs until boot() fires at the very end, after every file below has
+       already loaded, the order here just mirrors the original file's top-to-bottom layout. -->
+  <script src="/js/app-data.js"></script>
+  <script src="/js/app-core.js"></script>
+  <script src="/js/app-login.js"></script>
+  <script src="/js/app-admin.js"></script>
+  <script src="/js/app-report.js"></script>
+  <script src="/js/app-inspector.js"></script>
+  <script src="/js/app-boot.js"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

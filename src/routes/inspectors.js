@@ -19,6 +19,14 @@ function toPublic(row) {
 
 router.get('/', (req, res) => {
   if (req.user.role === 'hotel') return res.json([]); // not relevant to the hotel side
+  if (req.user.role === 'inspector') {
+    // An inspector has no legitimate need to see the rest of the roster (other inspectors'
+    // usernames and emails) -- the client only actually needs its own record here (merged into
+    // the local USERS list so currentUser() can find "me"). Scope this down to self instead of
+    // the full team.
+    const row = db.prepare("SELECT * FROM users WHERE id=? AND role='inspector'").get(req.user.id);
+    return res.json(row ? [toPublic(row)] : []);
+  }
   const rows = db.prepare("SELECT * FROM users WHERE role='inspector' ORDER BY created_at DESC").all();
   res.json(rows.map(toPublic));
 });

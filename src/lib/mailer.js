@@ -61,4 +61,20 @@ async function sendPasswordResetEmail({ to, name, resetUrl }) {
   });
 }
 
-module.exports = { sendPasswordResetEmail, isConfigured };
+// Emails a database backup file as an attachment (see src/lib/backup.js). Uses the same Gmail
+// SMTP transporter as password resets -- no separate mail infrastructure needed for this to be a
+// genuine off-instance copy, not just another file sitting on the same Render disk.
+async function sendBackupEmail({ to, filePath }) {
+  const t = getTransporter();
+  if (!t) throw new Error('smtp_not_configured');
+  const fileName = filePath.split('/').pop();
+  await t.sendMail({
+    from: `"THO Mystery Guest" <${process.env.SMTP_USER}>`,
+    to,
+    subject: `THO Mystery Guest -- DB backup ${fileName}`,
+    text: `Automated database backup attached (${fileName}). This is a point-in-time copy of the platform's SQLite database, sent automatically so a copy exists off the hosting instance.`,
+    attachments: [{ filename: fileName, path: filePath }]
+  });
+}
+
+module.exports = { sendPasswordResetEmail, sendBackupEmail, isConfigured };

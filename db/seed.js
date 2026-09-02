@@ -83,13 +83,30 @@ function seed() {
       const a = di.answers[itemId];
       insertAnswer.run(di.id, itemId, a.value, a.note || '');
     });
+
+    // Only the admin's own bootstrap password goes to the console -- there is no session yet at
+    // first boot, so that one credential has to reach the operator through *some* side channel,
+    // and the process log is the least-bad option for a single secret. Every other seeded
+    // account's password is stashed in seed_credentials instead of also being printed: the admin
+    // logs in with the console-printed credential, then views (and permanently clears) the rest
+    // from an authenticated one-time screen in the app (GET/DELETE /api/auth/seed-credentials) --
+    // so N secrets no longer sit in Render's retained logs forever, only the one that's
+    // unavoidable.
+    const insertSeedCred = db.prepare(`INSERT INTO seed_credentials (username, role, password, created_at) VALUES (?, ?, ?, ?)`);
+    const now = Date.now();
+    seededCredentials.forEach(c => {
+      if (c.role !== 'admin') insertSeedCred.run(c.username, c.role, c.password, now);
+    });
+
     db.exec('COMMIT');
   } catch (e) {
     db.exec('ROLLBACK');
     throw e;
   }
-  console.log('[seed] done. One-time login passwords (change these immediately from the app):');
-  seededCredentials.forEach(c => console.log(`[seed]   ${c.username} (${c.role}): ${c.password}`));
+  const adminCred = seededCredentials.find(c => c.role === 'admin');
+  console.log('[seed] done. Admin bootstrap password (change this immediately from the app):');
+  if (adminCred) console.log(`[seed]   ${adminCred.username} (admin): ${adminCred.password}`);
+  console.log('[seed] Other seeded accounts\' one-time passwords are available in-app: log in as admin, then check the "Seeded accounts" prompt (GET /api/auth/seed-credentials).');
 }
 
 module.exports = { seed };

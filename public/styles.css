@@ -254,6 +254,15 @@
   .icon-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px;display:inline-flex;min-height:36px;min-width:36px;align-items:center;justify-content:center;}
   .icon-btn:hover{background:#eef0f3;color:var(--navy);}
   .icon-btn.danger:hover{background:var(--red-bg);color:var(--red);}
+  @media (max-width:900px){
+    /* .icon-btn's 36x36px base size is below the ~44px touch-target guideline -- fine with a
+       mouse, but these are exactly the edit/delete/view row actions that get tapped constantly
+       on a phone, so bump them up (and give row-actions a bit more breathing room) once we're
+       in a touch-first layout. Must come AFTER the base .icon-btn rule above -- same
+       specificity, so source order decides the winner regardless of the media query. */
+    .icon-btn{min-height:44px;min-width:44px;padding:10px;}
+    .row-actions{gap:2px;}
+  }
 
   /* drawer */
   .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s;}
@@ -469,6 +478,19 @@
   .rc-hero-photo img{width:100%;height:100%;object-fit:cover;display:block;}
   .rc-hero-photo-empty{color:var(--muted);}
   .rc-hero-photo-empty .material-symbols-outlined{font-size:44px;}
+  /* On-screen mobile only (the print stylesheet already handles the exported-PDF case with its
+     own, more aggressive compaction further down). .rc-hero has no flex-wrap, so its two
+     children (.rc-hero-card and .rc-hero-photo, each with their own min-width) were forced
+     side-by-side no matter how narrow the viewport got -- the combined minimum width easily
+     exceeds a phone screen, causing horizontal scroll on the live (non-print) report view.
+     Stacking them instead removes that hard floor. */
+  @media (max-width:640px){
+    .rc-hero{flex-direction:column;}
+    .rc-hero-card{padding:14px;}
+    .rc-hero-identity{min-width:0;}
+    .rc-hero-score{min-width:0;border-inline-start:none;border-top:1px solid var(--border);padding-inline-start:0;padding-top:12px;margin-top:8px;width:100%;}
+    .rc-hero-photo{min-width:0;min-height:140px;}
+  }
 
   .rc-exec-summary{display:flex;align-items:flex-start;gap:12px;background:#fffaf0;border:1px solid var(--gold);border-radius:12px;padding:13px 18px;margin-bottom:18px;}
   .rc-exec-badge{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;}

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const db = require('../../db/db');
-const { signToken, requireAuth } = require('../middleware/auth');
+const { signToken, requireAuth, requireRole } = require('../middleware/auth');
 const { sendPasswordResetEmail, isConfigured: mailerConfigured } = require('../lib/mailer');
 const { withinLength } = require('../utils/validate');
 const { resolveAppOrigin } = require('../utils/origin');
@@ -182,6 +182,17 @@ router.post('/reset-password', (req, res) => {
   db.prepare('UPDATE users SET password_hash=?, token_version = token_version + 1 WHERE id=?')
     .run(bcrypt.hashSync(new_password, 10), user.id);
   res.json({ ok: true });
+});
+
+// One-time delivery for the OTHER seeded demo accounts' passwords (the admin's own bootstrap
+// credential is still printed to the console at first boot -- see db/seed.js for why). Returns
+// whatever's currently in seed_credentials and immediately deletes every row it returned, so a
+// second call (or a second admin, or anyone else later) gets nothing -- this is meant to be
+// viewed exactly once, right after the very first login.
+router.get('/seed-credentials', requireAuth, requireRole('admin'), (req, res) => {
+  const rows = db.prepare('SELECT username, role, password FROM seed_credentials ORDER BY created_at ASC').all();
+  if (rows.length) db.prepare('DELETE FROM seed_credentials').run();
+  res.json({ credentials: rows });
 });
 
 module.exports = router;

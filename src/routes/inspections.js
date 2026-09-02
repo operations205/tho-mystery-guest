@@ -17,6 +17,26 @@ function getAnswers(inspectionId) {
   return map;
 }
 
+// Bulk-loads just enough to score every inspection in one query, instead of the N+1 pattern of
+// calling getAnswers() (which also pulls every item's full base64 photo blob -- potentially
+// several MB each) once per row in the list route below. Returns { [inspectionId]: {itemId:
+// {value, note}} }, keyed the same shape getAnswers() uses per-inspection so computeScores()
+// doesn't need to change. photo is deliberately left out -- nothing that scores an inspection
+// needs the image data, only value (and note, for critical-fail detail).
+function getAnswersBulk(inspectionIds) {
+  const byInsp = {};
+  if (inspectionIds.length === 0) return byInsp;
+  const placeholders = inspectionIds.map(() => '?').join(',');
+  const rows = db.prepare(
+    `SELECT inspection_id, item_id, value, note FROM answers WHERE inspection_id IN (${placeholders})`
+  ).all(...inspectionIds);
+  rows.forEach(r => {
+    if (!byInsp[r.inspection_id]) byInsp[r.inspection_id] = {};
+    byInsp[r.inspection_id][r.item_id] = { value: r.value, note: r.note || '' };
+  });
+  return byInsp;
+}
+
 // A hotel-role user may only ever see their own hotel's *completed* reports — an in-progress
 // inspection isn't a finished report yet, so it stays hidden from the hotel side.
 function hotelCanSee(row, user) {
@@ -44,9 +64,12 @@ router.get('/', (req, res) => {
     rows = db.prepare('SELECT * FROM inspections ORDER BY created_at DESC').all();
   }
   // Include a lightweight computed score summary so dashboard/list views don't need full answers.
+  // One bulk query for every row's answers (value/note only, no photo blobs) instead of a
+  // separate getAnswers() round-trip per inspection.
+  const answersByInsp = getAnswersBulk(rows.map(r => r.id));
   res.json(rows.map(r => {
     const pub = toPublic(r, false);
-    const sc = computeScores(r.standard_id, getAnswers(r.id));
+    const sc = computeScores(r.standard_id, answersByInsp[r.id] || {});
     pub.overall = sc.overall;
     pub.totalItems = sc.totalItems;
     pub.answeredCount = sc.answeredCount;
