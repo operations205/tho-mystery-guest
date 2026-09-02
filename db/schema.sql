@@ -137,7 +137,14 @@ CREATE TABLE IF NOT EXISTS clients (
 CREATE TABLE IF NOT EXISTS generated_documents (
   id TEXT PRIMARY KEY,
   type TEXT NOT NULL CHECK(type IN ('proposal','contract')),
-  client_id TEXT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  -- Nullable with ON DELETE SET NULL (not CASCADE), same rationale as inspections.hotel_id/
+  -- inspector_id above: data_json is a full denormalized snapshot of the client/hotel/pricing
+  -- info captured at generation time (the admin document-history list already renders from
+  -- data_json, e.g. h.data.document_ref -- see public/js/app-admin.js -- never from a live
+  -- client join), so a generated proposal/contract doesn't need client_id to stay valid to
+  -- keep rendering. Deleting a client (e.g. a lead that never converted, or old test data)
+  -- should not silently destroy every contract/proposal ever generated for them.
+  client_id TEXT REFERENCES clients(id) ON DELETE SET NULL,
   file_name TEXT NOT NULL,
   file_data TEXT NOT NULL,
   data_json TEXT NOT NULL,

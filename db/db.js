@@ -158,4 +158,41 @@ if (inspectionsTableSql && inspectionsTableSql.sql.includes('hotel_id TEXT NOT N
   db.exec('PRAGMA foreign_keys = ON');
 }
 
+// generated_documents.client_id: same fix, same rationale as the inspections migration
+// above -- change ON DELETE CASCADE to ON DELETE SET NULL (and drop the NOT NULL) so deleting a
+// client no longer cascades into destroying every proposal/contract ever generated for them.
+// See the comment on this column in schema.sql.
+const documentsTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='generated_documents'").get();
+if (documentsTableSql && documentsTableSql.sql.includes('client_id TEXT NOT NULL REFERENCES clients(id) ON DELETE CASCADE')) {
+  db.exec('PRAGMA foreign_keys = OFF');
+  db.exec('PRAGMA legacy_alter_table = ON');
+  db.exec('BEGIN');
+  try {
+    db.exec('ALTER TABLE generated_documents RENAME TO generated_documents_old');
+    db.exec(`CREATE TABLE generated_documents (
+      id TEXT PRIMARY KEY,
+      type TEXT NOT NULL CHECK(type IN ('proposal','contract')),
+      client_id TEXT REFERENCES clients(id) ON DELETE SET NULL,
+      file_name TEXT NOT NULL,
+      file_data TEXT NOT NULL,
+      data_json TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      created_by TEXT
+    )`);
+    db.exec(`INSERT INTO generated_documents (id, type, client_id, file_name, file_data, data_json, created_at, created_by)
+      SELECT id, type, client_id, file_name, file_data, data_json, created_at, created_by FROM generated_documents_old`);
+    db.exec('DROP TABLE generated_documents_old');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_documents_client ON generated_documents(client_id)');
+    db.exec('COMMIT');
+    console.log('[migrate] generated_documents.client_id changed from ON DELETE CASCADE to ON DELETE SET NULL -- deleting a client no longer deletes their past proposals/contracts');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    db.exec('PRAGMA legacy_alter_table = OFF');
+    db.exec('PRAGMA foreign_keys = ON');
+    throw e;
+  }
+  db.exec('PRAGMA legacy_alter_table = OFF');
+  db.exec('PRAGMA foreign_keys = ON');
+}
+
 module.exports = db;
