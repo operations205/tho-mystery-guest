@@ -261,6 +261,21 @@ router.post('/:id/approve', requireRole('admin'), (req, res) => {
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });
 
+// Admin/committee sends an already-approved report back to pending_review WITHOUT touching
+// its content, answers, or signature -- unlike /:id/reject or /:id/reopen, which are for when
+// the inspector needs to change something. This is for correcting an approval itself: either
+// undoing an accidental Approve click, or -- the case this was actually added for -- applying
+// the review requirement retroactively to a report that was completed before this approval
+// workflow existed at all (so it was never actually looked at by the committee, even though
+// its status column says 'completed' just like a genuinely-approved one would).
+router.post('/:id/unapprove', requireRole('admin'), (req, res) => {
+  const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!insp) return res.status(404).json({ error: 'not_found' });
+  if (insp.status !== 'completed') return res.status(400).json({ error: 'not_completed' });
+  db.prepare("UPDATE inspections SET status='pending_review', completed_at=NULL WHERE id=?").run(req.params.id);
+  res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
+});
+
 // Admin/committee rejects a submitted report with feedback -- sends it back to the inspector
 // as in_progress (never visible to the hotel role), clearing the old signature since the
 // inspector will be editing content and must re-sign before resubmitting.

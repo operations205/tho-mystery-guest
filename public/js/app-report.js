@@ -296,6 +296,7 @@ function renderReportBody(insp, backAction){
   const workflowActionsHtml = `
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-primary btn-sm" onclick="approveReport('${insp.id}')">${ic('task_alt')}${t('btnApproveReport')}</button>` : ''}
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="rejectReport('${insp.id}')">${ic('cancel')}${t('btnRejectReport')}</button>` : ''}
+    ${role === 'admin' && insp.status === 'completed' ? `<button class="btn btn-outline btn-sm" onclick="unapproveReport('${insp.id}')">${ic('undo')}${t('btnUnapproveReport')}</button>` : ''}
     ${canReopen ? `<button class="btn btn-outline btn-sm" onclick="reopenReport('${insp.id}')">${ic('edit')}${t('btnReopenReport')}</button>` : ''}
   `;
 
@@ -486,6 +487,20 @@ async function viewHotelReport(id){ return openReportView(id, 'hotel-report'); }
    Shared here since the same report view (renderReportBody) is used from the admin, inspector,
    and hotel shells alike -- these three functions just call their endpoint, drop the refreshed
    inspection into local state, and re-render wherever the user currently is. */
+async function unapproveReport(id){
+  if(!confirm(t('confirmUnapproveReport'))) return;
+  let updated;
+  try{
+    updated = await apiPost('/inspections/' + id + '/unapprove');
+  }catch(e){
+    showToast((state.lang==='ar' ? 'تعذّر إرجاع التقرير: ' : 'Could not send the report back: ') + e.message, 'error');
+    return;
+  }
+  const idx = state.inspections.findIndex(i => i.id === id);
+  if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
+  showToast(t('toastReportUnapproved'), 'success');
+  render();
+}
 async function approveReport(id){
   let updated;
   try{
