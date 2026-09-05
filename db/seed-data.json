@@ -4579,8 +4579,8 @@
       "ar": "تم إرسال التقرير — بانتظار مراجعة واعتماد اللجنة قبل ما يوصل للعميل."
     },
     "submitAlertApproved": {
-      "en": "This report has been approved by the committee.",
-      "ar": "تم اعتماد هذا التقرير من اللجنة."
+      "en": "This report is completed and visible to the client.",
+      "ar": "هذا التقرير مكتمل ومتاح للعميل."
     },
     "reviewNoteBanner": {
       "en": "The committee sent this report back for changes:",
