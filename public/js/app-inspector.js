@@ -196,7 +196,7 @@ function renderInspectorInspect(){
 
   return `
   <div class="stepper-top">
-    <div class="mi-progress"><span>${esc(insp.property)}</span><span>${sc.answeredCount}/${sc.totalItems} (${pct}%)</span></div>
+    <div class="mi-progress"><span>${esc(inspPropertyName(insp))}</span><span>${sc.answeredCount}/${sc.totalItems} (${pct}%)</span></div>
     <div class="progress-bar-bg" style="margin-bottom:8px;"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
     <div class="chip-row">${chips}</div>
   </div>

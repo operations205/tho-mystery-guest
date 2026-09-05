@@ -18,7 +18,7 @@ function renderSignatureBlock(insp){
     <div class="sig-col">
       ${sigHtml}
       <div class="sig-line">
-        <div class="sig-name">${esc(insp.inspector||'')}</div>
+        <div class="sig-name">${esc(inspInspectorName(insp)||'')}</div>
         <div class="sig-date">${t('inspectorSignedRole')} · ${esc(dateStr)}</div>
       </div>
     </div>
@@ -120,7 +120,7 @@ function renderMetaStrip(insp){
   <div class="report-meta-strip">
     <div class="rm-item"><span class="rm-label">${t('propType')}</span><span class="rm-value">${esc(insp.propertyTypeLabel||'')}</span></div>
     <div class="rm-item"><span class="rm-label">${t('city')}</span><span class="rm-value">${esc(insp.city||'')}</span></div>
-    <div class="rm-item"><span class="rm-label">${t('inspector')}</span><span class="rm-value">${esc(insp.inspector)}</span></div>
+    <div class="rm-item"><span class="rm-label">${t('inspector')}</span><span class="rm-value">${esc(inspInspectorName(insp))}</span></div>
     <div class="rm-item"><span class="rm-label">${t('visitDate')}</span><span class="rm-value">${esc(insp.visitDate||'')}</span></div>
     ${insp.ref ? `<div class="rm-item"><span class="rm-label">${t('refLabel')}</span><span class="rm-value" dir="ltr">${esc(insp.ref)}</span></div>` : ''}
     <div class="rm-item"><span class="rm-label">${t('reportDateLabel')}</span><span class="rm-value">${esc(insp.completedAt ? new Date(insp.completedAt).toISOString().slice(0,10) : (insp.visitDate||''))}</span></div>
@@ -259,12 +259,12 @@ function renderReportBody(insp, backAction){
 
   const execSummaryHtml = `<p class="exec-summary">${
     state.lang==='ar'
-      ? `شمل هذا التفتيش ${sc.totalItems} معيارًا موزعة على ${catList.length} فئة في ${esc(insp.property)}، وجاءت النتيجة الإجمالية ${sc.overall}% (${grade.label}).`
+      ? `شمل هذا التفتيش ${sc.totalItems} معيارًا موزعة على ${catList.length} فئة في ${esc(inspPropertyName(insp))}، وجاءت النتيجة الإجمالية ${sc.overall}% (${grade.label}).`
         + (sc.criticalFails.length>0
             ? ` رُصدت ${sc.criticalFails.length} نقطة حرجة تستدعي معالجة فورية.`
             : ' لم تُرصد أي نقاط حرجة خلال الزيارة.')
         + (weakestCat ? ` أعلى أولوية للتحسين: <strong>${esc(tc(weakestCat))}</strong> (${weakestScore}%).` : '')
-      : `This inspection covered ${sc.totalItems} criteria across ${catList.length} categories at ${esc(insp.property)}, with an overall score of ${sc.overall}% (${grade.label}).`
+      : `This inspection covered ${sc.totalItems} criteria across ${catList.length} categories at ${esc(inspPropertyName(insp))}, with an overall score of ${sc.overall}% (${grade.label}).`
         + (sc.criticalFails.length>0
             ? ` ${sc.criticalFails.length} critical issue(s) require immediate attention.`
             : ' No critical issues were found during the visit.')
@@ -307,10 +307,10 @@ function renderReportBody(insp, backAction){
     <div class="rc-hero-card">
       <div class="rc-hero-identity">
         ${reportHotel && reportHotel.logo ? `<img class="rc-hero-hotel-logo" src="${esc(reportHotel.logo)}" alt="">` : ''}
-        <div class="rc-hotel-name">${esc(reportHotel ? reportHotel.name.en : insp.property)}</div>
+        <div class="rc-hotel-name">${esc(inspPropertyName(insp))}</div>
         <div class="rc-hero-row">${ic('location_on')}<span>${esc(reportHotel ? reportHotel.city.en : (insp.city||''))} / ${esc(reportHotel ? reportHotel.city.ar : (insp.city||''))}</span></div>
         <div class="rc-hero-row">${ic('event')}<span>${bl('تاريخ الزيارة','Visit Date')} : ${esc(insp.visitDate||'')}</span></div>
-        <div class="rc-hero-row">${ic('person')}<span>${bl('اسم المفتش','Inspector')} : ${esc(insp.inspector)}</span></div>
+        <div class="rc-hero-row">${ic('person')}<span>${bl('اسم المفتش','Inspector')} : ${esc(inspInspectorName(insp))}</span></div>
         <div class="rc-hero-row">${ic('badge')}<span>${bl('التقرير','Report Code')} : <span class="rc-code-pill">${reportCode}</span></span></div>
       </div>
       <div class="rc-hero-score">
@@ -462,7 +462,7 @@ function renderHotelReports(){
     const overall = insp.overall || 0;
     const badge = `<span class="badge ${overall>=75?'badge-green':(overall>=60?'badge-amber':'badge-red')}">${overall}%</span>`;
     return `<tr>
-      <td><strong>${esc(insp.property)}</strong></td>
+      <td><strong>${esc(inspPropertyName(insp))}</strong></td>
       <td>${esc(insp.visitDate||'')}</td>
       <td>${badge}</td>
       <td style="text-align:end;"><button class="btn btn-ghost btn-sm" onclick="viewHotelReport('${insp.id}')">${t('view')}</button></td>

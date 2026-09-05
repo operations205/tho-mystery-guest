@@ -298,6 +298,24 @@ function scoreColor(pct){
 /* ===================== SMALL HELPERS ===================== */
 function hotelById(id){ return state.hotels.find(h=>h.id===id); }
 function userById(id){ return USERS.find(u=>u.id===id); }
+
+/* Bilingual-aware display for inspection records. property_name/inspector_name on the
+   inspection row are a denormalized ENGLISH-ONLY snapshot captured once at creation time
+   (see POST /inspections/start on the server -- it stores hotel.name_en/user.name_en only,
+   never the Arabic equivalents). Rendering that field directly means the hotel/inspector
+   name always shows in English no matter what state.lang is set to.
+   Fix: prefer a live lookup of the hotel/inspector's real bilingual {en,ar} name via tl(),
+   and fall back to the English snapshot only when the live record is gone -- e.g. the hotel
+   or inspector was later deleted (inspections.hotel_id/inspector_id are ON DELETE SET NULL
+   specifically so old reports keep rendering via this snapshot). */
+function inspPropertyName(insp){
+  const hotel = hotelById(insp.hotelId);
+  return hotel ? tl(hotel.name) : insp.property;
+}
+function inspInspectorName(insp){
+  const u = userById(insp.inspectorId);
+  return (u && u.name) ? tl(u.name) : insp.inspector;
+}
 function inspectionById(id){ return state.inspections.find(i=>i.id===id); }
 function assignmentById(id){ return state.assignments.find(a=>a.id===id); }
 function isOverdue(as){ return as.status!=='completed' && as.dueDate < new Date().toISOString().slice(0,10); }

@@ -263,9 +263,9 @@ function renderAdminInspections(){
       ? `<span class="badge ${overall>=75?'badge-green':(overall>=60?'badge-amber':'badge-red')}">${overall}%</span>`
       : `<span class="badge badge-amber">${t('statusProgress')}</span>`;
     return `<tr>
-      <td><strong>${esc(insp.property)}</strong></td>
+      <td><strong>${esc(inspPropertyName(insp))}</strong></td>
       <td>${esc(insp.propertyTypeLabel||'')}</td>
-      <td>${esc(insp.inspector)}</td>
+      <td>${esc(inspInspectorName(insp))}</td>
       <td>${esc(insp.visitDate||'')}</td>
       <td>${badge}</td>
       <td>${insp.status==='completed' ? `<span class="badge badge-gray">${t('statusDone')}</span>` : `<span class="badge badge-amber">${t('statusProgress')}</span>`}</td>
