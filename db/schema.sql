@@ -77,8 +77,17 @@ CREATE TABLE IF NOT EXISTS inspections (
   inspector_name TEXT,
   visit_date TEXT,
   ref TEXT DEFAULT '',
-  status TEXT NOT NULL DEFAULT 'in_progress' CHECK(status IN ('in_progress','completed')),
+  -- status flow: in_progress (inspector working) -> pending_review (inspector signed &
+  -- submitted, awaiting the company review committee) -> completed (committee approved --
+  -- ONLY status the hotel role is ever allowed to see, per hotelCanSee() below). A rejected
+  -- pending_review report goes back to in_progress with review_note set to the committee's
+  -- feedback and signature cleared, so the inspector must fix it and re-sign before it can be
+  -- resubmitted. completed_at is set only on approval (i.e. it doubles as "approved_at");
+  -- submitted_at marks when the inspector originally signed off, independent of approval.
+  status TEXT NOT NULL DEFAULT 'in_progress' CHECK(status IN ('in_progress','pending_review','completed')),
   signature TEXT,
+  review_note TEXT,
+  submitted_at INTEGER,
   completed_at INTEGER,
   created_at INTEGER NOT NULL
 );

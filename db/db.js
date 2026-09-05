@@ -195,4 +195,54 @@ if (documentsTableSql && documentsTableSql.sql.includes('client_id TEXT NOT NULL
   db.exec('PRAGMA foreign_keys = ON');
 }
 
+// inspections: add the committee-approval workflow. Previously an inspector's signed report
+// went straight to status='completed' (immediately visible to the hotel via hotelCanSee()).
+// Now it goes to 'pending_review' first -- invisible to the hotel role until an admin
+// approves it -- and only an approval flips it to 'completed'. A rejection sends it back to
+// 'in_progress' with review_note set to the committee's feedback. Also adds submitted_at
+// (when the inspector originally signed off) alongside the existing completed_at, which from
+// now on means "approved_at" specifically.
+const inspectionsStatusSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='inspections'").get();
+if (inspectionsStatusSql && inspectionsStatusSql.sql.includes("CHECK(status IN ('in_progress','completed'))")) {
+  db.exec('PRAGMA foreign_keys = OFF');
+  db.exec('PRAGMA legacy_alter_table = ON');
+  db.exec('BEGIN');
+  try {
+    db.exec('ALTER TABLE inspections RENAME TO inspections_old2');
+    db.exec(`CREATE TABLE inspections (
+      id TEXT PRIMARY KEY,
+      assignment_id TEXT REFERENCES assignments(id) ON DELETE SET NULL,
+      hotel_id TEXT REFERENCES hotels(id) ON DELETE SET NULL,
+      inspector_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+      standard_id TEXT NOT NULL DEFAULT 'audit4' CHECK(standard_id IN ('audit4','plus5')),
+      property_name TEXT,
+      property_type_label TEXT,
+      city TEXT,
+      inspector_name TEXT,
+      visit_date TEXT,
+      ref TEXT DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'in_progress' CHECK(status IN ('in_progress','pending_review','completed')),
+      signature TEXT,
+      review_note TEXT,
+      submitted_at INTEGER,
+      completed_at INTEGER,
+      created_at INTEGER NOT NULL
+    )`);
+    db.exec(`INSERT INTO inspections (id, assignment_id, hotel_id, inspector_id, standard_id, property_name, property_type_label, city, inspector_name, visit_date, ref, status, signature, review_note, submitted_at, completed_at, created_at)
+      SELECT id, assignment_id, hotel_id, inspector_id, standard_id, property_name, property_type_label, city, inspector_name, visit_date, ref, status, signature, NULL, NULL, completed_at, created_at FROM inspections_old2`);
+    db.exec('DROP TABLE inspections_old2');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_inspections_hotel ON inspections(hotel_id)');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_inspections_inspector ON inspections(inspector_id)');
+    db.exec('COMMIT');
+    console.log('[migrate] inspections gained the committee-approval workflow: status pending_review, review_note, submitted_at columns added');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    db.exec('PRAGMA legacy_alter_table = OFF');
+    db.exec('PRAGMA foreign_keys = ON');
+    throw e;
+  }
+  db.exec('PRAGMA legacy_alter_table = OFF');
+  db.exec('PRAGMA foreign_keys = ON');
+}
+
 module.exports = db;

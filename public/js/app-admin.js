@@ -254,21 +254,32 @@ function renderAdminAssignments(){
 function renderAdminInspections(){
   const list = state.inspections.slice().sort((a,b)=>b.createdAt-a.createdAt);
   let filtered = list;
-  if(state.inspFilterStatus==='completed') filtered = list.filter(i=>i.status==='completed');
-  else if(state.inspFilterStatus==='in_progress') filtered = list.filter(i=>i.status!=='completed');
+  if(state.inspFilterStatus!=='all') filtered = list.filter(i=>i.status===state.inspFilterStatus);
+
+  const pendingCount = list.filter(i=>i.status==='pending_review').length;
+
+  function statusBadge(insp){
+    if(insp.status==='completed'){
+      const overall = insp.overall || 0;
+      return `<span class="badge ${overall>=75?'badge-green':(overall>=60?'badge-amber':'badge-red')}">${overall}%</span>`;
+    }
+    if(insp.status==='pending_review') return `<span class="badge badge-amber">${t('statusPendingReview')}</span>`;
+    return `<span class="badge badge-amber">${t('statusProgress')}</span>`;
+  }
+  function statusLabel(insp){
+    if(insp.status==='completed') return `<span class="badge badge-gray">${t('statusDone')}</span>`;
+    if(insp.status==='pending_review') return `<span class="badge badge-amber">${t('statusPendingReview')}</span>`;
+    return `<span class="badge badge-amber">${t('statusProgress')}</span>`;
+  }
 
   const rows = filtered.map(insp=>{
-    const overall = insp.overall || 0;
-    const badge = insp.status==='completed'
-      ? `<span class="badge ${overall>=75?'badge-green':(overall>=60?'badge-amber':'badge-red')}">${overall}%</span>`
-      : `<span class="badge badge-amber">${t('statusProgress')}</span>`;
     return `<tr>
       <td><strong>${esc(inspPropertyName(insp))}</strong></td>
       <td>${esc(insp.propertyTypeLabel||'')}</td>
       <td>${esc(inspInspectorName(insp))}</td>
       <td>${esc(insp.visitDate||'')}</td>
-      <td>${badge}</td>
-      <td>${insp.status==='completed' ? `<span class="badge badge-gray">${t('statusDone')}</span>` : `<span class="badge badge-amber">${t('statusProgress')}</span>`}</td>
+      <td>${statusBadge(insp)}</td>
+      <td>${statusLabel(insp)}</td>
       <td class="row-actions" style="justify-content:flex-end;">
         <button class="btn btn-ghost btn-sm" onclick="viewAdminReport('${insp.id}')">${t('view')}</button>
         <button class="icon-btn danger" onclick="deleteInspectionReport('${insp.id}')" title="${t('delete')}" aria-label="${t('delete')}">${ic('delete')}</button>
@@ -281,6 +292,7 @@ function renderAdminInspections(){
   <div class="toolbar">
     <select class="mini" onchange="state.inspFilterStatus=this.value;render();">
       <option value="all" ${state.inspFilterStatus==='all'?'selected':''}>${t('filterAllStatus')}</option>
+      <option value="pending_review" ${state.inspFilterStatus==='pending_review'?'selected':''}>${t('statusPendingReview')}${pendingCount>0?' ('+pendingCount+')':''}</option>
       <option value="completed" ${state.inspFilterStatus==='completed'?'selected':''}>${t('statusDone')}</option>
       <option value="in_progress" ${state.inspFilterStatus==='in_progress'?'selected':''}>${t('statusProgress')}</option>
     </select>

@@ -48,7 +48,8 @@ function toPublic(row, includeAnswers) {
     id: row.id, assignmentId: row.assignment_id, hotelId: row.hotel_id, inspectorId: row.inspector_id,
     standardId: row.standard_id, property: row.property_name, propertyTypeLabel: row.property_type_label,
     city: row.city, inspector: row.inspector_name, visitDate: row.visit_date, ref: row.ref,
-    status: row.status, signature: row.signature, completedAt: row.completed_at, createdAt: row.created_at
+    status: row.status, signature: row.signature, reviewNote: row.review_note,
+    submittedAt: row.submitted_at, completedAt: row.completed_at, createdAt: row.created_at
   };
   if (includeAnswers) base.answers = getAnswers(row.id);
   return base;
@@ -159,7 +160,11 @@ router.put('/:id/answers/:itemId', requireRole('inspector'), (req, res) => {
   const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!insp) return res.status(404).json({ error: 'not_found' });
   if (insp.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
-  if (insp.status === 'completed') return res.status(400).json({ error: 'already_completed' });
+  // Only editable while the inspector still has it in draft. Once signed & submitted it's
+  // pending_review (with the committee) or completed (approved) -- neither should be silently
+  // edited out from under a pending or already-delivered report. A committee rejection or an
+  // explicit reopen (see /:id/reopen below) is what puts it back into in_progress.
+  if (insp.status !== 'in_progress') return res.status(400).json({ error: 'not_editable' });
 
   const body = req.body || {};
   const item = catsForStandard(insp.standard_id).flatMap(c => c.items).find(i => i.id === req.params.itemId);
@@ -202,12 +207,18 @@ router.put('/:id/answers/:itemId', requireRole('inspector'), (req, res) => {
   res.json({ ok: true });
 });
 
-// Complete + sign
+// Complete + sign. As of the committee-approval workflow, this no longer finalizes the
+// report directly -- it moves it to 'pending_review' and an admin must separately approve it
+// (see /:id/approve below) before status becomes 'completed' and the hotel role can see it.
 router.post('/:id/complete', requireRole('inspector'), (req, res) => {
   const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!insp) return res.status(404).json({ error: 'not_found' });
   if (insp.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
-  if (insp.status === 'completed') return res.status(400).json({ error: 'already_completed' });
+  // Was previously "block only if already completed" -- now a stricter allowlist, since a
+  // report that's pending_review (already submitted) or completed (already approved) should
+  // never be re-submitted directly; it has to go through /:id/reopen or a committee rejection
+  // first to get back into in_progress.
+  if (insp.status !== 'in_progress') return res.status(400).json({ error: 'not_in_progress' });
 
   // Guard against the score formula's blind spot: overall% = yes/(yes+no), which silently
   // excludes unanswered items from the denominator. Without this check, an inspector could
@@ -221,15 +232,70 @@ router.post('/:id/complete', requireRole('inspector'), (req, res) => {
     return res.status(400).json({ error: 'incomplete', unansweredCount, totalItems: allItems.length });
   }
 
-  const { signature } = req.body || {}; // base64 PNG data URL, or null if skipped
-  if (signature !== undefined && signature !== null && signature !== '' && !isValidImageDataUrl(signature)) {
-    return res.status(400).json({ error: 'invalid_signature' });
+  // Signature is now mandatory -- previously it could be skipped (signature: null), which meant
+  // a report could be finalized and sent toward the client with no inspector sign-off at all.
+  // The business rule is explicit: no report is ever confirmed from an inspector without their
+  // signature on it.
+  const { signature } = req.body || {};
+  if (!signature || typeof signature !== 'string' || !isValidImageDataUrl(signature)) {
+    return res.status(400).json({ error: 'signature_required' });
   }
   const now = Date.now();
-  db.prepare("UPDATE inspections SET status='completed', signature=?, completed_at=? WHERE id=?")
-    .run(signature || null, now, req.params.id);
+  db.prepare("UPDATE inspections SET status='pending_review', signature=?, review_note=NULL, submitted_at=? WHERE id=?")
+    .run(signature, now, req.params.id);
   if (insp.assignment_id) {
     db.prepare("UPDATE assignments SET status='completed' WHERE id=?").run(insp.assignment_id);
+  }
+  res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
+});
+
+// Admin/committee approves a submitted report -- the only action that sets status='completed',
+// which is the only status the hotel role is ever allowed to see (see hotelCanSee() above).
+router.post('/:id/approve', requireRole('admin'), (req, res) => {
+  const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!insp) return res.status(404).json({ error: 'not_found' });
+  if (insp.status !== 'pending_review') return res.status(400).json({ error: 'not_pending_review' });
+  const now = Date.now();
+  db.prepare("UPDATE inspections SET status='completed', completed_at=?, review_note=NULL WHERE id=?")
+    .run(now, req.params.id);
+  res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
+});
+
+// Admin/committee rejects a submitted report with feedback -- sends it back to the inspector
+// as in_progress (never visible to the hotel role), clearing the old signature since the
+// inspector will be editing content and must re-sign before resubmitting.
+router.post('/:id/reject', requireRole('admin'), (req, res) => {
+  const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!insp) return res.status(404).json({ error: 'not_found' });
+  if (insp.status !== 'pending_review') return res.status(400).json({ error: 'not_pending_review' });
+  const note = (req.body && req.body.note || '').trim();
+  if (!note) return res.status(400).json({ error: 'note_required' });
+  if (!withinLength(note, 2000)) return res.status(400).json({ error: 'note_too_long' });
+  db.prepare("UPDATE inspections SET status='in_progress', review_note=?, signature=NULL, submitted_at=NULL WHERE id=?")
+    .run(note, req.params.id);
+  if (insp.assignment_id) {
+    db.prepare("UPDATE assignments SET status='in_progress' WHERE id=?").run(insp.assignment_id);
+  }
+  res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
+});
+
+// Reopen an already-submitted or already-approved report back into in_progress -- e.g. the
+// inspector forgot to rate an item and it needs a small correction. Allowed for an admin (any
+// report) or the inspector who owns it (their own report only). Clears the signature and any
+// approval, exactly like a rejection, since the content is about to change and re-submission
+// must go through the same sign + committee-review cycle again before the hotel can see it.
+router.post('/:id/reopen', (req, res) => {
+  const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!insp) return res.status(404).json({ error: 'not_found' });
+  const isOwnerInspector = req.user.role === 'inspector' && insp.inspector_id === req.user.id;
+  if (req.user.role !== 'admin' && !isOwnerInspector) return res.status(403).json({ error: 'forbidden' });
+  if (insp.status !== 'pending_review' && insp.status !== 'completed') {
+    return res.status(400).json({ error: 'not_reopenable' });
+  }
+  db.prepare("UPDATE inspections SET status='in_progress', signature=NULL, review_note=NULL, submitted_at=NULL, completed_at=NULL WHERE id=?")
+    .run(req.params.id);
+  if (insp.assignment_id) {
+    db.prepare("UPDATE assignments SET status='in_progress' WHERE id=?").run(insp.assignment_id);
   }
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });

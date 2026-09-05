@@ -194,7 +194,12 @@ function renderInspectorInspect(){
     </div>`;
   }).join('');
 
+  const reviewNoteHtml = insp.reviewNote
+    ? `<div class="alert" style="background:var(--red-bg);color:var(--red);border-color:var(--red);margin-bottom:10px;"><div>${ic('report')}<strong>${t('reviewNoteBanner')}</strong></div><div style="margin-top:6px;">${esc(insp.reviewNote)}</div></div>`
+    : '';
+
   return `
+  ${reviewNoteHtml}
   <div class="stepper-top">
     <div class="mi-progress"><span>${esc(inspPropertyName(insp))}</span><span>${sc.answeredCount}/${sc.totalItems} (${pct}%)</span></div>
     <div class="progress-bar-bg" style="margin-bottom:8px;"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
@@ -531,9 +536,8 @@ function renderInspectorSign(){
     <div class="sigpad-wrap"><canvas id="sigCanvas"></canvas></div>
     <div style="display:flex;gap:10px;margin-top:4px;">
       <button class="btn btn-ghost btn-sm" onclick="clearSigPad()">${ic('backspace')}${t('clearSig')}</button>
-      <button class="btn btn-ghost btn-sm" onclick="submitSignature(true)">${t('skipSig')}</button>
     </div>
-    <button class="btn btn-primary btn-block" style="margin-top:18px;" onclick="submitSignature(false)">${ic('task_alt')}${t('certifySubmit')}</button>
+    <button class="btn btn-primary btn-block" style="margin-top:18px;" onclick="submitSignature()">${ic('task_alt')}${t('certifySubmit')}</button>
   `, {hideNav:true});
 }
 function initSigPad(){
@@ -570,7 +574,7 @@ function clearSigPad(){
   sigCtx.clearRect(0, 0, canvas.width, canvas.height);
   sigHasInk = false;
 }
-async function submitSignature(skip){
+async function submitSignature(){
   const insp = currentMobileInsp(); if(!insp) return;
   // Defense-in-depth: attemptFinishInspection() already blocks reaching this screen while
   // incomplete, but re-check here too in case this is ever called from another path.
@@ -583,16 +587,19 @@ async function submitSignature(skip){
     return;
   }
   const canvas = document.getElementById('sigCanvas');
-  let signature = null;
-  if(!skip && canvas && sigHasInk){
-    signature = canvas.toDataURL('image/png');
+  if(!canvas || !sigHasInk){
+    alert(t('signatureRequiredMsg'));
+    return;
   }
+  const signature = canvas.toDataURL('image/png');
   let updated;
   try{
     updated = await apiPost('/inspections/' + insp.id + '/complete', { signature });
   }catch(e){
     const msg = (e.data && e.data.error === 'incomplete')
       ? (state.lang==='ar' ? `لسه فيه ${e.data.unansweredCount} بند بدون إجابة.` : `${e.data.unansweredCount} item(s) still need an answer.`)
+      : (e.data && e.data.error === 'signature_required')
+      ? t('signatureRequiredMsg')
       : e.message;
     alert((state.lang==='ar' ? 'تعذّر إرسال التقرير: ' : 'Could not submit the report: ') + msg);
     return;
@@ -611,7 +618,7 @@ async function viewInspectorReport(id){ return openReportView(id, 'inspector-rep
 function renderInspectorReport(){
   const insp = currentMobileInsp();
   if(!insp) return renderInspectorHome();
-  const body = `<div class="alert no-print" style="background:var(--gold-soft);color:#7a5600;border-color:#f0dca0;">${ic('info')}<div>${t('submitAlert')}</div></div>` + renderReportBody(insp, "state.inspTab='assignments';go('inspector-home')");
+  const body = renderReportBody(insp, "state.inspTab='assignments';go('inspector-home')");
   return renderInspectorShell(body, {hideNav:true});
 }
 

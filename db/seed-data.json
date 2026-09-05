@@ -4525,6 +4525,70 @@
     "addSignatureAdmin": {
       "en": "Add Inspector Signature",
       "ar": "إضافة توقيع المفتش"
+    },
+    "statusPendingReview": {
+      "en": "Pending Review",
+      "ar": "بانتظار الاعتماد"
+    },
+    "btnApproveReport": {
+      "en": "Approve",
+      "ar": "اعتماد"
+    },
+    "btnRejectReport": {
+      "en": "Reject with Note",
+      "ar": "رفض مع ملاحظة"
+    },
+    "btnReopenReport": {
+      "en": "Reopen for Editing",
+      "ar": "إعادة فتح للتعديل"
+    },
+    "rejectPromptText": {
+      "en": "Enter the rejection reason / notes for the inspector:",
+      "ar": "اكتب سبب الرفض / الملاحظات للمفتش:"
+    },
+    "rejectNoteRequired": {
+      "en": "A rejection reason is required.",
+      "ar": "لازم تكتب سبب الرفض."
+    },
+    "reviewNoteLabel": {
+      "en": "Committee Notes",
+      "ar": "ملاحظات اللجنة"
+    },
+    "confirmReopenReport": {
+      "en": "This will reopen the report for editing. It must be re-signed and resubmitted to the committee. Continue?",
+      "ar": "هيتم إعادة فتح التقرير للتعديل، ولازم يتوقع ويترسل للجنة تاني. متابعة؟"
+    },
+    "toastReportApproved": {
+      "en": "Report approved.",
+      "ar": "تم اعتماد التقرير."
+    },
+    "toastReportRejected": {
+      "en": "Report rejected and returned to the inspector.",
+      "ar": "تم رفض التقرير وإرجاعه للمفتش."
+    },
+    "toastReportReopened": {
+      "en": "Report reopened for editing.",
+      "ar": "تم إعادة فتح التقرير للتعديل."
+    },
+    "signatureRequiredMsg": {
+      "en": "You must sign before submitting the report to the committee.",
+      "ar": "لازم توقع قبل إرسال التقرير للجنة."
+    },
+    "submitAlertPending": {
+      "en": "Report submitted — awaiting committee review and approval before it reaches the client.",
+      "ar": "تم إرسال التقرير — بانتظار مراجعة واعتماد اللجنة قبل ما يوصل للعميل."
+    },
+    "submitAlertApproved": {
+      "en": "This report has been approved by the committee.",
+      "ar": "تم اعتماد هذا التقرير من اللجنة."
+    },
+    "reviewNoteBanner": {
+      "en": "The committee sent this report back for changes:",
+      "ar": "اللجنة رجّعت التقرير للتعديل، وده سبب الرفض:"
+    },
+    "filterPendingReviewOnly": {
+      "en": "Pending Review",
+      "ar": "بانتظار الاعتماد"
     }
   },
   "defaultHotelsData": [

@@ -276,10 +276,35 @@ function renderReportBody(insp, backAction){
     resolve();
   }, 0));
 
+  // Committee-approval workflow banners/actions. A report is only ever visible to the hotel
+  // role once status is 'completed' (see hotelCanSee() server-side) -- pending_review means
+  // it's signed and submitted but still waiting on an admin/committee decision, and a
+  // review_note present on an in_progress report means the committee sent it back for fixes.
+  const role = state.session && state.session.role;
+  const isOwnerInspector = role === 'inspector' && insp.inspectorId === (currentUser() && currentUser().id);
+  const canReopen = (role === 'admin' || isOwnerInspector) && (insp.status === 'completed' || insp.status === 'pending_review');
+
+  let workflowBannerHtml = '';
+  if (insp.status === 'pending_review') {
+    workflowBannerHtml = `<div class="alert no-print" style="background:var(--gold-soft);color:#7a5600;border-color:#f0dca0;">${ic('hourglass_top')}<div>${t('submitAlertPending')}</div></div>`;
+  } else if (insp.status === 'completed' && role !== 'hotel') {
+    workflowBannerHtml = `<div class="alert no-print" style="background:#eafaf1;color:#146c43;border-color:#bfe8cf;">${ic('verified')}<div>${t('submitAlertApproved')}</div></div>`;
+  } else if (insp.status === 'in_progress' && insp.reviewNote) {
+    workflowBannerHtml = `<div class="alert no-print" style="background:var(--red-bg);color:var(--red);border-color:var(--red);"><div>${ic('report')}<strong>${t('reviewNoteBanner')}</strong></div><div style="margin-top:6px;">${esc(insp.reviewNote)}</div></div>`;
+  }
+
+  const workflowActionsHtml = `
+    ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-primary btn-sm" onclick="approveReport('${insp.id}')">${ic('task_alt')}${t('btnApproveReport')}</button>` : ''}
+    ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="rejectReport('${insp.id}')">${ic('cancel')}${t('btnRejectReport')}</button>` : ''}
+    ${canReopen ? `<button class="btn btn-outline btn-sm" onclick="reopenReport('${insp.id}')">${ic('edit')}${t('btnReopenReport')}</button>` : ''}
+  `;
+
   return `
+  ${workflowBannerHtml}
   <div class="top-actions no-print">
     <button class="btn btn-ghost btn-sm" onclick="${backAction}">${ic('arrow_back')}${t('backDash')}</button>
     <button class="btn btn-primary btn-sm" onclick="exportReportPdf('${insp.id}')">${ic('picture_as_pdf')}${t('exportPdfBtn')}</button>
+    ${workflowActionsHtml}
     ${state.session && state.session.role==='admin' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteInspectionReport('${insp.id}')">${ic('delete')}${t('delete')}</button>` : ''}
   </div>
   <div class="report-mode-tabs no-print">
@@ -456,6 +481,57 @@ function renderHotelShell(bodyHtml){
   </div>`;
 }
 async function viewHotelReport(id){ return openReportView(id, 'hotel-report'); }
+
+/* ---- Committee-approval workflow actions (admin approve/reject, admin-or-inspector reopen) ----
+   Shared here since the same report view (renderReportBody) is used from the admin, inspector,
+   and hotel shells alike -- these three functions just call their endpoint, drop the refreshed
+   inspection into local state, and re-render wherever the user currently is. */
+async function approveReport(id){
+  let updated;
+  try{
+    updated = await apiPost('/inspections/' + id + '/approve');
+  }catch(e){
+    showToast((state.lang==='ar' ? 'تعذّر اعتماد التقرير: ' : 'Could not approve the report: ') + e.message, 'error');
+    return;
+  }
+  const idx = state.inspections.findIndex(i => i.id === id);
+  if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
+  showToast(t('toastReportApproved'), 'success');
+  render();
+}
+async function rejectReport(id){
+  const raw = prompt(t('rejectPromptText'));
+  if(raw === null) return; // user cancelled the prompt
+  const note = raw.trim();
+  if(!note){ showToast(t('rejectNoteRequired'), 'error'); return; }
+  let updated;
+  try{
+    updated = await apiPost('/inspections/' + id + '/reject', { note });
+  }catch(e){
+    showToast((state.lang==='ar' ? 'تعذّر رفض التقرير: ' : 'Could not reject the report: ') + e.message, 'error');
+    return;
+  }
+  const idx = state.inspections.findIndex(i => i.id === id);
+  if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
+  showToast(t('toastReportRejected'), 'success');
+  render();
+}
+async function reopenReport(id){
+  if(!confirm(t('confirmReopenReport'))) return;
+  let updated;
+  try{
+    updated = await apiPost('/inspections/' + id + '/reopen');
+  }catch(e){
+    showToast((state.lang==='ar' ? 'تعذّر إعادة فتح التقرير: ' : 'Could not reopen the report: ') + e.message, 'error');
+    return;
+  }
+  const idx = state.inspections.findIndex(i => i.id === id);
+  if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
+  const as = updated.assignmentId ? assignmentById(updated.assignmentId) : null;
+  if(as) as.status = 'in_progress';
+  showToast(t('toastReportReopened'), 'success');
+  render();
+}
 function renderHotelReports(){
   const list = state.inspections.slice().sort((a,b)=>b.createdAt-a.createdAt);
   const rows = list.map(insp=>{
