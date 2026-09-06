@@ -90,6 +90,29 @@ router.get('/:id', (req, res) => {
 // PDF export -- same visibility rule as GET /:id (admin sees all, inspector sees own,
 // hotel sees own *completed* reports), then hands off to a headless-Chrome render of the
 // exact same report the browser shows, so Arabic/RTL content comes out correctly.
+// The exported file previously downloaded as "report-insp_mtlg7alpzx6d.pdf" -- the internal
+// database id, meaningless to whoever opens their Downloads folder looking for "which report is
+// this". Build a human filename from the hotel's name in whichever language the report was
+// exported in (falling back to the inspection's own denormalized property name, then a generic
+// label, so this never throws even for a hotel that's since been deleted), plus the visit date.
+// Content-Disposition needs two filename forms: a plain ASCII one for older clients that don't
+// understand RFC 5987, and a filename* with UTF-8 percent-encoding so Arabic names survive
+// intact in modern browsers instead of being transliterated away.
+function buildPdfContentDisposition(row, lang) {
+  const hotel = db.prepare('SELECT name_en, name_ar FROM hotels WHERE id=?').get(row.hotel_id);
+  const preferred = lang === 'ar'
+    ? (hotel && (hotel.name_ar || hotel.name_en))
+    : (hotel && (hotel.name_en || hotel.name_ar));
+  const hotelName = preferred || row.property_name || (lang === 'ar' ? 'تقرير' : 'Report');
+  const dateStr = (row.visit_date || '').slice(0, 10) || new Date(row.created_at).toISOString().slice(0, 10);
+  const rawName = `THO Mystery Guest Report - ${hotelName} - ${dateStr}`;
+  // Strip characters that are unsafe or reserved in filenames on Windows/macOS/Linux.
+  const cleanName = rawName.replace(/[\\/:*?"<>|]/g, '').trim();
+  const asciiFallback = (cleanName.replace(/[^\x20-\x7E]/g, '').trim() || 'THO Mystery Guest Report') + '.pdf';
+  const utf8Name = encodeURIComponent(cleanName + '.pdf');
+  return `inline; filename="${asciiFallback}"; filename*=UTF-8''${utf8Name}`;
+}
+
 router.get('/:id/pdf', async (req, res) => {
   const row = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
@@ -115,7 +138,7 @@ router.get('/:id/pdf', async (req, res) => {
       lang
     });
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="report-${row.id}.pdf"`);
+    res.setHeader('Content-Disposition', buildPdfContentDisposition(row, lang));
     res.send(Buffer.from(pdf));
   } catch (e) {
     console.error('[pdf-export] failed', e.message);
