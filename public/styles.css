@@ -553,6 +553,8 @@
   .full-item-row .fi-left{flex:1;min-width:0;}
   .full-item-row .fi-text{line-height:1.5;}
   .full-item-row .fi-note{color:var(--muted);font-size:11.5px;margin-top:3px;font-style:italic;}
+  .full-item-row .fi-flag{color:var(--amber);background:var(--amber-bg);font-size:11px;font-weight:700;margin-top:5px;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;}
+  .full-item-row .fi-flag .material-symbols-rounded, .full-item-row .fi-flag .material-symbols-outlined{font-size:14px;}
   .full-item-row .fi-tag{display:inline-block;margin-top:5px;font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;letter-spacing:.2px;}
   .full-item-row .fi-badge{flex-shrink:0;}
   .sig-block{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;margin-top:36px;padding-top:24px;border-top:1.5px dashed var(--border);flex-wrap:wrap;break-inside:avoid;page-break-inside:avoid;}

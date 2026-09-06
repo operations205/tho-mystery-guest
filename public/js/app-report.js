@@ -5,6 +5,22 @@ let chartRefs = [];
 let chartsRenderPromise = null;
 function setReportMode(mode){ state.reportMode = mode; render(); }
 
+// Consistency-check heuristic for the committee review screen: flags checklist items whose
+// free-text note looks like it contradicts the inspector's yes/no answer (e.g. answered "yes"
+// but the note describes something broken/missing/unavailable). This is advisory ONLY -- it
+// never changes the stored answer. The committee reviews the flag and decides for itself
+// whether the inspector's judgment stands; overriding an inspector's answer is a human
+// decision, not something this heuristic is allowed to make.
+const NOTE_FLAG_NEGATIVE = /\b(not\s+(working|functional|available|explained|provided|present|clean|maintained|possible|done|acceptable|responsive|sufficient)|no\s+(response|towels|soap|water|signal|light|answer|inspection\s+record)|didn'?t|doesn'?t|wasn'?t|isn'?t|unavailable|missing|broken|damaged|dirty|dusty|not\s+functioning|out\s+of\s+order|leak|scratch|stain|expired|overdue|understaffed|unprofessional|rude|delay(ed)?|complain|fail(ed|ure)?|poor|inadequate|serious\s+issue|critical)\b/i;
+const NOTE_FLAG_POSITIVE = /\b(excellent|perfect|great|fully\s+functional|no\s+issues?|all\s+good|clean\s+and\s+tidy|working\s+(fine|well|properly)|as\s+expected|no\s+complaints?)\b/i;
+function noteAnswerFlag(value, note){
+  if(!note || (value!=='yes' && value!=='no')) return false;
+  const text = String(note);
+  if(value==='yes' && NOTE_FLAG_NEGATIVE.test(text)) return true;
+  if(value==='no' && NOTE_FLAG_POSITIVE.test(text) && !NOTE_FLAG_NEGATIVE.test(text)) return true;
+  return false;
+}
+
 function renderSignatureBlock(insp){
   const dateStr = insp.completedAt ? new Date(insp.completedAt).toISOString().slice(0,10) : (insp.visitDate||'');
   const canAdminSign = !insp.signature && state.session && state.session.role==='admin';
@@ -127,7 +143,7 @@ function renderMetaStrip(insp){
   </div>`;
 }
 
-function renderFullDetail(insp){
+function renderFullDetail(insp, showFlags){
   const sc = computeScores(insp);
   const cats = catsForStandard(insp.standardId || 'audit4');
   return cats.map(cat=>{
@@ -143,6 +159,7 @@ function renderFullDetail(insp){
           <div class="fi-text">${ti(item)}${item.crit?`<span class="item-crit">${ic('priority_high')}${state.lang==='ar'?'جوهري':'Critical'}</span>`:''}</div>
           <span class="fi-tag" style="background:${CLASS_META[item.cls].color}">${tcls(item.cls)}</span>
           ${a.note?`<div class="fi-note">${esc(a.note)}</div>`:''}
+          ${showFlags && noteAnswerFlag(a.value, a.note) ? `<div class="fi-flag">${ic('flag')}${state.lang==='ar'?'للمراجعة: الملاحظة قد تتعارض مع الإجابة \u2014 قرار اللجنة':'Review: note may conflict with answer \u2014 committee decision'}</div>` : ''}
           ${a.photo?`<img class="photo-thumb" src="${esc(a.photo)}" alt="${esc(t('itemPhotoLabel'))}" onclick="openPhotoLightbox('${esc(a.photo)}')">`:''}
         </div>
         ${badge}
@@ -166,7 +183,7 @@ function exportReportPdf(id){
   // an English-only report.
   window.open('/api/inspections/' + id + '/pdf?lang=' + encodeURIComponent(state.lang), '_blank');
 }
-function renderReportBody(insp, backAction){
+function renderReportBody(insp, backAction, showFlags){
   const sc = computeScores(insp);
   const grade = gradeInfo(sc.overall, sc.criticalFails.length>0);
   const isDetailed = state.reportMode !== 'summary';
@@ -184,7 +201,7 @@ function renderReportBody(insp, backAction){
     : `<div class="chart-card" style="margin-bottom:22px;"><h3>${t('byCategory')}</h3><canvas id="chartCat" height="170"></canvas></div>`;
 
   const bodyHtml = isDetailed
-    ? `<div class="card" style="margin-bottom:0;"><h3 style="margin-top:0;">${t('detailTitle')}</h3>${renderFullDetail(insp)}</div>`
+    ? `<div class="card" style="margin-bottom:0;"><h3 style="margin-top:0;">${t('detailTitle')}</h3>${renderFullDetail(insp, showFlags)}</div>`
     : `<div class="summary-kpis">
         <div class="stat"><div class="stat-ic">${ic('percent')}</div><div><div class="num">${sc.overall}%</div><div class="lbl">${t('overallScore')}</div></div></div>
         <div class="stat"><div class="stat-ic">${ic('checklist')}</div><div><div class="num">${sc.totalItems}</div><div class="lbl">${t('totalItemsLabel')}</div></div></div>
@@ -460,7 +477,7 @@ function renderCharts(sc, cats){
 function renderAdminReport(){
   const insp = inspectionById(state.currentInspectionId);
   if(!insp) return renderAdminOverview();
-  return renderReportBody(insp, "go('admin-inspections')");
+  return renderReportBody(insp, "go('admin-inspections')", true);
 }
 
 /* ===================== HOTEL SHELL (read-only report viewer) ===================== */
