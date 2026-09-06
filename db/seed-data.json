@@ -4590,17 +4590,17 @@
       "en": "Pending Review",
       "ar": "بانتظار الاعتماد"
     },
-    "btnUnapproveReport": {
-      "en": "Send Back to Pending Review",
-      "ar": "إرجاع لبانتظار الاعتماد"
+    "btnEditAnswers": {
+      "en": "Edit Answers",
+      "ar": "تعديل الإجابات"
     },
-    "confirmUnapproveReport": {
-      "en": "This will move the report back to Pending Review and hide it from the client again, without changing its answers or signature. Continue?",
-      "ar": "هيرجع التقرير لحالة \"بانتظار الاعتماد\" ويتخفي عن العميل تاني، من غير ما يتغيّر أي إجابة أو توقيع. متابعة؟"
+    "backBtn": {
+      "en": "Back",
+      "ar": "رجوع"
     },
-    "toastReportUnapproved": {
-      "en": "Report sent back to pending review.",
-      "ar": "تم إرجاع التقرير لبانتظار الاعتماد."
+    "btnSaveAndBack": {
+      "en": "Save & Back",
+      "ar": "حفظ ورجوع"
     }
   },
   "defaultHotelsData": [

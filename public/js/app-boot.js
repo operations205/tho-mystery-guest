@@ -21,6 +21,7 @@ function render(){
     else if(state.view==='admin-assignments') content = renderAdminAssignments();
     else if(state.view==='admin-inspections') content = renderAdminInspections();
     else if(state.view==='admin-report') content = renderAdminReport();
+    else if(state.view==='admin-edit-inspection') content = renderInspectorInspect();
     else if(state.view==='admin-standards') content = renderAdminStandards();
     else if(state.view==='admin-documents') content = renderAdminDocuments();
     else if(state.view==='admin-settings') content = renderAdminSettings();

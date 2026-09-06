@@ -296,7 +296,7 @@ function renderReportBody(insp, backAction){
   const workflowActionsHtml = `
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-primary btn-sm" onclick="approveReport('${insp.id}')">${ic('task_alt')}${t('btnApproveReport')}</button>` : ''}
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="rejectReport('${insp.id}')">${ic('cancel')}${t('btnRejectReport')}</button>` : ''}
-    ${role === 'admin' && insp.status === 'completed' ? `<button class="btn btn-ghost btn-sm" onclick="unapproveReport('${insp.id}')">${ic('undo')}${t('btnUnapproveReport')}</button>` : ''}
+    ${role === 'admin' && insp.status === 'in_progress' ? `<button class="btn btn-ghost btn-sm" onclick="editInspectionAnswers('${insp.id}')">${ic('edit_note')}${t('btnEditAnswers')}</button>` : ''}
     ${canReopen ? `<button class="btn btn-ghost btn-sm" onclick="reopenReport('${insp.id}')">${ic('edit')}${t('btnReopenReport')}</button>` : ''}
   `;
 
@@ -487,19 +487,26 @@ async function viewHotelReport(id){ return openReportView(id, 'hotel-report'); }
    Shared here since the same report view (renderReportBody) is used from the admin, inspector,
    and hotel shells alike -- these three functions just call their endpoint, drop the refreshed
    inspection into local state, and re-render wherever the user currently is. */
-async function unapproveReport(id){
-  if(!confirm(t('confirmUnapproveReport'))) return;
-  let updated;
+// Lets an admin edit an in_progress inspection's own checklist answers directly (as opposed
+// to sending it back to the inspector via Reopen and waiting for them). Reuses the exact same
+// checklist-editing screen the inspector uses (renderInspectorInspect) -- see the
+// 'admin-edit-inspection' case in app-boot.js's render() -- since the underlying
+// setAnswerM/setNoteM/handlePhotoInput functions and their PUT /answers/:itemId calls are
+// already role-agnostic; only the server-side permission check needed broadening (see
+// inspections.js). Editing here never bypasses the mandatory-signature rule: the report still
+// can't move past in_progress until the actual assigned inspector signs it themselves.
+async function editInspectionAnswers(id){
   try{
-    updated = await apiPost('/inspections/' + id + '/unapprove');
+    await loadInspectionDetail(id);
   }catch(e){
-    showToast((state.lang==='ar' ? 'تعذّر إرجاع التقرير: ' : 'Could not send the report back: ') + e.message, 'error');
+    showToast(state.lang==='ar'
+      ? 'تعذّر تحميل التفتيش. تأكد من الاتصال بالإنترنت وحاول تاني.'
+      : 'Could not load the inspection. Check your connection and try again.', 'error');
     return;
   }
-  const idx = state.inspections.findIndex(i => i.id === id);
-  if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
-  showToast(t('toastReportUnapproved'), 'success');
-  render();
+  state.currentInspectionId = id;
+  state.activeCatIndex = 0;
+  go('admin-edit-inspection');
 }
 async function approveReport(id){
   let updated;

@@ -198,7 +198,32 @@ function renderInspectorInspect(){
     ? `<div class="alert" style="background:var(--red-bg);color:var(--red);border-color:var(--red);margin-bottom:10px;"><div>${ic('report')}<strong>${t('reviewNoteBanner')}</strong></div><div style="margin-top:6px;">${esc(insp.reviewNote)}</div></div>`
     : '';
 
+  // Admin reaches this same checklist screen via editInspectionAnswers() (see app-report.js) to
+  // fix a small mistake directly, without waiting on the inspector. Only the actual assigned
+  // inspector may ever sign/submit a report (hard rule), so admin gets a back button instead of
+  // a forward stepper, and "Save & Back" instead of Finish/Next -- every edit already autosaves
+  // per-item via the existing apiPut calls in setAnswerM/setNoteM/handlePhotoInput, so there is
+  // nothing extra to persist on the way out.
+  const isAdminEditing = state.session && state.session.role === 'admin';
+  const adminBackBarHtml = isAdminEditing
+    ? `<div class="stepper-top" style="padding-bottom:0;"><button class="btn btn-ghost btn-sm" onclick="go('admin-report')">${ic('arrow_back')}${t('backBtn')}</button></div>`
+    : '';
+  const footerHtml = isAdminEditing
+    ? `<div class="sticky-footnav no-print">
+        <button class="btn btn-ghost btn-sm" ${state.activeCatIndex===0?'disabled':''} onclick="shiftCatM(-1)">${t('prevCat')}</button>
+        ${state.activeCatIndex===cats.length-1
+          ? `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="go('admin-report')">${ic('save')}${t('btnSaveAndBack')}</button>`
+          : `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="shiftCatM(1)">${t('nextCat')}</button>`}
+      </div>`
+    : `<div class="sticky-footnav no-print">
+        <button class="btn btn-ghost btn-sm" ${state.activeCatIndex===0?'disabled':''} onclick="shiftCatM(-1)">${t('prevCat')}</button>
+        ${state.activeCatIndex===cats.length-1
+          ? `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="attemptFinishInspection()">${ic('task_alt')}${t('finishBtn')}</button>`
+          : `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="shiftCatM(1)">${t('nextCat')}</button>`}
+      </div>`;
+
   return `
+  ${adminBackBarHtml}
   ${reviewNoteHtml}
   <div class="stepper-top">
     <div class="mi-progress"><span>${esc(inspPropertyName(insp))}</span><span>${sc.answeredCount}/${sc.totalItems} (${pct}%)</span></div>
@@ -207,12 +232,7 @@ function renderInspectorInspect(){
   </div>
   <div class="cat-header"><h2 style="font-size:15px;">${ic(cat.icon)} ${tc(cat)}</h2></div>
   ${items}
-  <div class="sticky-footnav no-print">
-    <button class="btn btn-ghost btn-sm" ${state.activeCatIndex===0?'disabled':''} onclick="shiftCatM(-1)">${t('prevCat')}</button>
-    ${state.activeCatIndex===cats.length-1
-      ? `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="attemptFinishInspection()">${ic('task_alt')}${t('finishBtn')}</button>`
-      : `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="shiftCatM(1)">${t('nextCat')}</button>`}
-  </div>
+  ${footerHtml}
   `;
 }
 // Blocks moving on to the signature screen while any checklist item is unanswered. The

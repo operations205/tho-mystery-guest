@@ -155,15 +155,23 @@ router.post('/start', requireRole('inspector'), (req, res) => {
   res.status(201).json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(id), true));
 });
 
-// Set/update a single answer
-router.put('/:id/answers/:itemId', requireRole('inspector'), (req, res) => {
+// Set/update a single answer. Editable by the owning inspector, or by an admin correcting a
+// mistake directly (e.g. the inspector forgot to mark an item, or pressed the wrong one) --
+// added after feedback that admin-only review actions weren't enough; sometimes the fix is
+// small enough that the admin wants to just make it themselves rather than send the whole
+// report back for the inspector to redo. Either way this never bypasses the signature
+// requirement: the report can only be *submitted* (see /:id/complete below) by the actual
+// assigned inspector, so an admin edit still requires the inspector to come back and re-sign
+// before it can go to the committee again.
+router.put('/:id/answers/:itemId', (req, res) => {
   const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!insp) return res.status(404).json({ error: 'not_found' });
-  if (insp.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
-  // Only editable while the inspector still has it in draft. Once signed & submitted it's
-  // pending_review (with the committee) or completed (approved) -- neither should be silently
-  // edited out from under a pending or already-delivered report. A committee rejection or an
-  // explicit reopen (see /:id/reopen below) is what puts it back into in_progress.
+  const isOwnerInspector = req.user.role === 'inspector' && insp.inspector_id === req.user.id;
+  if (req.user.role !== 'admin' && !isOwnerInspector) return res.status(403).json({ error: 'forbidden' });
+  // Only editable while it's still in draft. Once signed & submitted it's pending_review (with
+  // the committee) or completed (approved) -- neither should be silently edited out from under
+  // a pending or already-delivered report. A committee rejection or an explicit reopen (see
+  // /:id/reopen below) is what puts it back into in_progress.
   if (insp.status !== 'in_progress') return res.status(400).json({ error: 'not_editable' });
 
   const body = req.body || {};
@@ -258,21 +266,6 @@ router.post('/:id/approve', requireRole('admin'), (req, res) => {
   const now = Date.now();
   db.prepare("UPDATE inspections SET status='completed', completed_at=?, review_note=NULL WHERE id=?")
     .run(now, req.params.id);
-  res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
-});
-
-// Admin/committee sends an already-approved report back to pending_review WITHOUT touching
-// its content, answers, or signature -- unlike /:id/reject or /:id/reopen, which are for when
-// the inspector needs to change something. This is for correcting an approval itself: either
-// undoing an accidental Approve click, or -- the case this was actually added for -- applying
-// the review requirement retroactively to a report that was completed before this approval
-// workflow existed at all (so it was never actually looked at by the committee, even though
-// its status column says 'completed' just like a genuinely-approved one would).
-router.post('/:id/unapprove', requireRole('admin'), (req, res) => {
-  const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
-  if (!insp) return res.status(404).json({ error: 'not_found' });
-  if (insp.status !== 'completed') return res.status(400).json({ error: 'not_completed' });
-  db.prepare("UPDATE inspections SET status='pending_review', completed_at=NULL WHERE id=?").run(req.params.id);
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });
 
