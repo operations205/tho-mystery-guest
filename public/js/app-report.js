@@ -296,8 +296,8 @@ function renderReportBody(insp, backAction){
   const workflowActionsHtml = `
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-primary btn-sm" onclick="approveReport('${insp.id}')">${ic('task_alt')}${t('btnApproveReport')}</button>` : ''}
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="rejectReport('${insp.id}')">${ic('cancel')}${t('btnRejectReport')}</button>` : ''}
-    ${role === 'admin' && insp.status === 'completed' ? `<button class="btn btn-outline btn-sm" onclick="unapproveReport('${insp.id}')">${ic('undo')}${t('btnUnapproveReport')}</button>` : ''}
-    ${canReopen ? `<button class="btn btn-outline btn-sm" onclick="reopenReport('${insp.id}')">${ic('edit')}${t('btnReopenReport')}</button>` : ''}
+    ${role === 'admin' && insp.status === 'completed' ? `<button class="btn btn-ghost btn-sm" onclick="unapproveReport('${insp.id}')">${ic('undo')}${t('btnUnapproveReport')}</button>` : ''}
+    ${canReopen ? `<button class="btn btn-ghost btn-sm" onclick="reopenReport('${insp.id}')">${ic('edit')}${t('btnReopenReport')}</button>` : ''}
   `;
 
   return `
