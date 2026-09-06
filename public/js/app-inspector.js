@@ -146,6 +146,28 @@ async function resumeInspection(assignmentId){
   state.currentInspectionId = as.inspectionId;
   go('inspector-inspect');
 }
+// Serializes writes to a given checklist item's answer row. Every tap of Yes/No/N/A, every
+// note edit, and every photo add/remove hits the SAME PUT /answers/:itemId endpoint, and each
+// call fires immediately (optimistic UI) without waiting for the previous one to finish. Two
+// independent, unawaited fetches racing to the same row have no guaranteed arrival order --
+// on a slow/flaky connection (a mystery-guest inspector on hotel wifi is the textbook case),
+// an earlier click's request can land at the server AFTER a later click's, silently reverting
+// the stored answer to the earlier (wrong) value even though the screen already shows the
+// later, correct one. This was traced directly to a real report (a "No" answer that the
+// checklist showed correctly but the generated report displayed as "Yes"). Routing every
+// write for a given item through this queue means a new write always waits for the previous
+// one to finish before it is sent, so the server only ever sees them in click order and the
+// last click always wins for real, not just on screen.
+const itemSaveQueues = {};
+function queueItemSave(inspectionId, itemId, body){
+  const key = inspectionId + '::' + itemId;
+  const prior = itemSaveQueues[key] || Promise.resolve();
+  const next = prior
+    .catch(()=>{}) // a previous failure must not permanently jam this item's queue
+    .then(() => apiPut('/inspections/' + inspectionId + '/answers/' + itemId, body));
+  itemSaveQueues[key] = next;
+  return next;
+}
 function currentMobileInsp(){
   const insp = inspectionById(state.currentInspectionId);
   // Defense in depth: every render/handler below assumes insp.answers is an object. If an
@@ -270,7 +292,7 @@ function setAnswerM(itemId, value){
   const newVal = insp.answers[itemId].value === value ? null : value;
   insp.answers[itemId].value = newVal;
   render();
-  apiPut('/inspections/' + insp.id + '/answers/' + itemId, { value: newVal, note: insp.answers[itemId].note || '' })
+  queueItemSave(insp.id, itemId, { value: newVal, note: insp.answers[itemId].note || '' })
     .catch(e=>{
       console.error('failed to save answer', itemId, e);
       showToast(t('answerSaveFailed'), 'error');
@@ -280,7 +302,7 @@ function setNoteM(itemId, note){
   const insp = currentMobileInsp(); if(!insp) return;
   if(!insp.answers[itemId]) insp.answers[itemId] = {};
   insp.answers[itemId].note = note;
-  apiPut('/inspections/' + insp.id + '/answers/' + itemId, { value: insp.answers[itemId].value || null, note })
+  queueItemSave(insp.id, itemId, { value: insp.answers[itemId].value || null, note })
     .catch(e=>{
       console.error('failed to save note', itemId, e);
       showToast(t('answerSaveFailed'), 'error');
@@ -328,7 +350,7 @@ async function handlePhotoInput(itemId, input){
   insp.answers[itemId].photo = dataUrl;
   render();
   try{
-    await apiPut('/inspections/' + insp.id + '/answers/' + itemId, { photo: dataUrl });
+    await queueItemSave(insp.id, itemId, { photo: dataUrl });
   }catch(e){
     console.error('failed to save photo', itemId, e);
     alert(t('photoSaveFailed'));
@@ -339,7 +361,7 @@ function removePhotoM(itemId){
   if(!insp.answers[itemId]) insp.answers[itemId] = {};
   insp.answers[itemId].photo = '';
   render();
-  apiPut('/inspections/' + insp.id + '/answers/' + itemId, { photo: '' })
+  queueItemSave(insp.id, itemId, { photo: '' })
     .catch(e=>console.error('failed to remove photo', itemId, e));
 }
 function openPhotoLightbox(photoDataUrl){
