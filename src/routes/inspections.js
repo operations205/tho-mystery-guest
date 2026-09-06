@@ -334,10 +334,21 @@ router.put('/:id/signature', requireRole('admin'), (req, res) => {
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });
 
-// Delete a report (admin only) — e.g. to remove test/mistaken inspections. If it was started
-// from an assignment, hand that assignment back to pending (cleared of the deleted inspection)
-// instead of leaving it pointing at a now-missing report.
+// Deleting a report is permanent (no undo, unlike the approval workflow above) -- the operator
+// asked that only their own account be able to do it, not every admin/manager account that
+// might exist on the system. Configurable via SUPER_ADMIN_EMAIL so it doesn't need a code
+// change if the account's email ever does; defaults to the operator's own address.
+const SUPER_ADMIN_EMAIL = (process.env.SUPER_ADMIN_EMAIL || 'operations@thehotelieroffice.com').toLowerCase();
+
+// Delete a report (admin only, and only the super-admin account above) — e.g. to remove
+// test/mistaken inspections. If it was started from an assignment, hand that assignment back
+// to pending (cleared of the deleted inspection) instead of leaving it pointing at a
+// now-missing report.
 router.delete('/:id', requireRole('admin'), (req, res) => {
+  const me = db.prepare('SELECT email FROM users WHERE id=?').get(req.user.id);
+  if (!me || (me.email || '').toLowerCase() !== SUPER_ADMIN_EMAIL) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
   const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!insp) return res.status(404).json({ error: 'not_found' });
   if (insp.assignment_id) {

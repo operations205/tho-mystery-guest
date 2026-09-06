@@ -282,7 +282,7 @@ function renderAdminInspections(){
       <td>${statusLabel(insp)}</td>
       <td class="row-actions" style="justify-content:flex-end;">
         <button class="btn btn-ghost btn-sm" onclick="viewAdminReport('${insp.id}')">${t('view')}</button>
-        <button class="icon-btn danger" onclick="deleteInspectionReport('${insp.id}')" title="${t('delete')}" aria-label="${t('delete')}">${ic('delete')}</button>
+        ${isSuperAdmin() ? `<button class="icon-btn danger" onclick="deleteInspectionReport('${insp.id}')" title="${t('delete')}" aria-label="${t('delete')}">${ic('delete')}</button>` : ''}
       </td>
     </tr>`;
   }).join('');

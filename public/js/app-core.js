@@ -299,6 +299,17 @@ function scoreColor(pct){
 function hotelById(id){ return state.hotels.find(h=>h.id===id); }
 function userById(id){ return USERS.find(u=>u.id===id); }
 
+// Deleting a report is permanent, so the operator asked that only their own account (not every
+// admin/manager) see the delete button at all -- mirrors the same SUPER_ADMIN_EMAIL check the
+// server enforces on DELETE /inspections/:id, so hiding the button here is a UI convenience,
+// not the actual security boundary (that's server-side).
+const SUPER_ADMIN_EMAIL = 'operations@thehotelieroffice.com';
+function isSuperAdmin(){
+  if(!state.session || state.session.role !== 'admin') return false;
+  const me = currentUser();
+  return !!(me && (me.email || '').toLowerCase() === SUPER_ADMIN_EMAIL);
+}
+
 /* Bilingual-aware display for inspection records. property_name/inspector_name on the
    inspection row are a denormalized ENGLISH-ONLY snapshot captured once at creation time
    (see POST /inspections/start on the server -- it stores hotel.name_en/user.name_en only,

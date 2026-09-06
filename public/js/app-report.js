@@ -306,7 +306,7 @@ function renderReportBody(insp, backAction){
     <button class="btn btn-ghost btn-sm" onclick="${backAction}">${ic('arrow_back')}${t('backDash')}</button>
     <button class="btn btn-primary btn-sm" onclick="exportReportPdf('${insp.id}')">${ic('picture_as_pdf')}${t('exportPdfBtn')}</button>
     ${workflowActionsHtml}
-    ${state.session && state.session.role==='admin' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteInspectionReport('${insp.id}')">${ic('delete')}${t('delete')}</button>` : ''}
+    ${isSuperAdmin() ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteInspectionReport('${insp.id}')">${ic('delete')}${t('delete')}</button>` : ''}
   </div>
   <div class="report-mode-tabs no-print">
     <button class="report-mode-tab ${isDetailed?'active':''}" onclick="setReportMode('detailed')">${ic('fact_check')}${t('reportDetailed')}</button>
