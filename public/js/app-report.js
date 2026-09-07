@@ -34,7 +34,6 @@ function renderSignatureBlock(insp){
     <div class="sig-col">
       ${sigHtml}
       <div class="sig-line">
-        <div class="sig-name">${esc(inspInspectorName(insp)||'')}</div>
         <div class="sig-date">${t('inspectorSignedRole')} · ${esc(dateStr)}</div>
       </div>
     </div>
@@ -136,7 +135,6 @@ function renderMetaStrip(insp){
   <div class="report-meta-strip">
     <div class="rm-item"><span class="rm-label">${t('propType')}</span><span class="rm-value">${esc(insp.propertyTypeLabel||'')}</span></div>
     <div class="rm-item"><span class="rm-label">${t('city')}</span><span class="rm-value">${esc(insp.city||'')}</span></div>
-    <div class="rm-item"><span class="rm-label">${t('inspector')}</span><span class="rm-value">${esc(inspInspectorName(insp))}</span></div>
     <div class="rm-item"><span class="rm-label">${t('visitDate')}</span><span class="rm-value">${esc(insp.visitDate||'')}</span></div>
     ${insp.ref ? `<div class="rm-item"><span class="rm-label">${t('refLabel')}</span><span class="rm-value" dir="ltr">${esc(insp.ref)}</span></div>` : ''}
     <div class="rm-item"><span class="rm-label">${t('reportDateLabel')}</span><span class="rm-value">${esc(insp.completedAt ? new Date(insp.completedAt).toISOString().slice(0,10) : (insp.visitDate||''))}</span></div>
@@ -353,7 +351,6 @@ function renderReportBody(insp, backAction, showFlags){
         <div class="rc-hotel-name">${esc(inspPropertyName(insp))}</div>
         <div class="rc-hero-row">${ic('location_on')}<span>${esc(reportHotel ? reportHotel.city.en : (insp.city||''))} / ${esc(reportHotel ? reportHotel.city.ar : (insp.city||''))}</span></div>
         <div class="rc-hero-row">${ic('event')}<span>${bl('تاريخ الزيارة','Visit Date')} : ${esc(insp.visitDate||'')}</span></div>
-        <div class="rc-hero-row">${ic('person')}<span>${bl('اسم المفتش','Inspector')} : ${esc(inspInspectorName(insp))}</span></div>
         <div class="rc-hero-row">${ic('badge')}<span>${bl('التقرير','Report Code')} : <span class="rc-code-pill">${reportCode}</span></span></div>
       </div>
       <div class="rc-hero-score">
