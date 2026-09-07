@@ -561,7 +561,7 @@
   .sig-col{flex:1;min-width:220px;}
   .sig-col.stamp-col{text-align:center;flex:0 0 auto;}
   .sig-col.stamp-col img{max-width:230px;height:auto;}
-  .sig-label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:8px;}
+  .sig-label{font-size:14px;font-weight:700;color:var(--navy);letter-spacing:.2px;margin:8px 0 10px;}
   .sig-image{height:60px;display:block;margin-bottom:4px;}
   .sig-cursive{font-family:'Dancing Script',cursive;font-size:34px;color:var(--navy);line-height:1;margin-bottom:2px;}
   .sig-cursive.ar{font-family:'Aref Ruqaa',serif;font-size:30px;}
