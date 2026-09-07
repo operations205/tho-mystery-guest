@@ -32,6 +32,7 @@ function renderSignatureBlock(insp){
   return `
   <div class="sig-block">
     <div class="sig-col">
+      <div class="sig-label">${t('signTitle')}</div>
       ${sigHtml}
       <div class="sig-line">
         <div class="sig-date">${t('inspectorSignedRole')} · ${esc(dateStr)}</div>
