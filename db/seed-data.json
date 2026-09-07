@@ -2204,13 +2204,13 @@
           "id": "tr8",
           "cls": "PRD",
           "en": "Hotel provides shuttle service to/from Masjid al-Haram (Makkah hotels only, unless the hotel is within a comfortable walking distance)",
-          "ar": "يوفر الفندق خدمة نقل (مكوك) من وإلى الحرم المكي (يخص فنادق مكة المكرمة فقط، ما لم يكن الفندق ضمن مسافة مشي مناسبة)"
+          "ar": "توفر حافلة الفندق (الباص) خدمة نقل من وإلى الحرم المكي (يخص فنادق مكة المكرمة فقط، ما لم يكن الفندق ضمن مسافة مشي مناسبة)"
         },
         {
           "id": "tr9",
           "cls": "PRD",
           "en": "Hotel provides shuttle service to/from Masjid an-Nabawi (Madinah hotels only, unless the hotel is within a comfortable walking distance)",
-          "ar": "يوفر الفندق خدمة نقل (مكوك) من وإلى الحرم النبوي (يخص فنادق المدينة المنورة فقط، ما لم يكن الفندق ضمن مسافة مشي مناسبة)"
+          "ar": "توفر حافلة الفندق (الباص) خدمة نقل من وإلى الحرم النبوي (يخص فنادق المدينة المنورة فقط، ما لم يكن الفندق ضمن مسافة مشي مناسبة)"
         }
       ]
     },
