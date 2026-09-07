@@ -2247,6 +2247,45 @@
       ]
     },
     {
+      "id": "accessibility",
+      "icon": "accessible",
+      "en": "Accessibility",
+      "ar": "إمكانية الوصول لذوي الإعاقة",
+      "items": [
+        {
+          "id": "acc1",
+          "cls": "PRD",
+          "en": "Wheelchair-accessible route from the main entrance to reception/lobby, free of unavoidable steps",
+          "ar": "يوجد مسار ممهّد لمستخدمي الكراسي المتحركة من المدخل الرئيسي إلى الاستقبال دون درجات لا يمكن تجاوزها"
+        },
+        {
+          "id": "acc2",
+          "cls": "PRD",
+          "en": "At least one designated accessible room available with grab bars, roll-in shower or lowered fixtures, all in working order",
+          "ar": "تتوفر غرفة واحدة على الأقل مخصصة لذوي الإعاقة بمقابض دعم ودُش بمستوى الأرض أو تجهيزات بارتفاع مناسب، وكلها تعمل بكفاءة"
+        },
+        {
+          "id": "acc3",
+          "cls": "PRD",
+          "en": "Elevator controls include tactile/braille buttons and audible floor announcements, reaching every guest floor",
+          "ar": "أزرار المصعد تشمل لمسات بارزة أو بريل مع إعلان صوتي بالطابق، ويصل المصعد لجميع طوابق الغرف"
+        },
+        {
+          "id": "acc4",
+          "cls": "PRD",
+          "en": "Marked accessible parking spaces of adequate width available near the main entrance",
+          "ar": "تتوفر أماكن انتظار مخصصة لذوي الإعاقة معلَّمة وبعرض كافٍ بالقرب من المدخل الرئيسي"
+        },
+        {
+          "id": "acc5",
+          "cls": "SEC",
+          "crit": true,
+          "en": "Staff could clearly explain assistance and evacuation procedures for a guest with a mobility limitation",
+          "ar": "استطاع الموظف شرح إجراءات المساعدة والإخلاء بوضوح لضيف ذي إعاقة حركية"
+        }
+      ]
+    },
+    {
       "id": "wellness_facilities",
       "icon": "hot_tub",
       "en": "Wellness Facilities: Steam, Sauna & Jacuzzi",
