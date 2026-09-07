@@ -2279,9 +2279,8 @@
         {
           "id": "acc5",
           "cls": "SEC",
-          "crit": true,
-          "en": "Staff could clearly explain assistance and evacuation procedures for a guest with a mobility limitation",
-          "ar": "استطاع الموظف شرح إجراءات المساعدة والإخلاء بوضوح لضيف ذي إعاقة حركية"
+          "en": "Instructions for assisting/evacuating a guest with a mobility limitation are posted and visible behind the guest room door, alongside the fire evacuation plan",
+          "ar": "تعليمات مساعدة وإخلاء ذوي الإعاقة الحركية معروضة وواضحة خلف باب الغرفة، بجانب خطة إخلاء الحريق"
         }
       ]
     },
