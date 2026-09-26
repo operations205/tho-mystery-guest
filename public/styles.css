@@ -77,9 +77,34 @@
   .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
   @media (max-width:768px){.stat-row{grid-template-columns:repeat(2,1fr);}}
   .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;align-items:center;gap:12px;}
+  .stat-ic-navy{background:var(--navy);color:#fff;}
+  .stat-ic-green{background:var(--green-bg);color:var(--green);}
+  .stat-ic-amber{background:var(--amber-bg);color:var(--amber);}
+  .stat-ic-red{background:var(--red-bg);color:var(--red);}
   .stat .stat-ic{width:38px;height:38px;border-radius:10px;background:var(--gold-soft);color:#9a6d00;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .stat .num{font-size:24px;font-weight:800;color:var(--navy);line-height:1.1;}
   .stat .lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  /* Hotel client-portal hero: branded banner (cover photo or brand gradient) + logo badge,
+     replacing the old plain text page-head so the hotel's own identity is the first thing
+     it sees on its dashboard, not a generic heading. */
+  .hotel-hero{position:relative;border-radius:16px;overflow:hidden;margin-bottom:22px;min-height:130px;display:flex;align-items:flex-end;background:linear-gradient(135deg,var(--navy),var(--navy-2));}
+  .hotel-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+  .hotel-hero-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,0,0,.82),rgba(5,0,0,.35) 60%,rgba(5,0,0,.15));}
+  .hotel-hero-content{position:relative;padding:20px 22px;color:#fff;display:flex;align-items:center;gap:16px;width:100%;}
+  .hotel-hero-logo{width:60px;height:60px;border-radius:14px;object-fit:cover;background:#fff;border:3px solid rgba(255,255,255,.85);box-shadow:0 4px 14px rgba(0,0,0,.25);flex-shrink:0;}
+  .hotel-hero-logo-empty{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.14);border:3px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+  .hotel-hero-logo-empty .material-symbols-outlined{font-size:28px;}
+  .hotel-hero-name{font-size:21px;font-weight:800;margin-bottom:5px;}
+  .hotel-hero-meta{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:#eee;}
+  .hotel-hero-meta span{display:inline-flex;align-items:center;gap:5px;}
+  .hotel-hero-meta .material-symbols-outlined{font-size:15px;color:var(--gold);}
+  @media (max-width:640px){
+    .hotel-hero{min-height:110px;}
+    .hotel-hero-content{padding:14px 16px;gap:12px;}
+    .hotel-hero-logo,.hotel-hero-logo-empty{width:48px;height:48px;border-radius:12px;}
+    .hotel-hero-name{font-size:17px;}
+  }
   table{width:100%;border-collapse:collapse;font-size:13.5px;}
   th,td{padding:13px 10px;text-align:start;border-bottom:1px solid var(--border);}
   th{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;}

@@ -591,9 +591,7 @@ function renderHotelReports(){
   }).join('');
   const avg = list.length ? Math.round(list.reduce((s,i)=> s + (i.overall||0), 0) / list.length) : 0;
   const latest = list[0];
-  const heroLogo = hotel && hotel.logo
-    ? `<img src="${esc(hotel.logo)}" alt="" style="height:44px;width:44px;border-radius:10px;object-fit:cover;">`
-    : `<div class="avatar avatar-sm" style="background:var(--navy);color:#fff;">${ic('apartment')}</div>`;
+  const scoreClass = v => v>=75?'stat-ic-green':(v>=60?'stat-ic-amber':'stat-ic-red');
   // Score-over-time trend, oldest to newest visit -- the single most requested view on any
   // professional mystery-guest client portal (LQA Group and GoAudits both lead their dashboards
   // with exactly this: a running trend line so a repeat client can see whether quality is
@@ -611,18 +609,14 @@ function renderHotelReports(){
   }, 0));
 
   const categoryInsightsHtml = renderHotelCategoryInsights(chronological);
+  const heroHtml = renderHotelHero(hotel);
 
   return `
-  <div class="page-head">
-    <div style="display:flex;align-items:center;gap:12px;">
-      ${heroLogo}
-      <div><h2>${esc(hotel ? tl(hotel.name) : t('hotelDashboardTitle'))}</h2><p>${t('hotelDashboardTitle')}</p></div>
-    </div>
-  </div>
+  ${heroHtml}
   <div class="stat-row">
-    <div class="stat"><div class="stat-ic">${ic('fact_check')}</div><div><div class="num">${list.length}</div><div class="lbl">${t('totalInspections')}</div></div></div>
-    <div class="stat"><div class="stat-ic">${ic('percent')}</div><div><div class="num">${list.length ? avg + '%' : '—'}</div><div class="lbl">${t('avgScore')}</div></div></div>
-    <div class="stat"><div class="stat-ic">${ic('trending_up')}</div><div><div class="num">${latest ? (latest.overall||0) + '%' : '—'}</div><div class="lbl">${t('hotelKpiLatestScore')}</div></div></div>
+    <div class="stat"><div class="stat-ic stat-ic-navy">${ic('fact_check')}</div><div><div class="num">${list.length}</div><div class="lbl">${t('totalInspections')}</div></div></div>
+    <div class="stat"><div class="stat-ic ${list.length?scoreClass(avg):''}">${ic('percent')}</div><div><div class="num">${list.length ? avg + '%' : '—'}</div><div class="lbl">${t('avgScore')}</div></div></div>
+    <div class="stat"><div class="stat-ic ${latest?scoreClass(latest.overall||0):''}">${ic('trending_up')}</div><div><div class="num">${latest ? (latest.overall||0) + '%' : '—'}</div><div class="lbl">${t('hotelKpiLatestScore')}</div></div></div>
     <div class="stat"><div class="stat-ic">${ic('event')}</div><div><div class="num" style="font-size:16px;">${latest ? esc(latest.visitDate||'') : '—'}</div><div class="lbl">${t('hotelKpiLatestDate')}</div></div></div>
   </div>
   ${trendChartHtml}
@@ -630,6 +624,38 @@ function renderHotelReports(){
   <div class="card">
     ${list.length===0 ? `<div class="empty"><div class="big">${ic('fact_check')}</div>${t('noReportsYet')}<p style="color:var(--muted);font-size:13px;max-width:420px;margin:8px auto 0;">${t('noReportsYetHint')}</p></div>` : `
     <table><thead><tr><th>${t('colProperty')}</th><th>${t('colDate')}</th><th>${t('colScore')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
+  </div>
+  `;
+}
+
+// A strong branded banner for the hotel's own landing page -- the hotel's cover photo (if one
+// was uploaded when the property was onboarded) as a full-width backdrop with a dark gradient
+// for legibility, the hotel's logo as a badge, and its name/city/type set large. Falls back to
+// the brand navy/gold gradient (same treatment as the inspector's own hero card) when no photo
+// exists yet, so the page still reads as polished rather than empty.
+function renderHotelHero(hotel){
+  const name = hotel ? tl(hotel.name) : t('hotelDashboardTitle');
+  const city = hotel && hotel.city ? tl(hotel.city) : '';
+  const typeLabel = hotel && PROPERTY_TYPES[hotel.type] ? tl(PROPERTY_TYPES[hotel.type]) : '';
+  const bgStyle = hotel && hotel.photo
+    ? `style="background-image:url('${esc(hotel.photo)}')"`
+    : '';
+  const logoHtml = hotel && hotel.logo
+    ? `<img class="hotel-hero-logo" src="${esc(hotel.logo)}" alt="">`
+    : `<div class="hotel-hero-logo-empty">${ic('apartment')}</div>`;
+  const metaParts = [];
+  if(city) metaParts.push(`<span>${ic('location_on')}${esc(city)}</span>`);
+  if(typeLabel) metaParts.push(`<span>${ic('hotel_class')}${esc(typeLabel)}</span>`);
+  return `
+  <div class="hotel-hero ${hotel && hotel.photo ? 'has-photo' : ''}">
+    ${hotel && hotel.photo ? `<div class="hotel-hero-bg" ${bgStyle}></div><div class="hotel-hero-overlay"></div>` : ''}
+    <div class="hotel-hero-content">
+      ${logoHtml}
+      <div>
+        <div class="hotel-hero-name">${esc(name)}</div>
+        <div class="hotel-hero-meta">${metaParts.join('')}</div>
+      </div>
+    </div>
   </div>
   `;
 }
