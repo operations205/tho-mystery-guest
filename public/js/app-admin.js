@@ -37,7 +37,7 @@ function renderAdminShell(contentHtml){
           <div><div class="su-name">${esc(tl(user.name))}</div><div class="su-role">${esc(tl(user.title))}</div></div>
           <span class="side-user-edit-ic">${ic('edit')}</span>
         </div>
-        <button class="btn btn-outline btn-sm btn-block side-logout" onclick="logout()">${ic('logout')}${t('logout')}</button>
+        <button class="btn btn-outline btn-outline-invert btn-sm btn-block side-logout" onclick="logout()">${ic('logout')}${t('logout')}</button>
       </div>
     </aside>
     <div class="admin-main">

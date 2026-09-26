@@ -53,8 +53,17 @@
   .btn .material-symbols-outlined{font-size:18px;}
   .btn-gold{background:var(--gold);color:#1c1300;}
   .btn-gold:hover{background:var(--gold-light);}
-  .btn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.45);}
-  .btn-outline:hover{border-color:#fff;background:rgba(255,255,255,.08);}
+  /* .btn-outline defaults to a LIGHT-background outline style: nearly every call site (admin
+     panels, drawers, the inspector checklist, the hotel dashboard's own logout button) sits on
+     a white card or topbar, where the old white-text-on-a-near-white-border version rendered
+     essentially invisible -- exactly what surfaced as "I can't find how to log out" on the
+     hotel dashboard, but it affected buttons across every role. .btn-outline-invert restores
+     the white-on-dark look for the one legitimate dark-background usage (the navy sidebar's
+     own logout button). */
+  .btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--border);}
+  .btn-outline:hover{border-color:var(--navy);background:#eef1f8;}
+  .btn-outline-invert{color:#fff;border-color:rgba(255,255,255,.45);}
+  .btn-outline-invert:hover{border-color:#fff;background:rgba(255,255,255,.08);}
   .btn-ghost{background:transparent;color:var(--navy);border:1.5px solid var(--border);}
   .btn-ghost:hover{background:#eef1f8;}
   .btn-primary{background:var(--navy);color:#fff;}
