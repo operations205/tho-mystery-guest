@@ -168,7 +168,28 @@ function newId(prefix){ return prefix + '_' + Date.now() + '_' + Math.floor(Math
 
 /* ===================== AUTH ===================== */
 function currentUser(){ return state.session ? USERS.find(u=>u.id===state.session.userId) : null; }
-function setLoginRole(role){ state.loginRole = role; state.loginError=''; render(); }
+function setLoginRole(role){
+  state.loginRole = role;
+  state.loginError='';
+  render();
+  // Switching the login role tab (hotel/inspector/admin) always starts a fresh credential
+  // entry -- but the browser's own saved-password autofill doesn't know about our "role tabs"
+  // concept, and will happily re-populate whichever field the person filled in last (e.g. the
+  // admin login) into the newly rendered form for a completely different role, since both tabs
+  // reuse the same #f_username/#f_password field ids. Explicitly blanking both fields right
+  // after the re-render, and again on the next tick (autofill can apply asynchronously just
+  // after the DOM update), guarantees every role tab starts genuinely empty. The browser is
+  // still free to autofill the *correct* saved login for whichever tab is now selected once the
+  // person actually focuses/clicks into the field -- this only clears the stale carry-over.
+  const clearFields = () => {
+    const u = document.getElementById('f_username');
+    const p = document.getElementById('f_password');
+    if (u) u.value = '';
+    if (p) p.value = '';
+  };
+  clearFields();
+  setTimeout(clearFields, 0);
+}
 async function attemptLogin(){
   const username = (document.getElementById('f_username')||{}).value || '';
   const password = (document.getElementById('f_password')||{}).value || '';
