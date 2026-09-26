@@ -49,15 +49,17 @@ function renderLogin(){
           </button>
         </div>
         ${state.loginError ? `<div class="login-error">${ic('error')}${esc(state.loginError)}</div>` : ''}
+        <form autocomplete="off" onsubmit="event.preventDefault();">
         <div class="field-icon-wrap" dir="ltr">
           <span class="fi-icon">${ic('person')}</span>
-          <input id="${loginUserFieldId()}" name="${loginUserFieldId()}" type="text" style="text-align:left;" autocapitalize="off" autocomplete="username" placeholder="${t('username')}" aria-label="${t('username')}" onkeydown="if(event.key==='Enter')attemptLogin()">
+          <input id="${loginUserFieldId()}" name="${loginUserFieldId()}" type="text" style="text-align:left;" autocapitalize="off" autocomplete="off" placeholder="${t('username')}" aria-label="${t('username')}" onkeydown="if(event.key==='Enter')attemptLogin()">
         </div>
         <div class="field-icon-wrap pw-field-wrap" dir="ltr">
           <span class="fi-icon">${ic('lock')}</span>
-          <input id="${loginPassFieldId()}" name="${loginPassFieldId()}" type="password" style="text-align:left;" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${t('password')}" aria-label="${t('password')}" onkeydown="if(event.key==='Enter')attemptLogin()">
+          <input id="${loginPassFieldId()}" name="${loginPassFieldId()}" type="password" style="text-align:left;" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${t('password')}" aria-label="${t('password')}" onkeydown="if(event.key==='Enter')attemptLogin()">
           <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('${loginPassFieldId()}', this)" tabindex="-1" title="${t('showPassword')}">${ic('visibility')}</button>
         </div>
+        </form>
         <div class="login-forgot"><a onclick="go('forgot-password')">${t('forgotPassword')}</a></div>
         <button class="btn btn-primary btn-block" onclick="attemptLogin()">${ic('arrow_forward')}${t('loginBtn')}</button>
         ${state.loginRole==='hotel' ? `
