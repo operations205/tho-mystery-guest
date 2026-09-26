@@ -4651,6 +4651,14 @@
     "btnSaveAndBack": {
       "en": "Save & Back",
       "ar": "حفظ ورجوع"
+    },
+    "hotelAccountPasswordAutoHint": {
+      "en": "Leave blank to auto-generate a temporary password",
+      "ar": "اتركها فارغة لتوليد كلمة مرور مؤقتة تلقائيًا"
+    },
+    "hotelAccountUsernamePlaceholder": {
+      "en": "Leave blank to auto-generate",
+      "ar": "اتركه فارغًا للتوليد التلقائي"
     }
   },
   "defaultHotelsData": [

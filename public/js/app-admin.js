@@ -130,17 +130,29 @@ function renderAdminProperties(){
 function renderHotelAccountPanel(h){
   const account = state.hotelAccounts[h.id];
   const reveal = state.hotelAccountReveal && state.hotelAccountReveal.hotelId===h.id ? state.hotelAccountReveal : null;
+  // The password label depends on whether it was auto-generated (isTemp) or typed by the admin
+  // themselves -- calling a password the admin just chose "temporary" would be misleading.
   const revealHtml = reveal ? `
     <div class="hotel-account-creds">
       <div class="cred-row"><span>${t('hotelAccountUsername')}</span><b>${esc(reveal.username)}</b></div>
-      <div class="cred-row"><span>${t('hotelAccountTempPassword')}</span><b>${esc(reveal.tempPassword)}</b></div>
+      <div class="cred-row"><span>${reveal.isTemp === false ? t('password') : t('hotelAccountTempPassword')}</span><b>${esc(reveal.tempPassword)}</b></div>
     </div>
     <p style="font-size:12px;color:var(--muted);margin:8px 0 0;">${esc(t('hotelAccountHint'))}</p>
   ` : '';
   if(!account){
     return `
     <div><strong>${esc(t('hotelAccountTitle'))}</strong> — <span style="color:var(--muted);">${esc(t('hotelAccountNone'))}</span></div>
-    <button class="btn btn-gold btn-sm" style="margin-top:10px;" onclick="createHotelAccount('${h.id}')">${ic('vpn_key')}${t('createHotelAccount')}</button>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:flex-end;">
+      <div class="field" style="margin:0;min-width:160px;">
+        <label for="hacc_username_${h.id}" style="font-size:12px;">${t('username')}</label>
+        <input id="hacc_username_${h.id}" dir="ltr" style="text-align:left;" autocapitalize="off" autocomplete="off" placeholder="${esc(t('hotelAccountUsernamePlaceholder'))}">
+      </div>
+      <div class="field" style="margin:0;min-width:160px;">
+        <label for="hacc_password_${h.id}" style="font-size:12px;">${t('password')}</label>
+        <input id="hacc_password_${h.id}" type="password" dir="ltr" style="text-align:left;" autocomplete="new-password" placeholder="${esc(t('hotelAccountPasswordAutoHint'))}">
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="createHotelAccount('${h.id}')">${ic('vpn_key')}${t('createHotelAccount')}</button>
+    </div>
     ${revealHtml}
     `;
   }
@@ -159,15 +171,28 @@ function toggleHotelAccountPanel(hotelId){
   render();
 }
 async function createHotelAccount(hotelId){
+  const uEl = document.getElementById('hacc_username_' + hotelId);
+  const pEl = document.getElementById('hacc_password_' + hotelId);
+  const username = uEl ? uEl.value.trim() : '';
+  const password = pEl ? pEl.value : '';
+  // Same 6-char minimum as every other password field in the app -- checked client-side first
+  // so a too-short password never even makes the round trip, but the server enforces it too.
+  if(password && password.length < 6){
+    alert(t('passwordTooShort'));
+    return;
+  }
   let result;
   try{
-    result = await apiPost('/hotels/' + hotelId + '/account', {});
+    result = await apiPost('/hotels/' + hotelId + '/account', { username: username || undefined, password: password || undefined });
   }catch(e){
-    alert((state.lang==='ar' ? 'تعذّر إنشاء الحساب: ' : 'Could not create account: ') + e.message);
+    const code = e.data && e.data.error;
+    const msg = code === 'password_too_short' ? t('passwordTooShort')
+      : (state.lang==='ar' ? 'تعذّر إنشاء الحساب: ' : 'Could not create account: ') + e.message;
+    alert(msg);
     return;
   }
   state.hotelAccounts[hotelId] = { id: result.id, username: result.username, name: result.name };
-  state.hotelAccountReveal = { hotelId, username: result.username, tempPassword: result.tempPassword };
+  state.hotelAccountReveal = { hotelId, username: result.username, tempPassword: result.tempPassword, isTemp: result.isTemp };
   render();
 }
 async function resetHotelAccountPassword(hotelId){

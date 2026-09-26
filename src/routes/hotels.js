@@ -131,20 +131,30 @@ router.post('/:id/account', requireRole('admin'), (req, res) => {
   const already = db.prepare("SELECT id FROM users WHERE role='hotel' AND hotel_id=?").get(req.params.id);
   if (already) return res.status(409).json({ error: 'account_exists' });
 
-  const { username, name_en, name_ar } = req.body || {};
+  const { username, password, name_en, name_ar } = req.body || {};
   const base = (username || hotel.name_en.split(' ')[0]).toLowerCase().replace(/[^a-z0-9_.]/g, '');
   let uname = base || 'hotel';
   let n = 1;
   while (db.prepare('SELECT id FROM users WHERE username=?').get(uname)) {
     uname = base + (++n);
   }
+  // The admin can type the hotel account's own username/password by hand instead of always
+  // getting a random auto-generated one -- e.g. to hand the hotel a password they'll actually
+  // remember, or to match one already communicated over the phone. Leaving the password blank
+  // keeps the original auto-generate behavior so this stays a strict superset of the old flow.
+  let finalPassword = password;
+  const isTemp = !finalPassword;
+  if (isTemp) {
+    finalPassword = generateTempPassword();
+  } else if (typeof finalPassword !== 'string' || finalPassword.length < 6) {
+    return res.status(400).json({ error: 'password_too_short' });
+  }
   const id = 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const tempPassword = generateTempPassword();
   db.prepare(`INSERT INTO users (id, role, username, password_hash, name_en, name_ar, hotel_id, created_at)
     VALUES (?, 'hotel', ?, ?, ?, ?, ?, ?)`)
-    .run(id, uname, bcrypt.hashSync(tempPassword, 10), name_en || hotel.name_en, name_ar || hotel.name_ar, req.params.id, Date.now());
+    .run(id, uname, bcrypt.hashSync(finalPassword, 10), name_en || hotel.name_en, name_ar || hotel.name_ar, req.params.id, Date.now());
   const row = db.prepare('SELECT * FROM users WHERE id=?').get(id);
-  res.status(201).json({ ...toPublicAccount(row), tempPassword });
+  res.status(201).json({ ...toPublicAccount(row), tempPassword: finalPassword, isTemp });
 });
 
 router.post('/:id/account/reset-password', requireRole('admin'), (req, res) => {
