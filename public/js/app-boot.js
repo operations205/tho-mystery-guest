@@ -77,7 +77,12 @@ async function boot(){
       document.documentElement.lang = state.lang;
       document.documentElement.dir = state.lang==='ar' ? 'rtl':'ltr';
     }
-    state.reportMode = 'detailed';
+    // Same reasoning as printLang above, for the detailed/summary report-mode toggle: this
+    // print-only page used to always hardcode 'detailed', so there was never actually a way to
+    // export or share the concise executive-summary view someone had selected on screen -- see
+    // exportReportPdf() for where this query param gets set.
+    const printMode = urlParams.get('mode');
+    state.reportMode = printMode === 'summary' ? 'summary' : 'detailed';
     try{ await loadInspectionDetail(printId); }catch(e){}
     state.currentInspectionId = printId;
     state.view = 'print-only';

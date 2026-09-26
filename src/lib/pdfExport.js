@@ -45,7 +45,7 @@ function footerTemplate() {
   </div>`;
 }
 
-async function renderInspectionPdf({ origin, cookieName, cookieValue, inspectionId, lang }) {
+async function renderInspectionPdf({ origin, cookieName, cookieValue, inspectionId, lang, mode }) {
   const run = async () => {
     const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
@@ -75,7 +75,8 @@ async function renderInspectionPdf({ origin, cookieName, cookieValue, inspection
       // first means the charts are only ever created once, already at their final print size.
       await page.emulateMediaType('print');
       const langParam = lang ? `&lang=${encodeURIComponent(lang)}` : '';
-      await page.goto(`${origin}/?printReport=${encodeURIComponent(inspectionId)}${langParam}`, {
+      const modeParam = mode ? `&mode=${encodeURIComponent(mode)}` : '';
+      await page.goto(`${origin}/?printReport=${encodeURIComponent(inspectionId)}${langParam}${modeParam}`, {
         waitUntil: 'networkidle0',
         timeout: 30000
       });

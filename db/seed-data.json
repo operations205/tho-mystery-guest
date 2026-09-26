@@ -4679,6 +4679,10 @@
     "editMyProfileTooltip": {
       "en": "Edit name / change password",
       "ar": "تعديل الاسم / تغيير كلمة المرور"
+    },
+    "hotelTrendTitle": {
+      "en": "Score Trend Across Visits",
+      "ar": "اتجاه النتيجة عبر الزيارات"
     }
   },
   "defaultHotelsData": [

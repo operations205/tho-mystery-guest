@@ -98,14 +98,21 @@ router.get('/:id', (req, res) => {
 // Content-Disposition needs two filename forms: a plain ASCII one for older clients that don't
 // understand RFC 5987, and a filename* with UTF-8 percent-encoding so Arabic names survive
 // intact in modern browsers instead of being transliterated away.
-function buildPdfContentDisposition(row, lang) {
+function buildPdfContentDisposition(row, lang, mode) {
   const hotel = db.prepare('SELECT name_en, name_ar FROM hotels WHERE id=?').get(row.hotel_id);
   const preferred = lang === 'ar'
     ? (hotel && (hotel.name_ar || hotel.name_en))
     : (hotel && (hotel.name_en || hotel.name_ar));
   const hotelName = preferred || row.property_name || (lang === 'ar' ? 'تقرير' : 'Report');
   const dateStr = (row.visit_date || '').slice(0, 10) || new Date(row.created_at).toISOString().slice(0, 10);
-  const rawName = `THO Mystery Guest Report - ${hotelName} - ${dateStr}`;
+  // Distinguish the concise executive-summary export from the full detailed one in the
+  // downloaded filename itself -- otherwise both save as visually identical "THO Mystery Guest
+  // Report - ..." names and whoever downloads both ends up with one silently overwriting the
+  // other, or no way to tell them apart in a Downloads folder without opening each one.
+  const modeLabel = mode === 'summary'
+    ? (lang === 'ar' ? 'ملخص تنفيذي' : 'Executive Summary')
+    : (lang === 'ar' ? 'تقرير مفصل' : 'Full Report');
+  const rawName = `THO Mystery Guest Report - ${hotelName} - ${modeLabel} - ${dateStr}`;
   // Strip characters that are unsafe or reserved in filenames on Windows/macOS/Linux.
   const cleanName = rawName.replace(/[\\/:*?"<>|]/g, '').trim();
   const asciiFallback = (cleanName.replace(/[^\x20-\x7E]/g, '').trim() || 'THO Mystery Guest Report') + '.pdf';
@@ -130,15 +137,17 @@ router.get('/:id/pdf', async (req, res) => {
     // export renders in whichever language was selected on screen, instead of always defaulting
     // to Arabic. Only 'ar'/'en' are valid -- anything else falls back to the default.
     const lang = (req.query.lang === 'en') ? 'en' : (req.query.lang === 'ar' ? 'ar' : undefined);
+    const mode = (req.query.mode === 'summary') ? 'summary' : 'detailed';
     const pdf = await renderInspectionPdf({
       origin: resolveAppOrigin(req),
       cookieName: 'tho_token',
       cookieValue: req.cookies.tho_token,
       inspectionId: row.id,
-      lang
+      lang,
+      mode
     });
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', buildPdfContentDisposition(row, lang));
+    res.setHeader('Content-Disposition', buildPdfContentDisposition(row, lang, mode));
     res.send(Buffer.from(pdf));
   } catch (e) {
     console.error('[pdf-export] failed', e.message);

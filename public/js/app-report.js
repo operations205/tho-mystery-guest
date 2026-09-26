@@ -180,7 +180,12 @@ function exportReportPdf(id){
   // to on screen. Without this, "export PDF" silently ignored the on-screen language toggle
   // and always produced an Arabic PDF -- a real problem when a client specifically asked for
   // an English-only report.
-  window.open('/api/inspections/' + id + '/pdf?lang=' + encodeURIComponent(state.lang), '_blank');
+  // Same problem, same fix, for the detailed/summary report-mode toggle: the print-only page
+  // used to always hardcode 'detailed' regardless of which tab was selected on screen, so there
+  // was never actually a way to hand someone a short executive-summary PDF -- only the on-screen
+  // toggle existed, and even that view couldn't be exported or shared.
+  const mode = state.reportMode === 'summary' ? 'summary' : 'detailed';
+  window.open('/api/inspections/' + id + '/pdf?lang=' + encodeURIComponent(state.lang) + '&mode=' + mode, '_blank');
 }
 function renderReportBody(insp, backAction, showFlags){
   const sc = computeScores(insp);
@@ -589,6 +594,22 @@ function renderHotelReports(){
   const heroLogo = hotel && hotel.logo
     ? `<img src="${esc(hotel.logo)}" alt="" style="height:44px;width:44px;border-radius:10px;object-fit:cover;">`
     : `<div class="avatar avatar-sm" style="background:var(--navy);color:#fff;">${ic('apartment')}</div>`;
+  // Score-over-time trend, oldest to newest visit -- the single most requested view on any
+  // professional mystery-guest client portal (LQA Group and GoAudits both lead their dashboards
+  // with exactly this: a running trend line so a repeat client can see whether quality is
+  // improving or slipping, not just a snapshot of the latest visit).
+  const chronological = list.slice().reverse();
+  const trendChartHtml = list.length >= 1 ? `
+  <div class="chart-card" style="margin-bottom:22px;">
+    <h3>${t('hotelTrendTitle')}</h3>
+    <canvas id="hotelTrendChart" height="90"></canvas>
+  </div>` : '';
+
+  hotelChartsRenderPromise = new Promise(resolve => setTimeout(()=>{
+    renderHotelTrendChart(chronological);
+    resolve();
+  }, 0));
+
   return `
   <div class="page-head">
     <div style="display:flex;align-items:center;gap:12px;">
@@ -602,11 +623,35 @@ function renderHotelReports(){
     <div class="stat"><div class="stat-ic">${ic('trending_up')}</div><div><div class="num">${latest ? (latest.overall||0) + '%' : '—'}</div><div class="lbl">${t('hotelKpiLatestScore')}</div></div></div>
     <div class="stat"><div class="stat-ic">${ic('event')}</div><div><div class="num" style="font-size:16px;">${latest ? esc(latest.visitDate||'') : '—'}</div><div class="lbl">${t('hotelKpiLatestDate')}</div></div></div>
   </div>
+  ${trendChartHtml}
   <div class="card">
     ${list.length===0 ? `<div class="empty"><div class="big">${ic('fact_check')}</div>${t('noReportsYet')}<p style="color:var(--muted);font-size:13px;max-width:420px;margin:8px auto 0;">${t('noReportsYetHint')}</p></div>` : `
     <table><thead><tr><th>${t('colProperty')}</th><th>${t('colDate')}</th><th>${t('colScore')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
   </div>
   `;
+}
+let hotelChartsRenderPromise = null;
+let hotelChartRefs = [];
+function renderHotelTrendChart(chronologicalList){
+  hotelChartRefs.forEach(c=>c.destroy());
+  hotelChartRefs = [];
+  const canvas = document.getElementById('hotelTrendChart');
+  if(!canvas || !chronologicalList.length) return;
+  const labels = chronologicalList.map(i => i.visitDate || '');
+  const data = chronologicalList.map(i => i.overall || 0);
+  const colors = data.map(v => v>=85?'#1c8a4b':(v>=65?'#c98a13':'#c0392b'));
+  hotelChartRefs.push(new Chart(canvas, {
+    type: 'line',
+    data: { labels, datasets: [{
+      data, borderColor: '#c9a227', backgroundColor: 'rgba(201,162,39,.12)',
+      pointBackgroundColor: colors, pointRadius: 5, pointHoverRadius: 6, fill: true, tension: .25
+    }] },
+    options: {
+      animation: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } }
+    }
+  }));
 }
 function renderHotelReportDetail(){
   const insp = inspectionById(state.currentInspectionId);
