@@ -158,12 +158,56 @@ function renderHotelAccountPanel(h){
   }
   return `
   <div><strong>${esc(t('hotelAccountTitle'))}</strong> — <code>${esc(account.username)}</code></div>
-  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:flex-end;">
+    <div class="field" style="margin:0;min-width:160px;">
+      <label for="hacc_edit_username_${h.id}" style="font-size:12px;">${t('username')}</label>
+      <input id="hacc_edit_username_${h.id}" dir="ltr" style="text-align:left;" autocapitalize="off" autocomplete="off" value="${esc(account.username)}">
+    </div>
+    <div class="field" style="margin:0;min-width:160px;">
+      <label for="hacc_edit_password_${h.id}" style="font-size:12px;">${t('password')}</label>
+      <input id="hacc_edit_password_${h.id}" type="password" dir="ltr" style="text-align:left;" autocomplete="new-password" placeholder="${esc(t('hotelAccountPasswordKeepHint'))}">
+    </div>
+    <button class="btn btn-gold btn-sm" onclick="saveHotelAccountEdits('${h.id}')">${ic('save')}${t('save')}</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
     <button class="btn btn-outline btn-sm" onclick="resetHotelAccountPassword('${h.id}')">${ic('lock_reset')}${t('resetHotelPassword')}</button>
     <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteHotelAccount('${h.id}')">${ic('delete')}${t('deleteHotelAccount')}</button>
   </div>
   ${revealHtml}
   `;
+}
+async function saveHotelAccountEdits(hotelId){
+  const uEl = document.getElementById('hacc_edit_username_' + hotelId);
+  const pEl = document.getElementById('hacc_edit_password_' + hotelId);
+  const username = uEl ? uEl.value.trim() : '';
+  const password = pEl ? pEl.value : '';
+  if(password && password.length < 6){
+    alert(t('passwordTooShort'));
+    return;
+  }
+  let result;
+  try{
+    result = await apiPut('/hotels/' + hotelId + '/account', { username: username || undefined, password: password || undefined });
+  }catch(e){
+    const code = e.data && e.data.error;
+    const msg = code === 'password_too_short' ? t('passwordTooShort')
+      : code === 'username_taken' ? (state.lang==='ar' ? 'اسم المستخدم دا مستخدم بالفعل' : 'That username is already taken')
+      : (state.lang==='ar' ? 'تعذّر حفظ التغييرات: ' : 'Could not save changes: ') + e.message;
+    alert(msg);
+    return;
+  }
+  state.hotelAccounts[hotelId] = { id: result.id, username: result.username, name: result.name };
+  // Show whatever was actually changed so the admin has a copy to hand to the hotel, same as
+  // the create/reset flows -- but only surface a password if one was actually typed in (a
+  // username-only rename shouldn't imply the password changed).
+  if(password){
+    state.hotelAccountReveal = { hotelId, username: result.username, tempPassword: password, isTemp: false };
+  } else {
+    state.hotelAccountReveal = null;
+    showToast(state.lang==='ar' ? 'تم الحفظ' : 'Saved', 'success');
+  }
+  if(pEl) pEl.value = '';
+  render();
 }
 function toggleHotelAccountPanel(hotelId){
   state.openHotelAccountId = state.openHotelAccountId===hotelId ? null : hotelId;

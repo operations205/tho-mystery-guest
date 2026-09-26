@@ -157,6 +157,42 @@ router.post('/:id/account', requireRole('admin'), (req, res) => {
   res.status(201).json({ ...toPublicAccount(row), tempPassword: finalPassword, isTemp });
 });
 
+// Edit an existing hotel account's username and/or set a specific password by hand -- the
+// admin-managed equivalent of the inspector PUT /:id route. Either field is optional: send only
+// username to rename without touching the password, only password to just change the password,
+// or both together. Leaving a field out (or blank) leaves that part of the account untouched.
+router.put('/:id/account', requireRole('admin'), (req, res) => {
+  const existing = db.prepare("SELECT * FROM users WHERE role='hotel' AND hotel_id=?").get(req.params.id);
+  if (!existing) return res.status(404).json({ error: 'not_found' });
+  const { username, password } = req.body || {};
+  if (!withinLength(username, 50)) return res.status(400).json({ error: 'field_too_long' });
+
+  let uname = existing.username;
+  if (username !== undefined && String(username).trim() && String(username).trim().toLowerCase() !== existing.username) {
+    uname = String(username).trim().toLowerCase().replace(/[^a-z0-9_.]/g, '');
+    if (!uname) return res.status(400).json({ error: 'invalid_username' });
+    const clash = db.prepare('SELECT id FROM users WHERE username=? AND id != ?').get(uname, existing.id);
+    if (clash) return res.status(409).json({ error: 'username_taken' });
+  }
+
+  let passwordHash = existing.password_hash;
+  let passwordChanged = false;
+  if (password !== undefined && password !== null && password !== '') {
+    if (typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ error: 'password_too_short' });
+    }
+    passwordHash = bcrypt.hashSync(password, 10);
+    passwordChanged = true;
+  }
+
+  // Changing either the username or the password is a credential change -- bump token_version
+  // so any device still logged in under the old one is forced to sign in again (see requireAuth).
+  const usernameChanged = uname !== existing.username;
+  db.prepare('UPDATE users SET username=?, password_hash=?, token_version = token_version + ? WHERE id=?')
+    .run(uname, passwordHash, (usernameChanged || passwordChanged) ? 1 : 0, existing.id);
+  res.json(toPublicAccount(db.prepare('SELECT * FROM users WHERE id=?').get(existing.id)));
+});
+
 router.post('/:id/account/reset-password', requireRole('admin'), (req, res) => {
   const row = db.prepare("SELECT * FROM users WHERE role='hotel' AND hotel_id=?").get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });

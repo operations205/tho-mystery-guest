@@ -4659,6 +4659,10 @@
     "hotelAccountUsernamePlaceholder": {
       "en": "Leave blank to auto-generate",
       "ar": "اتركه فارغًا للتوليد التلقائي"
+    },
+    "hotelAccountPasswordKeepHint": {
+      "en": "Leave blank to keep the current password",
+      "ar": "اتركها فارغة للاحتفاظ بكلمة المرور الحالية"
     }
   },
   "defaultHotelsData": [
