@@ -4663,6 +4663,22 @@
     "hotelAccountPasswordKeepHint": {
       "en": "Leave blank to keep the current password",
       "ar": "اتركها فارغة للاحتفاظ بكلمة المرور الحالية"
+    },
+    "hotelKpiLatestScore": {
+      "en": "Latest Score",
+      "ar": "آخر نتيجة"
+    },
+    "hotelKpiLatestDate": {
+      "en": "Latest Visit",
+      "ar": "آخر زيارة"
+    },
+    "noReportsYetHint": {
+      "en": "Once an inspection visit is completed and approved by our review committee, the report will appear here.",
+      "ar": "بمجرد اكتمال زيارة التفتيش واعتمادها من لجنة المراجعة، سيظهر التقرير هنا."
+    },
+    "editMyProfileTooltip": {
+      "en": "Edit name / change password",
+      "ar": "تعديل الاسم / تغيير كلمة المرور"
     }
   },
   "defaultHotelsData": [

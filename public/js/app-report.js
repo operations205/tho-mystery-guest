@@ -487,14 +487,15 @@ function renderHotelShell(bodyHtml){
       <div class="admin-topbar">
         <h1>${ic('hotel')}${esc(state.view==='hotel-report' ? t('detailTitle') : t('hotelDashboardTitle'))}</h1>
         <div class="tb-actions">
-          <span style="color:var(--muted);font-size:13px;">${esc(t('hotelWelcome'))}, ${esc(tl(user.name))}</span>
+          <span style="color:var(--muted);font-size:13px;cursor:pointer;" onclick="openDrawer('profile')" title="${esc(t('editMyProfileTooltip'))}">${esc(t('hotelWelcome'))}, ${esc(tl(user.name))} <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">edit</span></span>
           <button class="lang-toggle" onclick="toggleLang()">${ic('translate')}<span>${state.lang==='ar'?'English':'عربي'}</span></button>
           <button class="btn btn-outline btn-sm" onclick="logout()">${ic('logout')}${t('logout')}</button>
         </div>
       </div>
       <div class="admin-content">${bodyHtml}</div>
     </div>
-  </div>`;
+  </div>
+  ${renderDrawer()}`;
 }
 async function viewHotelReport(id){ return openReportView(id, 'hotel-report'); }
 
@@ -571,6 +572,8 @@ async function reopenReport(id){
 }
 function renderHotelReports(){
   const list = state.inspections.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  const user = currentUser();
+  const hotel = user.hotelId ? hotelById(user.hotelId) : null;
   const rows = list.map(insp=>{
     const overall = insp.overall || 0;
     const badge = `<span class="badge ${overall>=75?'badge-green':(overall>=60?'badge-amber':'badge-red')}">${overall}%</span>`;
@@ -581,10 +584,26 @@ function renderHotelReports(){
       <td style="text-align:end;"><button class="btn btn-ghost btn-sm" onclick="viewHotelReport('${insp.id}')">${t('view')}</button></td>
     </tr>`;
   }).join('');
+  const avg = list.length ? Math.round(list.reduce((s,i)=> s + (i.overall||0), 0) / list.length) : 0;
+  const latest = list[0];
+  const heroLogo = hotel && hotel.logo
+    ? `<img src="${esc(hotel.logo)}" alt="" style="height:44px;width:44px;border-radius:10px;object-fit:cover;">`
+    : `<div class="avatar avatar-sm" style="background:var(--navy);color:#fff;">${ic('apartment')}</div>`;
   return `
-  <div class="page-head"><div><h2>${t('hotelDashboardTitle')}</h2></div></div>
+  <div class="page-head">
+    <div style="display:flex;align-items:center;gap:12px;">
+      ${heroLogo}
+      <div><h2>${esc(hotel ? tl(hotel.name) : t('hotelDashboardTitle'))}</h2><p>${t('hotelDashboardTitle')}</p></div>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-ic">${ic('fact_check')}</div><div><div class="num">${list.length}</div><div class="lbl">${t('totalInspections')}</div></div></div>
+    <div class="stat"><div class="stat-ic">${ic('percent')}</div><div><div class="num">${list.length ? avg + '%' : '—'}</div><div class="lbl">${t('avgScore')}</div></div></div>
+    <div class="stat"><div class="stat-ic">${ic('trending_up')}</div><div><div class="num">${latest ? (latest.overall||0) + '%' : '—'}</div><div class="lbl">${t('hotelKpiLatestScore')}</div></div></div>
+    <div class="stat"><div class="stat-ic">${ic('event')}</div><div><div class="num" style="font-size:16px;">${latest ? esc(latest.visitDate||'') : '—'}</div><div class="lbl">${t('hotelKpiLatestDate')}</div></div></div>
+  </div>
   <div class="card">
-    ${list.length===0 ? `<div class="empty"><div class="big">${ic('fact_check')}</div>${t('noReportsYet')}</div>` : `
+    ${list.length===0 ? `<div class="empty"><div class="big">${ic('fact_check')}</div>${t('noReportsYet')}<p style="color:var(--muted);font-size:13px;max-width:420px;margin:8px auto 0;">${t('noReportsYetHint')}</p></div>` : `
     <table><thead><tr><th>${t('colProperty')}</th><th>${t('colDate')}</th><th>${t('colScore')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
   </div>
   `;
