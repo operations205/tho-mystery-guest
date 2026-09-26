@@ -610,6 +610,8 @@ function renderHotelReports(){
     resolve();
   }, 0));
 
+  const categoryInsightsHtml = renderHotelCategoryInsights(chronological);
+
   return `
   <div class="page-head">
     <div style="display:flex;align-items:center;gap:12px;">
@@ -624,10 +626,94 @@ function renderHotelReports(){
     <div class="stat"><div class="stat-ic">${ic('event')}</div><div><div class="num" style="font-size:16px;">${latest ? esc(latest.visitDate||'') : '—'}</div><div class="lbl">${t('hotelKpiLatestDate')}</div></div></div>
   </div>
   ${trendChartHtml}
+  ${categoryInsightsHtml}
   <div class="card">
     ${list.length===0 ? `<div class="empty"><div class="big">${ic('fact_check')}</div>${t('noReportsYet')}<p style="color:var(--muted);font-size:13px;max-width:420px;margin:8px auto 0;">${t('noReportsYetHint')}</p></div>` : `
     <table><thead><tr><th>${t('colProperty')}</th><th>${t('colDate')}</th><th>${t('colScore')}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`}
   </div>
+  `;
+}
+
+// Per-department strengths/weaknesses, averaged across every completed visit -- this is the
+// piece that lets the hotel (not the inspector) own tracking the guest journey: the inspector's
+// job stops at a neutral record of what was observed per visit, and it's this view that turns
+// that raw history into "which departments are strong, which need a development plan, and is
+// each one trending up or down" for the hotel's own team to act on.
+const HOTEL_CAT_MIN_SAMPLE = 2;
+function renderHotelCategoryInsights(chronologicalList){
+  if(!chronologicalList.length) return '';
+  // Union of every category id across both standards, keyed by id, so a hotel whose visits mix
+  // audit4/plus5 standards (or just uses one) still gets one consistent label per category.
+  const labelByCat = {};
+  catsForStandard('plus5').forEach(c=>{ labelByCat[c.id] = c; });
+
+  const seriesByCat = {}; // catId -> [{score, date}] in chronological order
+  chronologicalList.forEach(insp=>{
+    const scores = insp.catScores || {};
+    const counts = insp.catCounts || {};
+    Object.keys(scores).forEach(catId=>{
+      const s = scores[catId];
+      if(s===null || s===undefined) return;
+      if((counts[catId]||0) < HOTEL_CAT_MIN_SAMPLE) return;
+      if(!seriesByCat[catId]) seriesByCat[catId] = [];
+      seriesByCat[catId].push({ score: s, date: insp.visitDate || '' });
+    });
+  });
+
+  const summaries = Object.keys(seriesByCat).map(catId=>{
+    const points = seriesByCat[catId];
+    const avgScore = Math.round(points.reduce((s,p)=>s+p.score,0) / points.length);
+    const latestScore = points[points.length-1].score;
+    const priorPoints = points.slice(0,-1);
+    const priorAvg = priorPoints.length ? Math.round(priorPoints.reduce((s,p)=>s+p.score,0)/priorPoints.length) : null;
+    const trend = priorAvg===null ? null : latestScore - priorAvg;
+    return { catId, avgScore, latestScore, trend, visits: points.length, cat: labelByCat[catId] };
+  }).filter(s=>s.cat);
+
+  if(!summaries.length){
+    return `<div class="card" style="margin-bottom:22px;color:var(--muted);font-size:13.5px;">${t('hotelCategoryNoDataHint')}</div>`;
+  }
+
+  const byScoreDesc = summaries.slice().sort((a,b)=> b.avgScore - a.avgScore);
+  const byScoreAsc = summaries.slice().sort((a,b)=> a.avgScore - b.avgScore);
+  const topN = Math.min(5, summaries.length);
+  const strengths = byScoreDesc.slice(0, topN);
+  const weaknesses = byScoreAsc.slice(0, topN);
+
+  function renderTrend(s){
+    if(s.trend===null) return `<span class="badge" style="background:#eef0f5;color:var(--muted);">${t('hotelCategoryNewBadge')}</span>`;
+    if(s.trend > 0) return `<span class="badge badge-green">▲ ${s.trend}%</span>`;
+    if(s.trend < 0) return `<span class="badge badge-red">▼ ${Math.abs(s.trend)}%</span>`;
+    return `<span class="badge" style="background:#eef0f5;color:var(--muted);">—</span>`;
+  }
+
+  function renderRow(s){
+    const barColor = s.avgScore>=80 ? 'var(--green)' : (s.avgScore>=60 ? 'var(--amber)' : 'var(--red)');
+    return `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="font-size:13.5px;font-weight:600;">${esc(tl(s.cat))}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12.5px;color:var(--muted);">${s.avgScore}%</span>
+          ${renderTrend(s)}
+        </div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${s.avgScore}%;background:${barColor};"></div></div>
+    </div>`;
+  }
+
+  return `
+  <div class="stat-row" style="grid-template-columns:1fr 1fr;margin-bottom:8px;">
+    <div class="chart-card">
+      <h3>${ic('trending_up')} ${t('hotelCategoryStrengthsTitle')}</h3>
+      ${strengths.map(renderRow).join('')}
+    </div>
+    <div class="chart-card">
+      <h3>${ic('trending_down')} ${t('hotelCategoryWeaknessesTitle')}</h3>
+      ${weaknesses.map(renderRow).join('')}
+    </div>
+  </div>
+  <p style="color:var(--muted);font-size:12.5px;margin:0 0 22px;">${t('hotelCategoryInsightHint')}</p>
   `;
 }
 let hotelChartsRenderPromise = null;

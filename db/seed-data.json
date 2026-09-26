@@ -4683,6 +4683,26 @@
     "hotelTrendTitle": {
       "en": "Score Trend Across Visits",
       "ar": "اتجاه النتيجة عبر الزيارات"
+    },
+    "hotelCategoryStrengthsTitle": {
+      "en": "Strongest Areas",
+      "ar": "أقوى الأقسام أداءً"
+    },
+    "hotelCategoryWeaknessesTitle": {
+      "en": "Areas Needing Attention",
+      "ar": "أقسام تحتاج تطوير"
+    },
+    "hotelCategoryInsightHint": {
+      "en": "Based on every completed visit, ranked by average score. Use this to focus each department's improvement plan.",
+      "ar": "بناءً على كل الزيارات المكتملة ومرتبة حسب متوسط الأداء. استخدمها لتوجيه خطة تطوير كل قسم."
+    },
+    "hotelCategoryNewBadge": {
+      "en": "New",
+      "ar": "جديد"
+    },
+    "hotelCategoryNoDataHint": {
+      "en": "A per-department breakdown will appear here once more visits are recorded.",
+      "ar": "سيظهر هنا تحليل أداء كل قسم بعد تسجيل مزيد من الزيارات."
     }
   },
   "defaultHotelsData": [

@@ -75,6 +75,10 @@ router.get('/', (req, res) => {
     pub.totalItems = sc.totalItems;
     pub.answeredCount = sc.answeredCount;
     pub.criticalFailCount = sc.criticalFails.length;
+    // Per-category scores/sample-counts so a hotel dashboard can chart each department's
+    // performance across visits without re-fetching every historic inspection's full answers.
+    pub.catScores = sc.catScores;
+    pub.catCounts = sc.catCounts;
     return pub;
   }));
 });
