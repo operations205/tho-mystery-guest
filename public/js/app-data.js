@@ -151,6 +151,15 @@ function ti(item){ return item[state.lang]; }
 function tcls(code){ return CLASS_META[code][state.lang]; }
 function tl(obj){ return obj ? (obj[state.lang] || obj.en || '') : ''; }
 function ic(name, extra){ return `<span class="material-symbols-outlined${extra?(' '+extra):''}">${name}</span>`; }
+// The login screen's username/password fields are keyed by the currently selected role tab
+// (hotel/inspector/admin) rather than a fixed id -- browsers key saved-password autofill off a
+// field's id/name, so three role tabs sharing one fixed id meant switching tabs could silently
+// re-populate a completely different role's saved credentials into the field just shown (e.g.
+// a hotel account's saved login appearing in the admin tab). Distinct ids per role make them
+// genuinely separate fields from the browser's point of view, so there is nothing saved under
+// e.g. "f_username_admin" to offer just because "f_username_hotel" has a saved login.
+function loginUserFieldId(){ return 'f_username_' + (state.loginRole || 'default'); }
+function loginPassFieldId(){ return 'f_password_' + (state.loginRole || 'default'); }
 function esc(str){
   if(str===undefined || str===null) return '';
   return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));

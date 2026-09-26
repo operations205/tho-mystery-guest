@@ -173,17 +173,15 @@ function setLoginRole(role){
   state.loginError='';
   render();
   // Switching the login role tab (hotel/inspector/admin) always starts a fresh credential
-  // entry -- but the browser's own saved-password autofill doesn't know about our "role tabs"
-  // concept, and will happily re-populate whichever field the person filled in last (e.g. the
-  // admin login) into the newly rendered form for a completely different role, since both tabs
-  // reuse the same #f_username/#f_password field ids. Explicitly blanking both fields right
-  // after the re-render, and again on the next tick (autofill can apply asynchronously just
-  // after the DOM update), guarantees every role tab starts genuinely empty. The browser is
-  // still free to autofill the *correct* saved login for whichever tab is now selected once the
-  // person actually focuses/clicks into the field -- this only clears the stale carry-over.
+  // entry. The fields are now keyed per-role (loginUserFieldId()/loginPassFieldId(), see
+  // app-data.js) specifically so the browser's saved-password autofill can't re-populate a
+  // different role's saved login into the tab just shown -- that was the actual root cause of
+  // a hotel account's credentials appearing in the admin tab, not just a timing issue. This
+  // explicit clear (immediate + next tick) stays as a second layer, in case the browser still
+  // has an in-memory value queued for these exact field ids from earlier in the same session.
   const clearFields = () => {
-    const u = document.getElementById('f_username');
-    const p = document.getElementById('f_password');
+    const u = document.getElementById(loginUserFieldId());
+    const p = document.getElementById(loginPassFieldId());
     if (u) u.value = '';
     if (p) p.value = '';
   };
@@ -191,8 +189,8 @@ function setLoginRole(role){
   setTimeout(clearFields, 0);
 }
 async function attemptLogin(){
-  const username = (document.getElementById('f_username')||{}).value || '';
-  const password = (document.getElementById('f_password')||{}).value || '';
+  const username = (document.getElementById(loginUserFieldId())||{}).value || '';
+  const password = (document.getElementById(loginPassFieldId())||{}).value || '';
   try{
     await apiPost('/auth/login', { username: username.trim(), password, role: state.loginRole });
   }catch(e){
