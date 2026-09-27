@@ -187,6 +187,13 @@ function exportReportPdf(id){
   const mode = state.reportMode === 'summary' ? 'summary' : 'detailed';
   window.open('/api/inspections/' + id + '/pdf?lang=' + encodeURIComponent(state.lang) + '&mode=' + mode, '_blank');
 }
+// A requested alternative to the PDF export: an .xlsx workbook with the same underlying data
+// (hotel info, overall score/grade, mandatory compliance, category breakdown, full checklist)
+// for whoever needs to filter/sort/paste it into their own spreadsheet -- not a pixel copy of
+// the PDF, which is a fixed-layout document a spreadsheet grid can't reproduce 1:1.
+function exportReportExcel(id){
+  window.open('/api/inspections/' + id + '/excel?lang=' + encodeURIComponent(state.lang), '_blank');
+}
 function renderReportBody(insp, backAction, showFlags){
   const sc = computeScores(insp);
   const grade = gradeInfo(sc.overall, sc.criticalFails.length>0);
@@ -326,6 +333,7 @@ function renderReportBody(insp, backAction, showFlags){
   <div class="top-actions no-print">
     <button class="btn btn-ghost btn-sm" onclick="${backAction}">${ic('arrow_back')}${t('backDash')}</button>
     <button class="btn btn-primary btn-sm" onclick="exportReportPdf('${insp.id}')">${ic('picture_as_pdf')}${t('exportPdfBtn')}</button>
+    <button class="btn btn-outline btn-sm" onclick="exportReportExcel('${insp.id}')">${ic('grid_on')}${t('exportExcelBtn')}</button>
     ${workflowActionsHtml}
     ${isSuperAdmin() ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="deleteInspectionReport('${insp.id}')">${ic('delete')}${t('delete')}</button>` : ''}
   </div>

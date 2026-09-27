@@ -4703,6 +4703,10 @@
     "hotelCategoryNoDataHint": {
       "en": "A per-department breakdown will appear here once more visits are recorded.",
       "ar": "سيظهر هنا تحليل أداء كل قسم بعد تسجيل مزيد من الزيارات."
+    },
+    "exportExcelBtn": {
+      "en": "Export Excel",
+      "ar": "تصدير Excel"
     }
   },
   "defaultHotelsData": [

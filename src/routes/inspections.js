@@ -5,6 +5,7 @@ const { isValidImageDataUrl } = require('../utils/validateImage');
 const { withinLength } = require('../utils/validate');
 const { computeScores, catsForStandard } = require('../lib/standards');
 const { renderInspectionPdf } = require('../lib/pdfExport');
+const { buildInspectionExcelBuffer } = require('../lib/excelExport');
 const { resolveAppOrigin } = require('../utils/origin');
 
 const router = express.Router();
@@ -124,6 +125,20 @@ function buildPdfContentDisposition(row, lang, mode) {
   return `inline; filename="${asciiFallback}"; filename*=UTF-8''${utf8Name}`;
 }
 
+function buildExcelContentDisposition(row, lang) {
+  const hotel = db.prepare('SELECT name_en, name_ar FROM hotels WHERE id=?').get(row.hotel_id);
+  const preferred = lang === 'ar'
+    ? (hotel && (hotel.name_ar || hotel.name_en))
+    : (hotel && (hotel.name_en || hotel.name_ar));
+  const hotelName = preferred || row.property_name || (lang === 'ar' ? 'تقرير' : 'Report');
+  const dateStr = (row.visit_date || '').slice(0, 10) || new Date(row.created_at).toISOString().slice(0, 10);
+  const rawName = `THO Mystery Guest Report - ${hotelName} - ${dateStr}`;
+  const cleanName = rawName.replace(/[\\/:*?"<>|]/g, '').trim();
+  const asciiFallback = (cleanName.replace(/[^\x20-\x7E]/g, '').trim() || 'THO Mystery Guest Report') + '.xlsx';
+  const utf8Name = encodeURIComponent(cleanName + '.xlsx');
+  return `attachment; filename="${asciiFallback}"; filename*=UTF-8''${utf8Name}`;
+}
+
 router.get('/:id/pdf', async (req, res) => {
   const row = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
@@ -156,6 +171,32 @@ router.get('/:id/pdf', async (req, res) => {
   } catch (e) {
     console.error('[pdf-export] failed', e.message);
     res.status(500).json({ error: 'pdf_generation_failed' });
+  }
+});
+
+// Excel export -- same underlying data as the PDF export (hotel info, overall score/grade,
+// mandatory compliance, per-category breakdown, full checklist with answers/notes), built as a
+// grid-based .xlsx workbook rather than a fixed-layout document. A spreadsheet and a PDF are
+// different mediums (editable cells and columns vs. a fixed page with photos/gradients), so this
+// deliberately isn't a pixel copy of the PDF -- it mirrors the same content and structure.
+router.get('/:id/excel', async (req, res) => {
+  const row = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  if (req.user.role === 'inspector' && row.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
+  if (req.user.role === 'hotel' && !hotelCanSee(row, req.user)) return res.status(403).json({ error: 'forbidden' });
+
+  try {
+    const lang = (req.query.lang === 'en') ? 'en' : 'ar';
+    const hotel = db.prepare('SELECT * FROM hotels WHERE id=?').get(row.hotel_id);
+    const answers = getAnswers(row.id);
+    const sc = computeScores(row.standard_id, answers);
+    const buffer = await buildInspectionExcelBuffer({ row, hotel, answers, sc, lang });
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', buildExcelContentDisposition(row, lang));
+    res.send(buffer);
+  } catch (e) {
+    console.error('[excel-export] failed', e.message);
+    res.status(500).json({ error: 'excel_generation_failed' });
   }
 });
 
