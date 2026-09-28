@@ -295,10 +295,19 @@ router.put('/:id/answers/:itemId', (req, res) => {
 // Complete + sign. As of the committee-approval workflow, this no longer finalizes the
 // report directly -- it moves it to 'pending_review' and an admin must separately approve it
 // (see /:id/approve below) before status becomes 'completed' and the hotel role can see it.
-router.post('/:id/complete', requireRole('inspector'), (req, res) => {
+//
+// Also reachable by an admin directly, not just the assigned inspector. Admins already have a
+// way to edit an in_progress inspection's answers (editInspectionAnswers/PUT answers) and to
+// attach their own signature to it (the admin-sign-capture modal) when standing in for an
+// inspector -- but until this, nothing could ever move that report past 'in_progress': this
+// route was inspector-only, so an admin who rebuilt a report entirely themselves had no way to
+// ever submit it for committee review, let alone approve it. It would sit at 'in_progress'
+// forever, invisible to the hotel and never showing any approval status, no matter how many
+// times an admin "signed" it.
+router.post('/:id/complete', requireRole(['inspector', 'admin']), (req, res) => {
   const insp = db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id);
   if (!insp) return res.status(404).json({ error: 'not_found' });
-  if (insp.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
+  if (req.user.role === 'inspector' && insp.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
   // Was previously "block only if already completed" -- now a stricter allowlist, since a
   // report that's pending_review (already submitted) or completed (already approved) should
   // never be re-submitted directly; it has to go through /:id/reopen or a committee rejection

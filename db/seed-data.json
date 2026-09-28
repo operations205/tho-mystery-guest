@@ -4715,6 +4715,14 @@
     "submitAlertApprovedHotel": {
       "en": "This report has been officially reviewed and approved by THO's review committee.",
       "ar": "هذا التقرير تمت مراجعته واعتماده رسميًا من لجنة المراجعة بذا هوتيلير أوفيس."
+    },
+    "signAndSubmitAdmin": {
+      "en": "Sign & Submit for Review",
+      "ar": "توقيع وإرسال للمراجعة"
+    },
+    "toastReportSubmittedByAdmin": {
+      "en": "Signed and submitted for committee review. Click Approve to finalize it for the client.",
+      "ar": "تم التوقيع وإرسال التقرير لمراجعة اللجنة. اضغط \"اعتماد\" لإنهائه وإتاحته للعميل."
     }
   },
   "defaultHotelsData": [

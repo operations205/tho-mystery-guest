@@ -24,10 +24,18 @@ function noteAnswerFlag(value, note){
 function renderSignatureBlock(insp){
   const dateStr = insp.completedAt ? new Date(insp.completedAt).toISOString().slice(0,10) : (insp.visitDate||'');
   const canAdminSign = !insp.signature && state.session && state.session.role==='admin';
+  // Two different situations share this same "no signature yet, admin can add one" button, and
+  // submitAdminSignature() branches on insp.status to do the right thing for each: an
+  // in_progress report has no signature because it was never submitted at all -- signing here
+  // IS the submission, so the label says so and the action moves it to pending_review. A
+  // pending_review/completed report with no signature is the original backfill case this modal
+  // was built for (inspector skipped it, or an old bug), where status is already settled and
+  // signing should only ever patch the image, never touch status.
+  const adminSignLabel = insp.status === 'in_progress' ? t('signAndSubmitAdmin') : t('addSignatureAdmin');
   const sigHtml = insp.signature
     ? `<img class="sig-image" src="${esc(insp.signature)}" alt="signature">`
     : canAdminSign
-      ? `<div class="sig-blank sig-blank-admin no-print"><button class="btn btn-outline btn-sm" onclick="openAdminSigCapture('${insp.id}')">${ic('draw')}${t('addSignatureAdmin')}</button></div>`
+      ? `<div class="sig-blank sig-blank-admin no-print"><button class="btn btn-outline btn-sm" onclick="openAdminSigCapture('${insp.id}')">${ic('draw')}${adminSignLabel}</button></div>`
       : `<div class="sig-blank"></div>`;
   return `
   <div class="sig-block">
@@ -119,15 +127,30 @@ async function submitAdminSignature(){
     return;
   }
   const signature = canvas.toDataURL('image/png');
+  const insp = inspectionById(inspId);
+  // An in_progress report has no signature because it was never actually submitted -- signing
+  // here has to BE that submission (POST /complete, same route the inspector's own sign-pad
+  // uses), or the report would be stuck at in_progress forever with an admin signature on it
+  // but no path to pending_review/approval. A report that's already pending_review/completed
+  // and just missing its signature (the original use case for this modal) only ever needs the
+  // image patched, never a status change.
+  const isSubmitting = insp && insp.status === 'in_progress';
   try{
-    const updated = await apiPut('/inspections/' + inspId + '/signature', { signature });
+    const updated = isSubmitting
+      ? await apiPost('/inspections/' + inspId + '/complete', { signature })
+      : await apiPut('/inspections/' + inspId + '/signature', { signature });
     const idx = state.inspections.findIndex(i => i.id === inspId);
     if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
     state.adminSigModalInspId = null;
     render();
-    showToast(state.lang==='ar' ? 'تم حفظ التوقيع' : 'Signature saved', 'success');
+    showToast(isSubmitting
+      ? t('toastReportSubmittedByAdmin')
+      : (state.lang==='ar' ? 'تم حفظ التوقيع' : 'Signature saved'), 'success');
   }catch(e){
-    showToast((state.lang==='ar' ? 'تعذّر حفظ التوقيع: ' : 'Could not save signature: ') + e.message, 'error');
+    const msg = (e.data && e.data.error === 'incomplete')
+      ? (state.lang==='ar' ? `لسه فيه ${e.data.unansweredCount} بند بدون إجابة. لازم تجاوب على كل البنود قبل الإرسال.` : `${e.data.unansweredCount} item(s) still need an answer before submitting.`)
+      : e.message;
+    showToast((state.lang==='ar' ? 'تعذّر حفظ التوقيع: ' : 'Could not save signature: ') + msg, 'error');
   }
 }
 
