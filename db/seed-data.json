@@ -31,12 +31,6 @@
           "ar": "شرح الموظف بوضوح ما يشمله السعر وسياسة الإلغاء والدفع"
         },
         {
-          "id": "r5",
-          "cls": "SRV",
-          "en": "Employee asked about special occasions or preferences (honeymoon, dietary, etc.)",
-          "ar": "سأل الموظف عن أي مناسبة خاصة أو تفضيلات (شهر عسل، احتياجات غذائية، إلخ)"
-        },
-        {
           "id": "r6",
           "cls": "EFF",
           "en": "Employee captured contact details and confirmed all reservation details before ending the call",
@@ -553,8 +547,8 @@
     {
       "id": "turndown_service",
       "icon": "nightlight",
-      "en": "Turndown Service",
-      "ar": "الخدمة المسائية (Turndown)",
+      "en": "Turndown Service / Service on Request",
+      "ar": "الخدمة المسائية (Turndown) / الخدمة عند الطلب",
       "items": [
         {
           "id": "s1",
@@ -946,8 +940,8 @@
         {
           "id": "rr4",
           "cls": "SRV",
-          "en": "Coats/bags offered assistance (cloakroom or seat storage) on arrival",
-          "ar": "تم عرض المساعدة في حفظ المعاطف/الحقائب عند الوصول"
+          "en": "Coats/bags offered assistance (cloakroom or seat storage) on arrival, where the venue provides this service",
+          "ar": "تم عرض المساعدة في المعاطف/الحقائب (غرفة معاطف أو تخزين بجانب المقعد) عند الوصول، في حال توفر هذه الخدمة بالمكان"
         },
         {
           "id": "rr5",
@@ -1245,8 +1239,8 @@
         {
           "id": "p4",
           "cls": "SRV",
-          "en": "Staff present, attentive and proactively assisting where needed",
-          "ar": "يوجد موظفون حاضرون ومهتمون ويقدمون المساعدة بشكل استباقي"
+          "en": "Staff present or available on request to assist when needed",
+          "ar": "الموظفون متواجدون أو متاحون عند الطلب للمساعدة عند الحاجة"
         },
         {
           "id": "p5",
@@ -1275,8 +1269,8 @@
         {
           "id": "pg9",
           "cls": "CLN",
-          "en": "Loungers, towels and pool furniture clean and available without excessive waiting",
-          "ar": "كراسي الاستلقاء والمناشف وأثاث المسبح نظيفة ومتوفرة دون انتظار طويل"
+          "en": "Loungers and pool furniture clean and available without excessive waiting (pool towels where provided by the hotel)",
+          "ar": "الكراسي وأثاث المسبح نظيف ومتاح دون انتظار مبالغ فيه (مناشف المسبح في حال توفيرها من الفندق)"
         },
         {
           "id": "p10",
@@ -1383,8 +1377,8 @@
     {
       "id": "business_center",
       "icon": "business_center",
-      "en": "Business Center & Meeting Facilities",
-      "ar": "مركز الأعمال وقاعات الاجتماعات",
+      "en": "Business Center",
+      "ar": "مركز الأعمال",
       "items": [
         {
           "id": "bcx1",
@@ -1397,7 +1391,15 @@
           "cls": "EFF",
           "en": "Staff support for printing/admin requests available promptly",
           "ar": "دعم الموظفين لطلبات الطباعة أو الأعمال الإدارية متوفر بسرعة"
-        },
+        }
+      ]
+    },
+    {
+      "id": "meeting_facilities",
+      "icon": "meeting_room",
+      "en": "Meeting Facilities",
+      "ar": "قاعات الاجتماعات",
+      "items": [
         {
           "id": "bcx3",
           "cls": "PRD",
@@ -1861,6 +1863,42 @@
           "cls": "EI",
           "en": "Overall impression felt like genuine, professional hospitality",
           "ar": "الانطباع العام كان ضيافة صادقة واحترافية"
+        },
+        {
+          "id": "gu1",
+          "cls": "SRV",
+          "en": "Uniforms clean, well-fitted and consistent with the department’s standard",
+          "ar": "الأزياء نظيفة ومناسبة القياس ومتوافقة مع معايير القسم"
+        },
+        {
+          "id": "gu2",
+          "cls": "SRV",
+          "en": "Name badges worn visibly and legibly by guest-facing staff",
+          "ar": "بطاقات الأسماء ظاهرة وواضحة لدى الموظفين المتعاملين مع الضيوف"
+        },
+        {
+          "id": "gu3",
+          "cls": "SRV",
+          "en": "Personal grooming (hair, nails, hygiene) met a professional standard throughout",
+          "ar": "الأناقة الشخصية (الشعر، الأظافر، النظافة) بمستوى مهني طوال الوقت"
+        },
+        {
+          "id": "gu4",
+          "cls": "SRV",
+          "en": "Staff posture and body language remained attentive and approachable",
+          "ar": "ظلت وضعية وحركة جسد الموظفين منتبهة وودودة"
+        },
+        {
+          "id": "gu5",
+          "cls": "SRV",
+          "en": "Footwear appropriate, clean and in good repair",
+          "ar": "الأحذية مناسبة ونظيفة وبحالة جيدة"
+        },
+        {
+          "id": "gu6",
+          "cls": "SRV",
+          "en": "Overall appearance consistent with the property’s brand positioning",
+          "ar": "المظهر العام متسق مع مكانة العلامة الفندقية للمنشأة"
         }
       ]
     },
@@ -2006,50 +2044,6 @@
           "cls": "SEC",
           "en": "Emergency numbers displayed in rooms/lobby area",
           "ar": "أرقام الطوارئ ظاهرة في الغرف/منطقة اللوبي"
-        }
-      ]
-    },
-    {
-      "id": "grooming",
-      "icon": "checkroom",
-      "en": "Staff Grooming & Uniform Standards",
-      "ar": "معايير أناقة وزي الموظفين",
-      "items": [
-        {
-          "id": "gu1",
-          "cls": "SRV",
-          "en": "Uniforms clean, well-fitted and consistent with the department’s standard",
-          "ar": "الأزياء نظيفة ومناسبة القياس ومتوافقة مع معايير القسم"
-        },
-        {
-          "id": "gu2",
-          "cls": "SRV",
-          "en": "Name badges worn visibly and legibly by guest-facing staff",
-          "ar": "بطاقات الأسماء ظاهرة وواضحة لدى الموظفين المتعاملين مع الضيوف"
-        },
-        {
-          "id": "gu3",
-          "cls": "SRV",
-          "en": "Personal grooming (hair, nails, hygiene) met a professional standard throughout",
-          "ar": "الأناقة الشخصية (الشعر، الأظافر، النظافة) بمستوى مهني طوال الوقت"
-        },
-        {
-          "id": "gu4",
-          "cls": "SRV",
-          "en": "Staff posture and body language remained attentive and approachable",
-          "ar": "ظلت وضعية وحركة جسد الموظفين منتبهة وودودة"
-        },
-        {
-          "id": "gu5",
-          "cls": "SRV",
-          "en": "Footwear appropriate, clean and in good repair",
-          "ar": "الأحذية مناسبة ونظيفة وبحالة جيدة"
-        },
-        {
-          "id": "gu6",
-          "cls": "SRV",
-          "en": "Overall appearance consistent with the property’s brand positioning",
-          "ar": "المظهر العام متسق مع مكانة العلامة الفندقية للمنشأة"
         }
       ]
     },
@@ -2318,8 +2312,8 @@
         {
           "id": "wf5",
           "cls": "CLN",
-          "en": "Fresh towels and water available near the wellness facilities",
-          "ar": "مناشف نظيفة ومياه متوفرة بالقرب من مرافق العافية"
+          "en": "Fresh towels and water available near the wellness facilities, or provided promptly on request",
+          "ar": "تتوفر مناشف ومياه نظيفة بالقرب من مرافق العافية، أو يتم توفيرها بسرعة عند الطلب"
         },
         {
           "id": "wf6",
