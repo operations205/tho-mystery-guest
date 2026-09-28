@@ -9,8 +9,8 @@
         {
           "id": "r1",
           "cls": "EFF",
-          "en": "Call answered within 3 rings / 10 seconds with a warm, branded greeting",
-          "ar": "تم الرد على المكالمة خلال 3 رنات أو 10 ثوانٍ مع تحية لبقة تعكس هوية الفندق"
+          "en": "Call answered within 3-6 rings / 10-15 seconds with a warm, branded greeting",
+          "ar": "تم الرد على المكالمة خلال 3-6 رنات أو 10-15 ثانية مع تحية لبقة تعكس هوية الفندق"
         },
         {
           "id": "r2",
@@ -59,6 +59,12 @@
           "cls": "SRV",
           "en": "Call ended with a genuine, warm farewell",
           "ar": "انتهت المكالمة بوداع دافئ وصادق"
+        },
+        {
+          "id": "r10",
+          "cls": "EFF",
+          "en": "If rooms were not available on the requested date, was an alternative date offered",
+          "ar": "في حال عدم توفر غرف بالتاريخ المطلوب، هل تم عرض تاريخ بديل"
         }
       ]
     },
@@ -209,6 +215,12 @@
           "cls": "SRV",
           "en": "Porter accepted or gracefully declined gratuity in line with hotel policy without awkwardness",
           "ar": "تعامل عامل الحقائب مع الإكرامية بما يتوافق مع سياسة الفندق دون إحراج"
+        },
+        {
+          "id": "pa7",
+          "cls": "SRV",
+          "en": "Porter offered to take the guest's luggage",
+          "ar": "عرض البورتر حمل أمتعة الضيف"
         }
       ]
     },
@@ -221,8 +233,8 @@
         {
           "id": "fi1",
           "cls": "EFF",
-          "en": "Guest acknowledged within 30 seconds even during a queue",
-          "ar": "تم الترحيب بالضيف خلال 30 ثانية حتى في وجود طابور"
+          "en": "Guest acknowledged within 10-30 seconds even if no other guest is present",
+          "ar": "تم الانتباه للضيف خلال 10-30 ثانية حتى لو لم يكن هناك ضيف آخر"
         },
         {
           "id": "fi2",
@@ -277,6 +289,25 @@
           "cls": "SUS",
           "en": "Guest offered a digital room key option where available",
           "ar": "تم عرض خيار مفتاح الغرفة الرقمي إن كان متاحًا"
+        },
+        {
+          "id": "fi11",
+          "cls": "SRV",
+          "en": "If the team member was busy with another guest, was the guest acknowledged promptly with eye contact",
+          "ar": "إذا كان الموظف منشغلًا مع ضيف آخر، هل تم الانتباه للضيف بسرعة من خلال التواصل بالعين"
+        },
+        {
+          "id": "fi12",
+          "cls": "SEC",
+          "crit": true,
+          "en": "Guest identity verified",
+          "ar": "تم التحقق من هوية الضيف"
+        },
+        {
+          "id": "fi13",
+          "cls": "SRV",
+          "en": "Guest was checked in promptly, efficiently and in a hospitable manner",
+          "ar": "تم تسجيل دخول الضيف بسرعة وكفاءة وبأسلوب مضياف"
         }
       ]
     },
@@ -389,6 +420,12 @@
           "cls": "SUS",
           "en": "Local, sustainable or community-based experiences included among the suggestions offered",
           "ar": "تضمنت الاقتراحات تجارب محلية أو مستدامة أو مجتمعية"
+        },
+        {
+          "id": "g11",
+          "cls": "EFF",
+          "en": "If asked for additional items (soap, shampoo, tea bag, etc.), were they served within 20 minutes",
+          "ar": "في حال طلب أغراض إضافية (صابون، شامبو، أكياس شاي، إلخ)، هل تم تقديمها خلال 20 دقيقة"
         }
       ]
     },
@@ -420,8 +457,8 @@
         {
           "id": "h6",
           "cls": "SUS",
-          "en": "Drinking water served in glass or eco-friendly containers, not single-use plastic",
-          "ar": "مياه الشرب مقدمة في عبوات زجاجية أو صديقة للبيئة وليست بلاستيكية أحادية الاستخدام"
+          "en": "Complimentary drinking water provided in bottles",
+          "ar": "تم توفير مياه شرب مجانية في زجاجات"
         },
         {
           "id": "h7",
@@ -452,6 +489,12 @@
           "cls": "PRD",
           "en": "Blackout curtains/blinds function fully without light gaps",
           "ar": "تعمل الستائر المعتمة بكفاءة كاملة دون تسرب للضوء"
+        },
+        {
+          "id": "h12",
+          "cls": "PRD",
+          "en": "In-room digital newspaper, basic service information and in-house contact numbers available",
+          "ar": "تتوفر بالغرفة جريدة رقمية ومعلومات أساسية عن الخدمات وأرقام التواصل الداخلية"
         }
       ]
     },
@@ -526,28 +569,10 @@
           "ar": "طرق الموظف الباب وانتظر وأعلن عن قسمه قبل الدخول"
         },
         {
-          "id": "s3",
-          "cls": "SRV",
-          "en": "Bed turned down neatly with slippers and water placed thoughtfully",
-          "ar": "تم تجهيز السرير بعناية مع وضع الشباشب والمياه بشكل لائق"
-        },
-        {
           "id": "s5",
           "cls": "SUS",
           "en": "Guest’s towel/linen reuse preference respected without being asked twice",
           "ar": "تم احترام تفضيل الضيف بشأن إعادة استخدام المناشف/المفروشات دون تكرار السؤال"
-        },
-        {
-          "id": "s7",
-          "cls": "SRV",
-          "en": "A thoughtful personal touch added (note, replenished amenity, etc.)",
-          "ar": "تمت إضافة لمسة شخصية لطيفة (رسالة، تجديد مستلزم، إلخ)"
-        },
-        {
-          "id": "td1",
-          "cls": "SRV",
-          "en": "Curtains drawn and lighting set to a relaxing ambiance during turndown",
-          "ar": "تم إغلاق الستائر وضبط الإضاءة لأجواء مريحة أثناء الخدمة المسائية"
         },
         {
           "id": "td2",
@@ -662,16 +687,10 @@
           "ar": "تم رصد أي تلطخ أو تلف بشكل استباقي من الموظفين وليس اكتشافه من الضيف"
         },
         {
-          "id": "lp6",
-          "cls": "SUS",
-          "en": "Reusable garment bags or minimal packaging used where possible",
-          "ar": "تم استخدام أكياس ملابس قابلة لإعادة الاستخدام أو تغليف بسيط حيثما أمكن"
-        },
-        {
           "id": "lp7",
           "cls": "EFF",
-          "en": "Billing for laundry accurate and itemized on the final folio",
-          "ar": "فوترة الغسيل دقيقة ومفصلة في الفاتورة النهائية"
+          "en": "Billing for laundry accurate and itemized, with guest signature obtained at checkout or a payment receipt handed over",
+          "ar": "فاتورة الغسيل دقيقة ومفصّلة، مع الحصول على توقيع الضيف عند الدفع أو تسليمه إيصال دفع"
         }
       ]
     },
@@ -684,8 +703,8 @@
         {
           "id": "c1",
           "cls": "EFF",
-          "en": "Guest acknowledged promptly even if a queue was present",
-          "ar": "تم الترحيب بالضيف بسرعة حتى في حال وجود طابور"
+          "en": "Guest acknowledged within 10-30 seconds even if no other guest is present",
+          "ar": "تم الانتباه للضيف خلال 10-30 ثانية حتى لو لم يكن هناك ضيف آخر"
         },
         {
           "id": "c2",
@@ -722,12 +741,6 @@
           "cls": "EFF",
           "en": "Late check-out request handled clearly, whether approved or politely declined with reasoning",
           "ar": "تم التعامل مع طلب تأخير المغادرة بوضوح سواء بالموافقة أو الرفض اللبق مع التوضيح"
-        },
-        {
-          "id": "co2",
-          "cls": "SRV",
-          "en": "Any service issue raised during the stay was referenced and resolved before departure, not repeated",
-          "ar": "تمت الإشارة إلى أي مشكلة أثيرت أثناء الإقامة والتأكد من حلها قبل المغادرة دون تكرارها"
         }
       ]
     },
@@ -746,8 +759,8 @@
         {
           "id": "pd1",
           "cls": "EFF",
-          "en": "Luggage collected from the room within 10 minutes of request",
-          "ar": "تم استلام الحقائب من الغرفة خلال 10 دقائق من الطلب"
+          "en": "Luggage collected from the room within 10-15 minutes of request",
+          "ar": "تم استلام الأمتعة من الغرفة خلال 10-15 دقيقة من الطلب"
         },
         {
           "id": "pd2",
@@ -772,12 +785,6 @@
           "cls": "SEC",
           "en": "Vehicle/luggage handover confirmed against the correct guest before departure",
           "ar": "تم التأكد من تسليم المركبة/الحقائب للضيف الصحيح قبل المغادرة"
-        },
-        {
-          "id": "pd6",
-          "cls": "SUS",
-          "en": "Digital receipt/folio offered as the default over a printed copy",
-          "ar": "تم عرض الفاتورة الرقمية كخيار افتراضي بدلاً من النسخة المطبوعة"
         }
       ]
     },
@@ -826,8 +833,8 @@
         {
           "id": "bs3",
           "cls": "EFF",
-          "en": "À la carte breakfast orders delivered within 15 minutes",
-          "ar": "تم توصيل طلبات الإفطار من القائمة خلال 15 دقيقة"
+          "en": "À la carte breakfast orders delivered within 15-25 minutes",
+          "ar": "تم تقديم طلبات الإفطار من قائمة الطلبات خلال 15-25 دقيقة"
         },
         {
           "id": "bs4",
@@ -889,8 +896,8 @@
         {
           "id": "bf2",
           "cls": "FQ",
-          "en": "Coffee and tea freshly brewed, not stale or over-extended on the hotplate",
-          "ar": "القهوة والشاي طازجان وليسا معرَّضين للحرارة لفترة طويلة"
+          "en": "Coffee and tea not stale or over-extended on the hotplate",
+          "ar": "القهوة والشاي غير قديمين أو متروكين لفترة طويلة على السخّان"
         },
         {
           "id": "bf3",
@@ -903,6 +910,12 @@
           "cls": "CLN",
           "en": "Buffet serving utensils clean and dedicated to a single dish (no cross-contamination)",
           "ar": "أدوات تقديم البوفيه نظيفة ومخصصة لطبق واحد دون تلوث متبادل"
+        },
+        {
+          "id": "bf5",
+          "cls": "SRV",
+          "en": "Table cleared promptly after each course/the meal/when requested",
+          "ar": "تم إخلاء الطاولة بسرعة بعد كل طبق/الوجبة/عند الطلب"
         }
       ]
     },
@@ -1021,6 +1034,12 @@
           "cls": "FQ",
           "en": "Kitchen able to accommodate a reasonable modification request without a long delay",
           "ar": "تمكن المطبخ من تلبية طلب تعديل معقول دون تأخير طويل"
+        },
+        {
+          "id": "rs11",
+          "cls": "SRV",
+          "en": "Light music or ambiance in the restaurant was pleasant",
+          "ar": "الموسيقى الهادئة أو أجواء المطعم كانت لطيفة"
         }
       ]
     },
@@ -1176,8 +1195,8 @@
         {
           "id": "bl1",
           "cls": "EFF",
-          "en": "Guest acknowledged within 1 minute of sitting at the bar or lounge",
-          "ar": "تم الترحيب بالضيف خلال دقيقة من جلوسه في البار أو الصالة"
+          "en": "Guest acknowledged within 1-3 minutes of sitting at the bar or lounge",
+          "ar": "تم الانتباه للضيف خلال 1-3 دقائق من جلوسه في البار أو الصالة"
         },
         {
           "id": "bl2",
@@ -1270,6 +1289,12 @@
           "cls": "PRD",
           "en": "Corridor carpets and flooring in good repair, without visible wear or stains",
           "ar": "سجاد وأرضيات الممرات بحالة جيدة ودون تآكل أو بقع ظاهرة"
+        },
+        {
+          "id": "p12",
+          "cls": "CLN",
+          "en": "Public restrooms neat, tidy and odor-free, with all fixtures functional",
+          "ar": "دورات المياه العامة نظيفة ومرتبة وخالية من الروائح، وجميع التجهيزات تعمل بشكل جيد"
         }
       ]
     },
@@ -1284,12 +1309,6 @@
           "cls": "PRD",
           "en": "Elevator interiors clean, well-lit and free of scuff marks or odors",
           "ar": "داخل المصعد نظيف وجيد الإضاءة وخالٍ من الخدوش أو الروائح"
-        },
-        {
-          "id": "el2",
-          "cls": "EFF",
-          "en": "Wait time for elevators reasonable even during peak periods",
-          "ar": "وقت انتظار المصاعد معقول حتى في أوقات الذروة"
         },
         {
           "id": "el3",
@@ -1610,14 +1629,14 @@
         {
           "id": "sf5",
           "cls": "SUS",
-          "en": "Visible sustainability initiatives in place (recycling, refillable amenities, etc.)",
-          "ar": "وجود مبادرات استدامة واضحة (إعادة تدوير، مستلزمات قابلة لإعادة التعبئة، إلخ)"
+          "en": "Visible sustainability initiatives in place (energy-saving cards, linen/towel reuse cards, recycling, refillable amenities, etc.)",
+          "ar": "توجد مبادرات استدامة واضحة (بطاقات توفير الطاقة، بطاقات إعادة استخدام المفروشات/المناشف، إعادة التدوير، مستلزمات قابلة لإعادة التعبئة، إلخ)"
         },
         {
           "id": "sus1",
           "cls": "SUS",
-          "en": "Single-use plastic minimized across guest-facing touchpoints (rooms, F&B, amenities)",
-          "ar": "تقليل البلاستيك أحادي الاستخدام في نقاط تواصل الضيف (الغرف، المطاعم، المستلزمات)"
+          "en": "Single-use plastic cutlery and glassware avoided or minimized across guest-facing touchpoints (mainly rooms and F&B)",
+          "ar": "تم تجنّب أو تقليل أدوات المائدة والأكواب البلاستيكية أحادية الاستخدام في نقاط تواصل الضيف (بشكل أساسي الغرف والمطاعم)"
         },
         {
           "id": "sus2",
@@ -1632,28 +1651,10 @@
           "ar": "تجهيزات أو ممارسات توفير المياه واضحة في الحمامات ودورات المياه العامة"
         },
         {
-          "id": "sus4",
-          "cls": "SUS",
-          "en": "Recycling clearly available and correctly labelled for guests and back-of-house",
-          "ar": "إعادة التدوير متوفرة بوضوح ومصنّفة بشكل صحيح للضيوف وموظفي التشغيل"
-        },
-        {
           "id": "sus5",
           "cls": "SUS",
           "en": "Locally sourced or seasonal products favored across F&B outlets",
           "ar": "تفضيل المنتجات المحلية أو الموسمية في منافذ الطعام والشراب"
-        },
-        {
-          "id": "sus6",
-          "cls": "SUS",
-          "en": "Sustainability initiatives communicated to guests without feeling like a cost-cutting excuse",
-          "ar": "تم توصيل مبادرات الاستدامة للضيوف دون أن تبدو كذريعة لخفض التكاليف"
-        },
-        {
-          "id": "sus7",
-          "cls": "SUS",
-          "en": "Guests actively informed how to participate in the property’s sustainability initiatives",
-          "ar": "تم إعلام الضيوف بشكل فعّال بكيفية المشاركة في مبادرات استدامة المنشأة"
         }
       ]
     },
@@ -1666,8 +1667,8 @@
         {
           "id": "cu1",
           "cls": "PRD",
-          "en": "Prayer room / musalla clean, clearly signed, correctly oriented, with prayer times posted",
-          "ar": "غرفة الصلاة نظيفة وعليها لافتات واضحة ومتجهة بشكل صحيح نحو القبلة مع عرض أوقات الصلاة"
+          "en": "Prayer room / musalla clean and clearly signed",
+          "ar": "مصلى الفندق نظيف وعليه لافتة واضحة"
         },
         {
           "id": "cu2",
@@ -1682,22 +1683,10 @@
           "ar": "تم تقديم لفتة ترحيب سعودية تقليدية (قهوة عربية وتمر أو ما يعادلها) بحفاوة عند الوصول"
         },
         {
-          "id": "cu4",
-          "cls": "SRV",
-          "en": "Family sections and entrances handled with appropriate discretion and privacy",
-          "ar": "تم التعامل مع أقسام ومداخل العائلات بما يليق من التقدير والخصوصية"
-        },
-        {
           "id": "cu5",
           "cls": "PRD",
           "en": "Halal sourcing / certification information available and clearly communicated on request",
           "ar": "معلومات مصادر ومطابقة الحلال متوفرة وواضحة عند الطلب"
-        },
-        {
-          "id": "cu6",
-          "cls": "EI",
-          "en": "Staff demonstrated genuine cultural awareness, with any dress-code or conduct guidance communicated respectfully and never intrusively",
-          "ar": "أظهر الموظفون وعيًا ثقافيًا حقيقيًا، وتم توصيل أي إرشادات متعلقة باللباس أو السلوك باحترام ودون تطفل"
         },
         {
           "id": "cu7",
@@ -1734,8 +1723,8 @@
         {
           "id": "cr2",
           "cls": "EFF",
-          "en": "Staff member took ownership of the issue rather than redirecting the guest elsewhere",
-          "ar": "تحمّل الموظف مسؤولية المشكلة بدلاً من تحويل الضيف لجهة أخرى"
+          "en": "Staff member took ownership of the issue or escalated it to the concerned department, rather than redirecting the guest elsewhere",
+          "ar": "تحمّل الموظف مسؤولية المشكلة أو قام بتصعيدها للقسم المختص، بدلًا من تحويل الضيف لجهة أخرى"
         },
         {
           "id": "cr3",
@@ -1760,12 +1749,6 @@
           "cls": "SRV",
           "en": "Staff remained composed and professional even if the guest was visibly frustrated",
           "ar": "حافظ الموظف على هدوئه واحترافيته حتى مع ضيف يبدو عليه الانزعاج"
-        },
-        {
-          "id": "cr7",
-          "cls": "EFF",
-          "en": "Incident logged internally so recurring issues could be identified",
-          "ar": "تم تسجيل الحادثة داخليًا لتتبع أي مشكلات متكررة"
         }
       ]
     },
@@ -1834,8 +1817,8 @@
         {
           "id": "e3",
           "cls": "EI",
-          "en": "Service felt anticipatory – staff acted ahead of the guest’s stated needs",
-          "ar": "كانت الخدمة استباقية - تصرف الموظفون قبل أن يطلب الضيف احتياجاته صراحة"
+          "en": "Service felt prompt and responsive - staff acted quickly without unnecessary delay",
+          "ar": "شعر الضيف بأن الخدمة سريعة ومتجاوبة - تصرف الموظفون بسرعة دون تأخير غير مبرر"
         },
         {
           "id": "e4",
@@ -1876,8 +1859,8 @@
         {
           "id": "e10",
           "cls": "EI",
-          "en": "Overall impression felt like genuine hospitality, not a rehearsed script",
-          "ar": "كان الانطباع العام ضيافة حقيقية وليس أسلوبًا محفوظًا"
+          "en": "Overall impression felt like genuine, professional hospitality",
+          "ar": "الانطباع العام كان ضيافة صادقة واحترافية"
         }
       ]
     },
@@ -2017,6 +2000,12 @@
           "cls": "SEC",
           "en": "Assembly point clearly identified and communicated to guests where relevant",
           "ar": "نقطة التجمع محددة بوضوح وتم إبلاغ الضيوف بها عند الحاجة"
+        },
+        {
+          "id": "fe6",
+          "cls": "SEC",
+          "en": "Emergency numbers displayed in rooms/lobby area",
+          "ar": "أرقام الطوارئ ظاهرة في الغرف/منطقة اللوبي"
         }
       ]
     },
@@ -2085,8 +2074,8 @@
         {
           "id": "wt3",
           "cls": "PRD",
-          "en": "In-room entertainment system (TV/casting) functioned without staff assistance",
-          "ar": "نظام الترفيه داخل الغرفة (التلفاز/البث) يعمل دون الحاجة لمساعدة الموظفين"
+          "en": "In-room entertainment system (TV/casting) available and functional",
+          "ar": "نظام الترفيه في الغرفة (التلفاز/البث) متوفر ويعمل بشكل جيد"
         },
         {
           "id": "wt4",
@@ -2103,8 +2092,8 @@
         {
           "id": "wt6",
           "cls": "PRD",
-          "en": "USB/charging ports at the bedside functional and sufficient in number",
-          "ar": "منافذ الشحن/USB بجانب السرير تعمل وبعدد كافٍ"
+          "en": "USB/charging ports available at the bedside and functional",
+          "ar": "منافذ USB/الشحن متوفرة بجانب السرير وتعمل بشكل جيد"
         }
       ]
     },
