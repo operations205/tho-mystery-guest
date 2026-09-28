@@ -156,7 +156,7 @@
   .login-brand-panel .lb-content, .login-card .mono{display:none;}
   @media (max-width:860px){.login-brand-panel{display:none;}}
   .login-form-panel{flex:1 1 54%;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
-  .login-card{width:100%;max-width:460px;}
+  .login-card{width:100%;max-width:520px;}
 
   .login-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:30px;}
   .login-topbar-brand{display:flex;align-items:center;gap:10px;}
@@ -172,23 +172,33 @@
   .login-card h2{font-size:16px;margin:0 0 8px;color:var(--navy);font-weight:700;}
   .login-card .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px;line-height:1.65;}
 
-  .role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
-  .role-card{position:relative;border:1.5px solid var(--border);border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:#fff;font-family:inherit;}
+  .role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+  .role-card{position:relative;border:1.5px solid var(--border);border-radius:16px;padding:22px 10px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:#fff;font-family:inherit;}
   .role-card:hover{border-color:#d8dbe0;}
   .role-card.active{border-color:var(--gold);background:#fffdf5;}
   .role-card-check{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15);}
   .role-card-check .material-symbols-outlined{font-size:14px;}
-  .role-card-icon{width:40px;height:40px;border-radius:10px;background:#f4f5f7;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:var(--navy);}
+  .role-card-icon{width:52px;height:52px;border-radius:12px;background:#f4f5f7;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--navy);}
   .role-card.active .role-card-icon{background:var(--gold-soft);color:var(--gold-dark,#9a6d00);}
-  .role-card-icon .material-symbols-outlined{font-size:20px;}
-  .role-card-title{font-weight:800;font-size:13px;color:var(--navy);margin-bottom:3px;}
-  .role-card-desc{font-size:10.5px;color:var(--muted);line-height:1.4;}
+  .role-card-icon .material-symbols-outlined{font-size:27px;}
+  .role-card-title{font-weight:800;font-size:15px;color:var(--navy);margin-bottom:4px;}
+  .role-card-desc{font-size:12px;color:var(--muted);line-height:1.45;}
 
-  .field-icon-wrap{position:relative;margin-bottom:14px;}
-  .field-icon-wrap .fi-icon{position:absolute;top:50%;transform:translateY(-50%);inset-inline-start:14px;color:var(--muted);pointer-events:none;}
-  .field-icon-wrap .fi-icon .material-symbols-outlined{font-size:19px;}
-  .field-icon-wrap input{padding-inline-start:42px;}
-  .field-icon-wrap.pw-field-wrap input{padding-inline-end:42px;}
+  .field-icon-wrap{position:relative;margin-bottom:16px;}
+  .field-icon-wrap .fi-icon{position:absolute;top:50%;transform:translateY(-50%);inset-inline-start:16px;color:var(--muted);pointer-events:none;}
+  .field-icon-wrap .fi-icon .material-symbols-outlined{font-size:21px;}
+  /* These login inputs sit in .field-icon-wrap, not .field, so they never picked up the shared
+     .field input styling at all -- just bare browser default text inputs (no border, no
+     radius, tiny). That's what actually made the login "gate" read as undersized, more than
+     any single spacing value. Sized deliberately larger than the standard .field input (44px)
+     since this is the one gate every user passes through first. */
+  .field-icon-wrap input{
+    width:100%;padding:15px 16px;padding-inline-start:46px;border:1.5px solid var(--border);
+    border-radius:11px;font-size:15.5px;background:#fff;color:var(--text);min-height:54px;
+    font-family:inherit;transition:border-color var(--dur),box-shadow var(--dur);
+  }
+  .field-icon-wrap input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft);}
+  .field-icon-wrap.pw-field-wrap input{padding-inline-end:46px;}
 
   .login-forgot{text-align:end;margin:-4px 0 18px;}
   .login-forgot a{font-size:12.5px;color:var(--gold-dark,#9a6d00);font-weight:700;cursor:pointer;}
