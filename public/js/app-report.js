@@ -153,6 +153,27 @@ async function submitAdminSignature(){
     showToast((state.lang==='ar' ? 'تعذّر حفظ التوقيع: ' : 'Could not save signature: ') + msg, 'error');
   }
 }
+// Covers a report that already has insp.signature set from BEFORE the fix above existed (the
+// admin-signature modal used to only PUT the image, never call /complete) -- it's stuck at
+// in_progress with a signature already on file and no dialog left to trigger, since
+// canAdminSign (see renderSignatureBlock) only fires when there's no signature yet. No new
+// signature is needed here; the existing one just needs to actually be submitted.
+async function submitExistingSignatureForReview(inspId){
+  const insp = inspectionById(inspId);
+  if(!insp || !insp.signature) return;
+  try{
+    const updated = await apiPost('/inspections/' + inspId + '/complete', { signature: insp.signature });
+    const idx = state.inspections.findIndex(i => i.id === inspId);
+    if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
+    render();
+    showToast(t('toastReportSubmittedByAdmin'), 'success');
+  }catch(e){
+    const msg = (e.data && e.data.error === 'incomplete')
+      ? (state.lang==='ar' ? `لسه فيه ${e.data.unansweredCount} بند بدون إجابة. لازم تجاوب على كل البنود قبل الإرسال.` : `${e.data.unansweredCount} item(s) still need an answer before submitting.`)
+      : e.message;
+    showToast((state.lang==='ar' ? 'تعذّر إرسال التقرير: ' : 'Could not submit the report: ') + msg, 'error');
+  }
+}
 
 function renderMetaStrip(insp){
   return `
@@ -351,9 +372,18 @@ function renderReportBody(insp, backAction, showFlags){
     workflowBannerHtml = `<div class="alert no-print" style="background:var(--red-bg);color:var(--red);border-color:var(--red);"><div>${ic('report')}<strong>${t('reviewNoteBanner')}</strong></div><div style="margin-top:6px;">${esc(insp.reviewNote)}</div></div>`;
   }
 
+  // Covers a report that already picked up a signature BEFORE this session's fix existed (the
+  // admin-signature modal used to only patch the image via PUT, never touching status) -- it has
+  // insp.signature set, so the sign-capture modal's own "no signature yet" trigger
+  // (canAdminSign in renderSignatureBlock) never appears for it, and it would otherwise have no
+  // way forward at all despite already being signed. A plain "Submit for Review" button covers
+  // exactly this leftover case: already has everything /complete needs, just needs the call made.
+  const canAdminSubmitExisting = role === 'admin' && insp.status === 'in_progress' && !!insp.signature;
+
   const workflowActionsHtml = `
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-primary btn-sm" onclick="approveReport('${insp.id}')">${ic('task_alt')}${t('btnApproveReport')}</button>` : ''}
     ${role === 'admin' && insp.status === 'pending_review' ? `<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="rejectReport('${insp.id}')">${ic('cancel')}${t('btnRejectReport')}</button>` : ''}
+    ${canAdminSubmitExisting ? `<button class="btn btn-primary btn-sm" onclick="submitExistingSignatureForReview('${insp.id}')">${ic('send')}${t('btnSubmitForReviewAdmin')}</button>` : ''}
     ${role === 'admin' && insp.status === 'in_progress' ? `<button class="btn btn-ghost btn-sm" onclick="editInspectionAnswers('${insp.id}')">${ic('edit_note')}${t('btnEditAnswers')}</button>` : ''}
     ${canReopen ? `<button class="btn btn-ghost btn-sm" onclick="reopenReport('${insp.id}')">${ic('edit')}${t('btnReopenReport')}</button>` : ''}
   `;

@@ -4723,6 +4723,10 @@
     "toastReportSubmittedByAdmin": {
       "en": "Signed and submitted for committee review. Click Approve to finalize it for the client.",
       "ar": "تم التوقيع وإرسال التقرير لمراجعة اللجنة. اضغط \"اعتماد\" لإنهائه وإتاحته للعميل."
+    },
+    "btnSubmitForReviewAdmin": {
+      "en": "Submit for Review",
+      "ar": "إرسال للمراجعة"
     }
   },
   "defaultHotelsData": [
