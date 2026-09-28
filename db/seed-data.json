@@ -4707,6 +4707,14 @@
     "exportExcelBtn": {
       "en": "Export Excel",
       "ar": "تصدير Excel"
+    },
+    "reportCommitteeApprovedBadge": {
+      "en": "Committee Approved",
+      "ar": "معتمد من لجنة المراجعة"
+    },
+    "submitAlertApprovedHotel": {
+      "en": "This report has been officially reviewed and approved by THO's review committee.",
+      "ar": "هذا التقرير تمت مراجعته واعتماده رسميًا من لجنة المراجعة بذا هوتيلير أوفيس."
     }
   },
   "defaultHotelsData": [

@@ -84,6 +84,11 @@ async function buildInspectionExcelBuffer({ row, hotel, answers, sc, lang }) {
   addField('تاريخ الزيارة', 'Visit Date', row.visit_date || '');
   addField('رمز التقرير', 'Report Code', row.ref || '');
   addField('المفتش', 'Inspector', row.inspector_name || '');
+  const statusRow = addField('حالة التقرير', 'Report Status',
+    row.status === 'completed' ? (isAr ? 'معتمد من لجنة المراجعة' : 'Committee Approved')
+      : row.status === 'pending_review' ? (isAr ? 'قيد مراجعة اللجنة' : 'Pending Committee Review')
+      : (isAr ? 'قيد التنفيذ' : 'In Progress'));
+  if (row.status === 'completed') statusRow.getCell(2).font = { bold: true, color: { argb: GREEN } };
   const overallRow = addField('النتيجة الإجمالية', 'Overall Score', sc.overall + '%');
   const overallArgb = scoreArgb(sc.overall);
   if (overallArgb) overallRow.getCell(2).font = { bold: true, size: 13, color: { argb: overallArgb } };

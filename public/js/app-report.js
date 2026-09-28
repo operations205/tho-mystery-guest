@@ -317,6 +317,13 @@ function renderReportBody(insp, backAction, showFlags){
     workflowBannerHtml = `<div class="alert no-print" style="background:var(--gold-soft);color:#7a5600;border-color:#f0dca0;">${ic('hourglass_top')}<div>${t('submitAlertPending')}</div></div>`;
   } else if (insp.status === 'completed' && role !== 'hotel') {
     workflowBannerHtml = `<div class="alert no-print" style="background:#eafaf1;color:#146c43;border-color:#bfe8cf;">${ic('verified')}<div>${t('submitAlertApproved')}</div></div>`;
+  } else if (insp.status === 'completed' && role === 'hotel') {
+    // The hotel/client never saw ANY confirmation that a report was through final committee
+    // review -- the staff-facing banner above ("this is now visible to the client") makes no
+    // sense read by the client itself, so it was simply suppressed for this role with nothing
+    // shown in its place. This is the client-facing equivalent: reassurance, in the client's own
+    // report view, that what they're looking at carries the committee's formal sign-off.
+    workflowBannerHtml = `<div class="alert no-print" style="background:#eafaf1;color:#146c43;border-color:#bfe8cf;">${ic('verified')}<div>${t('submitAlertApprovedHotel')}</div></div>`;
   } else if (insp.status === 'in_progress' && insp.reviewNote) {
     workflowBannerHtml = `<div class="alert no-print" style="background:var(--red-bg);color:var(--red);border-color:var(--red);"><div>${ic('report')}<strong>${t('reviewNoteBanner')}</strong></div><div style="margin-top:6px;">${esc(insp.reviewNote)}</div></div>`;
   }
@@ -366,6 +373,9 @@ function renderReportBody(insp, backAction, showFlags){
         <div class="rc-hero-row">${ic('location_on')}<span>${esc(reportHotel ? reportHotel.city.en : (insp.city||''))} / ${esc(reportHotel ? reportHotel.city.ar : (insp.city||''))}</span></div>
         <div class="rc-hero-row">${ic('event')}<span>${bl('تاريخ الزيارة','Visit Date')} : ${esc(insp.visitDate||'')}</span></div>
         <div class="rc-hero-row">${ic('badge')}<span>${bl('التقرير','Report Code')} : <span class="rc-code-pill">${reportCode}</span></span></div>
+        ${insp.status === 'completed' ? `
+        <div class="rc-hero-row rc-approved-row">${ic('verified')}<span class="rc-approved-badge">${bl('معتمد من لجنة المراجعة','Committee Approved')}</span></div>
+        ` : ''}
       </div>
       <div class="rc-hero-score">
         <div class="rc-score-lbl">${bl('النتيجة الإجمالية','OVERALL SCORE')}</div>
