@@ -1153,6 +1153,12 @@
           "cls": "CLN",
           "en": "Trays collected promptly once guest requested, not left in the corridor for hours",
           "ar": "تم استلام الصواني بسرعة عند طلب الضيف دون تركها في الممر لساعات"
+        },
+        {
+          "id": "ir6",
+          "cls": "EFF",
+          "en": "Bill clearly itemized, accurate and free of unexpected charges, whether presented on delivery or added to the room folio",
+          "ar": "الفاتورة مفصّلة ودقيقة وخالية من أي رسوم غير متوقعة، سواء تم تقديمها عند التوصيل أو إضافتها لفاتورة الغرفة"
         }
       ]
     },
@@ -1209,6 +1215,12 @@
           "cls": "SRV",
           "en": "Live music or ambiance (if applicable) matched the advertised atmosphere",
           "ar": "الموسيقى الحية أو الأجواء، إن وُجدت، مطابقة لما تم الإعلان عنه"
+        },
+        {
+          "id": "bl5",
+          "cls": "EFF",
+          "en": "Bill presented promptly and discreetly, clearly itemized, accurate and free of unexpected charges",
+          "ar": "تم تقديم الفاتورة بسرعة وبتكتّم، مفصّلة ودقيقة وخالية من أي رسوم غير متوقعة"
         }
       ]
     },
@@ -1517,6 +1529,12 @@
           "cls": "SUS",
           "en": "Products used were cruelty-free or sustainably sourced where advertised as such",
           "ar": "المنتجات المستخدمة صديقة للبيئة أو مستدامة المصدر وفق ما هو معلن"
+        },
+        {
+          "id": "spt5",
+          "cls": "EFF",
+          "en": "Bill clearly itemized, accurate and free of unexpected charges, whether settled at the spa or added to the room folio",
+          "ar": "الفاتورة مفصّلة ودقيقة وخالية من أي رسوم غير متوقعة، سواء تمت تسويتها في السبا أو أضيفت لفاتورة الغرفة"
         }
       ]
     },
