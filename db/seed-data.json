@@ -2340,6 +2340,65 @@
           "ar": "أوقات أو مداخل منفصلة حسب الجنس، إن اقتضت سياسة الفندق ذلك، موضحة بوضوح ومُحترمة"
         }
       ]
+    },
+    {
+      "id": "billing_integrity",
+      "icon": "verified_user",
+      "en": "Billing & Cash Handling Integrity",
+      "ar": "نزاهة الفوترة والتعامل النقدي",
+      "items": [
+        {
+          "id": "bi1",
+          "cls": "SEC",
+          "crit": true,
+          "en": "Every cash transaction observed during the visit was accompanied by a printed or digital receipt issued at the point of sale, without the guest needing to request it",
+          "ar": "تم إصدار إيصال مطبوع أو رقمي عن كل عملية دفع نقدي جرت أثناء الزيارة عند نقطة البيع مباشرة، دون أن يضطر الضيف لطلبه"
+        },
+        {
+          "id": "bi2",
+          "cls": "SEC",
+          "crit": true,
+          "en": "The amount recorded on the hotel's official invoice/folio for each transaction matched, to the exact currency unit, the amount actually collected from the guest",
+          "ar": "المبلغ المسجَّل في الفاتورة الرسمية لكل عملية طابق تمامًا، حتى أصغر وحدة عملة، المبلغ الذي تم تحصيله فعليًا من الضيف"
+        },
+        {
+          "id": "bi3",
+          "cls": "SEC",
+          "en": "Change returned following a cash payment was correct to the exact amount and counted back to the guest visibly, not handed over as a rounded or estimated sum",
+          "ar": "تم إرجاع الباقي بعد الدفع النقدي بالمبلغ الدقيق ومُعدودًا أمام الضيف بشكل واضح، دون تقريب أو تقدير"
+        },
+        {
+          "id": "bi4",
+          "cls": "SEC",
+          "en": "Any discount, complimentary item, or rate adjustment extended to the guest was clearly explained at the time it was applied and appeared to follow a standard, documented authorization process rather than an ad-hoc individual decision",
+          "ar": "أي خصم أو بند مجاني أو تعديل في السعر قُدّم للضيف تم توضيحه له وقت تطبيقه، وبدا متسقًا مع إجراء اعتماد موثّق ومعتاد، وليس قرارًا فرديًا غير موثق من الموظف"
+        },
+        {
+          "id": "bi5",
+          "cls": "SEC",
+          "en": "Any transaction voided, reversed, or adjusted after the initial charge was processed visibly involved a supervisor or manager override, rather than being corrected unilaterally by the front-line employee who processed it",
+          "ar": "أي عملية تم إلغاؤها أو عكسها أو تعديلها بعد تسجيلها بدا فيها تدخل واضح من مشرف أو مدير معتمد، وليس تصحيحًا فرديًا من الموظف الذي أجرى العملية أصلًا"
+        },
+        {
+          "id": "bi6",
+          "cls": "SEC",
+          "en": "The consolidated final folio, where charges were incurred across more than one outlet (room, bars, restaurant, lounge), itemized every charge individually and reconciled exactly to the sum of the charges confirmed at each point of sale, with no unexplained additions, omissions, or rounding discrepancies",
+          "ar": "الفاتورة النهائية الموحّدة، في حال تعدد نقاط الشراء (الغرفة، البارات، المطعم، صالة اللوبي)، فصّلت كل مبلغ على حدة وطابقت تمامًا مجموع المبالغ المؤكدة عند كل نقطة بيع، دون أي إضافة أو حذف أو فرق تقريب غير مبرر"
+        },
+        {
+          "id": "bi7",
+          "cls": "SEC",
+          "crit": true,
+          "en": "At no point did any staff member solicit, suggest, or imply an off-the-books cash payment, personal gratuity in lieu of a charge, or any arrangement bypassing the hotel's official billing system",
+          "ar": "لم يطلب أو يلمّح أي موظف في أي وقت لدفعة نقدية غير رسمية، أو إكرامية شخصية بدلاً من تحصيل رسمي، أو أي ترتيب يتجاوز نظام الفوترة الرسمي للفندق"
+        },
+        {
+          "id": "bi8",
+          "cls": "SEC",
+          "en": "The card payment terminal used was a standard, hotel-branded or recognized third-party device showing no signs of tampering, an unfamiliar attachment, or an unbranded standalone unit inconsistent with the property's official payment setup",
+          "ar": "جهاز الدفع بالبطاقة المستخدم كان جهازًا معتمدًا يحمل هوية الفندق أو مزود دفع معروف، دون أي علامات تلاعب أو إضافة غير مألوفة أو جهاز مستقل غير معتمد لا يتوافق مع نظام الدفع الرسمي للمنشأة"
+        }
+      ]
     }
   ],
   "CATS_PLUS_EXTRA": [

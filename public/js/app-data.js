@@ -43,7 +43,7 @@ const CAT_KEY_AREA = {
   spa_booking:'facilities', spa_treatment:'facilities', kids_family:'facilities',
   wellness_facilities:'facilities', exterior_grounds:'facilities',
   accessibility:'facilities',
-  digital:'digital', wifi_tech:'digital', security_safety:'digital', fire_emergency:'digital',
+  digital:'digital', wifi_tech:'digital', security_safety:'digital', fire_emergency:'digital', billing_integrity:'digital',
   sustainability:'digital',
   complaint_recovery:'guest_recovery', loyalty:'guest_recovery', behavior:'guest_recovery',
   culture:'guest_recovery',
