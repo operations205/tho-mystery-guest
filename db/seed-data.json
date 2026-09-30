@@ -683,8 +683,8 @@
         {
           "id": "lp7",
           "cls": "EFF",
-          "en": "Billing for laundry accurate and itemized, with guest signature obtained at checkout or a payment receipt handed over",
-          "ar": "فاتورة الغسيل دقيقة ومفصّلة، مع الحصول على توقيع الضيف عند الدفع أو تسليمه إيصال دفع"
+          "en": "Billing for laundry accurate, itemized and free of unexpected charges, with guest signature obtained at checkout or a payment receipt handed over",
+          "ar": "فاتورة الغسيل دقيقة ومفصّلة وخالية من أي رسوم غير متوقعة، مع الحصول على توقيع الضيف عند الدفع أو تسليمه إيصال دفع"
         }
       ]
     },
@@ -709,8 +709,8 @@
         {
           "id": "c3",
           "cls": "SRV",
-          "en": "Bill clearly itemized, accurate and offered for review before payment",
-          "ar": "كانت الفاتورة مفصلة وواضحة ودقيقة وتم عرضها للمراجعة قبل الدفع"
+          "en": "Bill clearly itemized, accurate, complete and free of any unexpected charges, with the guest given a clear opportunity to review it before payment; any error raised is corrected quickly and discreetly with a word of apology",
+          "ar": "الفاتورة مفصّلة وصحيحة وكاملة وخالية من أي رسوم غير متوقعة، مع إعطاء الضيف فرصة واضحة لمراجعتها قبل الدفع؛ وأي خطأ يتم تصحيحه بسرعة وبتكتّم مع الاعتذار"
         },
         {
           "id": "c4",
@@ -803,8 +803,8 @@
         {
           "id": "b7",
           "cls": "EFF",
-          "en": "Bill presented promptly, clearly itemized and correct",
-          "ar": "تم تقديم الفاتورة بسرعة وبشكل واضح ودقيق"
+          "en": "Bill clearly itemized, accurate and free of unexpected charges, presented promptly during the meal or within 3 minutes of being requested",
+          "ar": "الفاتورة مفصّلة ودقيقة وخالية من أي رسوم غير متوقعة، وتم تقديمها بسرعة أثناء الوجبة أو خلال 3 دقائق من طلبها"
         },
         {
           "id": "b8",
@@ -1002,8 +1002,8 @@
         {
           "id": "rs6",
           "cls": "EFF",
-          "en": "Bill presented promptly on request, accurate and easy to split if needed",
-          "ar": "تم تقديم الفاتورة بسرعة عند الطلب وبدقة وسهولة تقسيمها إن لزم"
+          "en": "Bill presented within 3 minutes of request, clearly itemized, accurate, free of unexpected charges and easy to split if needed",
+          "ar": "تم تقديم الفاتورة خلال 3 دقائق من الطلب، مفصّلة ودقيقة وخالية من أي رسوم غير متوقعة وسهلة التقسيم عند الحاجة"
         },
         {
           "id": "rs7",
