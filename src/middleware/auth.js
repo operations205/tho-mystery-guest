@@ -19,7 +19,39 @@ function signToken(user) {
   );
 }
 
+// Optional machine access for THO's local automation (ClickUp/Sadeq pipeline). Disabled unless
+// AUTOMATION_API_KEY (>= 32 chars) is set. The key only works on the routes below — never on
+// users, settings, backups, auth or templates — and acts as the first admin account.
+const crypto = require('crypto');
+const AUTOMATION_KEY = process.env.AUTOMATION_API_KEY || '';
+const AUTOMATION_ROUTES = [
+  ['GET', /^\/api\/hotels(\/\d+)?$/],
+  ['POST', /^\/api\/hotels$/],
+  ['GET', /^\/api\/clients(\/\d+)?$/],
+  ['GET', /^\/api\/inspectors$/],
+  ['GET', /^\/api\/assignments$/],
+  ['POST', /^\/api\/assignments$/],
+  ['GET', /^\/api\/inspections(\/\d+(\/pdf)?)?$/],
+  ['POST', /^\/api\/inspections\/\d+\/(approve|reject)$/],
+];
+function automationUser(req) {
+  if (AUTOMATION_KEY.length < 32) return null;
+  const h = req.headers.authorization || '';
+  if (!h.startsWith('Bearer ')) return null;
+  const given = Buffer.from(h.slice(7));
+  const want = Buffer.from(AUTOMATION_KEY);
+  if (given.length !== want.length || !crypto.timingSafeEqual(given, want)) return null;
+  const path = (req.originalUrl || '').split('?')[0];
+  if (!AUTOMATION_ROUTES.some(([m, re]) => m === req.method && re.test(path))) return 'forbidden';
+  const admin = db.prepare("SELECT id, username, token_version FROM users WHERE role = 'admin' ORDER BY id LIMIT 1").get();
+  if (!admin) return null;
+  return { id: admin.id, role: 'admin', username: admin.username, hotel_id: null, tv: admin.token_version || 0, automation: true };
+}
+
 function requireAuth(req, res, next) {
+  const auto = automationUser(req);
+  if (auto === 'forbidden') return res.status(403).json({ error: 'forbidden' });
+  if (auto) { req.user = auto; return next(); }
   const token = req.cookies && req.cookies.tho_token;
   if (!token) return res.status(401).json({ error: 'not_authenticated' });
   let payload;
