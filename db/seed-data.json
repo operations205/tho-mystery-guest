@@ -189,8 +189,8 @@
         {
           "id": "pa7",
           "cls": "SRV",
-          "en": "Porter offered to take the guest's luggage",
-          "ar": "عرض البورتر حمل أمتعة الضيف"
+          "en": "Porter offered to carry the guest's luggage",
+          "ar": "عرض عامل الحقائب حمل أمتعة الضيف"
         }
       ]
     },
@@ -374,12 +374,6 @@
           "ar": "تم تأكيد حجوزات المطاعم أو الأنشطة كتابيًا قبل مغادرة الضيف للمكتب"
         },
         {
-          "id": "g9",
-          "cls": "SRV",
-          "en": "Concierge offered a genuine personal recommendation, not only the top search result",
-          "ar": "قدّم الكونسيرج توصية شخصية حقيقية، وليس فقط أول نتيجة بحث"
-        },
-        {
           "id": "g10",
           "cls": "SUS",
           "en": "Local, sustainable or community-based experiences included among the suggestions offered",
@@ -529,7 +523,7 @@
           "id": "h5",
           "cls": "CLN",
           "en": "Towels and bathrobes clean, soft and in excellent condition",
-          "ar": "المناشف والأردية نظيفة وناعمة وبحالة ممتازة"
+          "ar": "المناشف وأرواب الحمام نظيفة وناعمة وبحالة ممتازة"
         },
         {
           "id": "hb1",
@@ -704,7 +698,7 @@
           "id": "lp5",
           "cls": "SRV",
           "en": "Any staining or damage noted proactively by staff rather than discovered by the guest",
-          "ar": "تم رصد أي تلطخ أو تلف بشكل استباقي من الموظفين وليس اكتشافه من الضيف"
+          "ar": "تم رصد أي بقع أو تلف بشكل استباقي من الموظفين وليس اكتشافه من الضيف"
         },
         {
           "id": "lp7",
@@ -1029,7 +1023,7 @@
           "id": "rs7",
           "cls": "SRV",
           "en": "Manager or senior staff visibly present on the floor during service",
-          "ar": "وجود مدير أو موظف أول بشكل واضح في صالة المطعم أثناء الخدمة"
+          "ar": "وجود مدير أو مشرف بشكل واضح في صالة المطعم أثناء الخدمة"
         },
         {
           "id": "rs8",
@@ -1135,20 +1129,14 @@
         {
           "id": "f2",
           "cls": "EFF",
-          "en": "In-room dining delivered within the promised time, presented attractively",
-          "ar": "تم توصيل طلب خدمة الغرف في الوقت المتفق عليه وبتقديم أنيق"
+          "en": "In-room dining delivered within the quoted time, with no more than 10 minutes of variance",
+          "ar": "تم توصيل طلب خدمة الغرف في الوقت المُعلَن بفارق لا يتجاوز 10 دقائق"
         },
         {
           "id": "f3",
           "cls": "SRV",
           "en": "Staff announced their department and knocked before entering for room service",
           "ar": "أعلن الموظف عن قسمه وطرق الباب قبل الدخول لتقديم خدمة الغرف"
-        },
-        {
-          "id": "ir1",
-          "cls": "EFF",
-          "en": "Estimated delivery time given at the time of order was accurate within 10 minutes",
-          "ar": "كان الوقت التقديري للتوصيل عند الطلب دقيقًا بفارق 10 دقائق"
         },
         {
           "id": "ir2",
@@ -1209,8 +1197,8 @@
         {
           "id": "f7",
           "cls": "SRV",
-          "en": "Tray/table cleared promptly after the meal",
-          "ar": "تم إخلاء الصينية أو الطاولة بسرعة بعد انتهاء الوجبة"
+          "en": "Glasses, plates and table cleared promptly once the guest had finished",
+          "ar": "تم إخلاء الأكواب والأطباق والطاولة بسرعة بعد انتهاء الضيف"
         },
         {
           "id": "bl1",
@@ -1474,7 +1462,7 @@
           "id": "spb2",
           "cls": "CLN",
           "en": "Changing rooms, lockers and robes clean and fully stocked",
-          "ar": "غرف تغيير الملابس والخزائن والأردية نظيفة ومجهزة بالكامل"
+          "ar": "غرف تغيير الملابس والخزائن وأرواب الحمام نظيفة ومجهزة بالكامل"
         },
         {
           "id": "spb3",
@@ -1512,7 +1500,7 @@
           "id": "sp5",
           "cls": "PRD",
           "en": "Treatment rooms, robes and amenities immaculate and of high quality",
-          "ar": "غرف العلاج والأردية والمستلزمات نظيفة تمامًا وعالية الجودة"
+          "ar": "غرف العلاج والأرواب والمستلزمات نظيفة تمامًا وعالية الجودة"
         },
         {
           "id": "sp6",
@@ -1612,7 +1600,7 @@
           "id": "sf2",
           "cls": "SEC",
           "en": "Room door fitted with a working viewing port, deadbolt and security latch",
-          "ar": "باب الغرفة مزود بعين مراقبة وقفل أمان يعملان بكفاءة",
+          "ar": "باب الغرفة مزود بعين سحرية ومزلاج قفل وسلسلة أمان تعمل بكفاءة",
           "crit": true
         },
         {
@@ -2309,7 +2297,7 @@
           "id": "wf3",
           "cls": "PRD",
           "en": "Temperature and function of the steam room, sauna and jacuzzi operating correctly and comfortably",
-          "ar": "درجة الحرارة وعمل غرفة البخار والساونا والجاكوزي تعمل بشكل صحيح ومريح"
+          "ar": "تعمل غرفة البخار والساونا والجاكوزي بدرجات حرارة صحيحة ومريحة"
         },
         {
           "id": "wf4",
@@ -2402,7 +2390,7 @@
           "id": "pac1",
           "cls": "SRV",
           "en": "A named senior host (not a rotating duty manager) is assigned to greet the guest personally at the point of arrival, by name, before any transactional step begins",
-          "ar": "يتم تخصيص مضيف أول محدد بالاسم (وليس مناوبًا متغيرًا) لاستقبال الضيف شخصيًا باسمه عند نقطة الوصول قبل بدء أي خطوة إجرائية"
+          "ar": "يتم تخصيص مضيف رئيسي محدد بالاسم (وليس مناوبًا متغيرًا) لاستقبال الضيف شخصيًا باسمه عند نقطة الوصول قبل بدء أي خطوة إجرائية"
         },
         {
           "id": "pac2",
@@ -2446,13 +2434,13 @@
       "id": "butler_service",
       "icon": "room_service",
       "en": "Personal Butler & Villa Host",
-      "ar": "خدمة الخادم الشخصي ومضيف الفيلا",
+      "ar": "خدمة المضيف الشخصي (الباتلر) ومضيف الفيلا",
       "items": [
         {
           "id": "bt1",
           "cls": "SRV",
           "en": "A dedicated butler or villa host introduces themselves in person within 15 minutes of arrival and provides a direct contact channel (not the general hotel line)",
-          "ar": "يقدّم الخادم الشخصي أو مضيف الفيلا نفسه حضوريًا خلال 15 دقيقة من الوصول ويوفر قناة تواصل مباشرة (وليس خط الفندق العام)"
+          "ar": "يقدّم المضيف الشخصي أو مضيف الفيلا نفسه حضوريًا خلال 15 دقيقة من الوصول ويوفر قناة تواصل مباشرة (وليس خط الفندق العام)"
         },
         {
           "id": "bt2",
@@ -2470,31 +2458,31 @@
           "id": "bt4",
           "cls": "EI",
           "en": "The butler proactively anticipates at least one unstated need per day of the stay (e.g., pressing an outfit ahead of a known dinner reservation) without being asked",
-          "ar": "يستبق الخادم الشخصي احتياجًا واحدًا غير مُعلن على الأقل يوميًا خلال الإقامة (مثل كي زي قبل حجز عشاء معروف) دون أن يُطلب منه ذلك"
+          "ar": "يستبق المضيف الشخصي احتياجًا واحدًا غير مُعلن على الأقل يوميًا خلال الإقامة (مثل كي زي قبل حجز عشاء معروف) دون أن يُطلب منه ذلك"
         },
         {
           "id": "bt5",
           "cls": "EFF",
           "en": "Shoe care, laundry, and pressing requested through the butler are returned within the promised window, and any delay is proactively communicated before the deadline passes",
-          "ar": "تُعاد خدمات العناية بالأحذية والغسيل والكي المطلوبة عبر الخادم الشخصي خلال الموعد المتفق عليه، ويُبلَّغ عن أي تأخير استباقيًا قبل انقضاء الموعد"
+          "ar": "تُعاد خدمات العناية بالأحذية والغسيل والكي المطلوبة عبر المضيف الشخصي خلال الموعد المتفق عليه، ويُبلَّغ عن أي تأخير استباقيًا قبل انقضاء الموعد"
         },
         {
           "id": "bt6",
           "cls": "SRV",
           "en": "The butler coordinates all in-stay logistics (transport, dining, spa, activities) as a single point of contact so the guest never has to repeat a request to multiple departments",
-          "ar": "ينسّق الخادم الشخصي جميع تفاصيل الإقامة (التنقل، الطعام، السبا، الأنشطة) كجهة اتصال واحدة بحيث لا يضطر الضيف لتكرار الطلب على عدة أقسام"
+          "ar": "ينسّق المضيف الشخصي جميع تفاصيل الإقامة (التنقل، الطعام، السبا، الأنشطة) كجهة اتصال واحدة بحيث لا يضطر الضيف لتكرار الطلب على عدة أقسام"
         },
         {
           "id": "bt7",
           "cls": "SEC",
           "en": "The butler maintains strict discretion regarding the guest's schedule, visitors, and personal effects, never disclosing details to unauthorized staff or third parties",
-          "ar": "يلتزم الخادم الشخصي بالتكتم التام بشأن جدول الضيف وزواره ومقتنياته الشخصية، ولا يفصح عن أي تفاصيل لموظفين غير مخولين أو أطراف خارجية"
+          "ar": "يلتزم المضيف الشخصي بالتكتم التام بشأن جدول الضيف وزواره ومقتنياته الشخصية، ولا يفصح عن أي تفاصيل لموظفين غير مخولين أو أطراف خارجية"
         },
         {
           "id": "bt8",
           "cls": "EI",
           "en": "On departure, the butler offers a personal, specific farewell referencing a genuine moment from the stay, rather than a standard scripted goodbye",
-          "ar": "عند المغادرة، يقدّم الخادم الشخصي وداعًا شخصيًا محددًا يشير إلى لحظة حقيقية من الإقامة، وليس وداعًا نمطيًا مكررًا"
+          "ar": "عند المغادرة، يقدّم المضيف الشخصي وداعًا شخصيًا محددًا يشير إلى لحظة حقيقية من الإقامة، وليس وداعًا نمطيًا مكررًا"
         }
       ]
     },
@@ -2514,11 +2502,11 @@
           "id": "pdc2",
           "cls": "SEC",
           "en": "Any stated allergy is visibly flagged in the kitchen ticket system and verbally confirmed by the chef or a senior server before the first course is served",
-          "ar": "تُوثَّق أي حساسية غذائية مُعلنة بوضوح في نظام طلبات المطبخ، ويؤكدها الشيف أو نادل أول شفهيًا قبل تقديم الطبق الأول"
+          "ar": "تُوثَّق أي حساسية غذائية مُعلنة بوضوح في نظام طلبات المطبخ، ويؤكدها الشيف أو كبير النادلين شفهيًا قبل تقديم الطبق الأول"
         },
         {
           "id": "pdc3",
-          "cls": "PRD",
+          "cls": "SRV",
           "en": "The chef or a senior culinary team member greets the table in person at least once during a chef's table experience, explaining at least one dish's provenance or technique",
           "ar": "يحضر الشيف أو أحد كبار فريق الطهي إلى الطاولة شخصيًا مرة واحدة على الأقل خلال تجربة طاولة الشيف، ويشرح مصدر أو تقنية طبق واحد على الأقل"
         },
@@ -2538,7 +2526,7 @@
           "id": "pdc6",
           "cls": "SRV",
           "en": "A bespoke menu or tasting sequence is offered for milestone occasions (anniversary, proposal, business closing) rather than the standard printed menu alone",
-          "ar": "يُقدَّم قائمة أو تسلسل تذوّق مصمم خصيصًا للمناسبات المميزة (ذكرى سنوية، طلب زواج، إغلاق صفقة) بدلاً من القائمة المطبوعة القياسية فقط"
+          "ar": "تُقدَّم قائمة أو تسلسل تذوّق مصمم خصيصًا للمناسبات المميزة (ذكرى سنوية، طلب زواج، إغلاق صفقة) بدلاً من القائمة المطبوعة القياسية فقط"
         },
         {
           "id": "pdc7",
@@ -2558,7 +2546,7 @@
           "id": "sb1",
           "cls": "EI",
           "en": "A sommelier or senior beverage specialist is available on request and engages the guest with genuine questions about taste preference rather than defaulting to the most expensive recommendation",
-          "ar": "يتوفر أخصائي نبيذ أو مختص مشروبات أول عند الطلب، ويتفاعل مع الضيف بأسئلة حقيقية حول تفضيلات الطعم بدلًا من التوصية الافتراضية بالأغلى ثمنًا"
+          "ar": "يتوفر أخصائي نبيذ أو مختص مشروبات رئيسي عند الطلب، ويتفاعل مع الضيف بأسئلة حقيقية حول تفضيلات الطعم بدلًا من التوصية الافتراضية بالأغلى ثمنًا"
         },
         {
           "id": "sb2",
@@ -2606,7 +2594,7 @@
         },
         {
           "id": "gp2",
-          "cls": "PRD",
+          "cls": "SRV",
           "en": "Pre-arrival communication (email, call, or app message) proactively asks about the purpose of stay and any special requirements, at least 48 hours before check-in for stays of 2+ nights",
           "ar": "يستفسر التواصل قبل الوصول (بريد إلكتروني أو اتصال أو رسالة تطبيق) استباقيًا عن غرض الإقامة وأي متطلبات خاصة، قبل 48 ساعة على الأقل من تسجيل الوصول للإقامات لليلتين فأكثر"
         },
@@ -2626,7 +2614,7 @@
           "id": "gp6",
           "cls": "EI",
           "en": "A meaningful personal detail shared by the guest during the stay (a birthday, a business milestone, a family member's name) is acknowledged again later in the same stay",
-          "ar": "يُعاد الإشارة إلى تفصيل شخصي مهم شاركه الضيف خلال الإقامة (عيد ميلاد، إنجاز مهني، اسم أحد أفراد العائلة) لاحقًا في نفس الإقامة"
+          "ar": "تُعاد الإشارة إلى تفصيل شخصي مهم شاركه الضيف خلال الإقامة (عيد ميلاد، إنجاز مهني، اسم أحد أفراد العائلة) لاحقًا في نفس الإقامة"
         },
         {
           "id": "gp7",
@@ -2657,8 +2645,8 @@
         {
           "id": "lt2",
           "cls": "CLN",
-          "en": "Vehicles, yachts, or helicopters used for guest transfer are inspected for cleanliness, working climate control, and functioning amenities before every trip",
-          "ar": "تُفحَص المركبات أو اليخوت أو المروحيات المستخدمة لنقل الضيوف من حيث النظافة وسلامة التحكم بالمناخ وسلامة المرافق قبل كل رحلة"
+          "en": "Vehicles, yachts, or helicopters used for guest transfer are visibly clean, with climate control and amenities working before every trip",
+          "ar": "المركبات أو اليخوت أو المروحيات المستخدمة لنقل الضيوف نظيفة بوضوح، والتحكم بالمناخ والمرافق تعمل قبل كل رحلة"
         },
         {
           "id": "lt4",
@@ -2689,8 +2677,8 @@
         {
           "id": "rv1",
           "cls": "CLN",
-          "en": "Private pools, if included, are tested and confirmed within safe chemical and clarity parameters before the guest's first use each day",
-          "ar": "تُختبر المسابح الخاصة، إن وُجدت، ويتم التأكد من سلامة مؤشراتها الكيميائية ووضوحها قبل استخدام الضيف الأول يوميًا"
+          "en": "Private pools, if included, are visibly clean, clear and safe to use, with water quality checks confirmed by staff on request",
+          "ar": "المسابح الخاصة، إن وُجدت، نظيفة وصافية بوضوح وآمنة للاستخدام، مع تأكيد الموظفين لفحوصات جودة المياه عند الطلب"
         },
         {
           "id": "rv2",
@@ -2889,8 +2877,8 @@
         {
           "id": "ku4",
           "cls": "CLN",
-          "en": "Toys, play equipment, and dining areas used by children are visibly sanitized on a documented schedule appropriate to child health standards",
-          "ar": "تُعقَّم الألعاب ومعدات اللعب ومناطق تناول الطعام المستخدمة من الأطفال وفق جدول موثق يتناسب مع معايير صحة الطفل"
+          "en": "Toys, play equipment, and dining areas used by children are visibly clean and sanitized between uses",
+          "ar": "الألعاب ومعدات اللعب ومناطق تناول الطعام المستخدمة من الأطفال نظيفة ومعقَّمة بوضوح بين الاستخدامات"
         },
         {
           "id": "ku5",
@@ -3010,7 +2998,7 @@
           "id": "ps1",
           "cls": "SRV",
           "en": "A personal shopping or styling request is acknowledged within 30 minutes with a proposed plan tailored to the guest's stated occasion and preferences",
-          "ar": "يُقر بطلب التسوق أو التنسيق الشخصي خلال 30 دقيقة مع خطة مقترحة تتناسب مع المناسبة والتفضيلات المُعلنة للضيف"
+          "ar": "يُؤكَّد استلام طلب التسوق أو التنسيق الشخصي خلال 30 دقيقة مع خطة مقترحة تتناسب مع المناسبة والتفضيلات المُعلنة للضيف"
         },
         {
           "id": "ps2",
@@ -3124,7 +3112,7 @@
           "id": "df1",
           "cls": "EI",
           "en": "A senior host or the guest's dedicated butler is present at departure to say goodbye personally, referencing at least one specific moment from the stay",
-          "ar": "يحضر مضيف أول أو الخادم الشخصي المخصص للضيف عند المغادرة لتوديعه شخصيًا، مع الإشارة إلى لحظة محددة واحدة على الأقل من الإقامة"
+          "ar": "يحضر مضيف رئيسي أو المضيف الشخصي المخصص للضيف عند المغادرة لتوديعه شخصيًا، مع الإشارة إلى لحظة محددة واحدة على الأقل من الإقامة"
         },
         {
           "id": "df2",
