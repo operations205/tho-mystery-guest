@@ -37,18 +37,6 @@
           "ar": "حصل الموظف على بيانات التواصل وأكّد كل تفاصيل الحجز قبل إنهاء المكالمة"
         },
         {
-          "id": "r7",
-          "cls": "SUS",
-          "en": "Employee mentioned eco-friendly transfer options where available",
-          "ar": "أشار الموظف إلى خيارات النقل الصديقة للبيئة إن وُجدت"
-        },
-        {
-          "id": "r8",
-          "cls": "EFF",
-          "en": "Confirmation received within 2 hours, correctly branded and free of errors",
-          "ar": "تم استلام تأكيد الحجز خلال ساعتين، بهوية الفندق الصحيحة وخالٍ من الأخطاء"
-        },
-        {
           "id": "r9",
           "cls": "SRV",
           "en": "Call ended with a genuine, warm farewell",
@@ -57,8 +45,8 @@
         {
           "id": "r10",
           "cls": "EFF",
-          "en": "If rooms were not available on the requested date, was an alternative date offered",
-          "ar": "في حال عدم توفر غرف بالتاريخ المطلوب، هل تم عرض تاريخ بديل"
+          "en": "An alternative date was offered when the requested dates had no availability",
+          "ar": "تم عرض تاريخ بديل عند عدم توفر غرف في التاريخ المطلوب"
         }
       ]
     },
@@ -153,12 +141,6 @@
           "cls": "SRV",
           "en": "Guest given clear, confident directions to the entrance or reception",
           "ar": "تم إرشاد الضيف بوضوح وثقة إلى المدخل أو الاستقبال"
-        },
-        {
-          "id": "da6",
-          "cls": "SUS",
-          "en": "Valet or self-parking sustainable options (EV charging, shuttle) mentioned where available",
-          "ar": "تمت الإشارة إلى خيارات وقوف مستدامة (شحن كهربائي، خدمة نقل) إن وُجدت"
         },
         {
           "id": "da7",
@@ -287,21 +269,21 @@
         {
           "id": "fi11",
           "cls": "SRV",
-          "en": "If the team member was busy with another guest, was the guest acknowledged promptly with eye contact",
-          "ar": "إذا كان الموظف منشغلًا مع ضيف آخر، هل تم الانتباه للضيف بسرعة من خلال التواصل بالعين"
+          "en": "The guest was acknowledged promptly with eye contact while the team member was busy with another guest",
+          "ar": "تم الانتباه للضيف بسرعة بالتواصل البصري بينما كان الموظف منشغلًا مع ضيف آخر"
         },
         {
           "id": "fi12",
           "cls": "SEC",
           "crit": true,
-          "en": "Guest identity verified",
-          "ar": "تم التحقق من هوية الضيف"
+          "en": "Guest identity and booking details verified against valid ID at check-in, discreetly and without feeling intrusive",
+          "ar": "تم التحقق من هوية الضيف وبيانات حجزه بمطابقتها مع هوية سارية عند تسجيل الوصول، بأسلوب لبق وغير متطفل"
         },
         {
-          "id": "fi13",
+          "id": "fi14",
           "cls": "SRV",
-          "en": "Guest was checked in promptly, efficiently and in a hospitable manner",
-          "ar": "تم تسجيل دخول الضيف بسرعة وكفاءة وبأسلوب مضياف"
+          "en": "Room allocated matched the room type, bed configuration and view confirmed at booking, or a suitable alternative was offered with explanation",
+          "ar": "الغرفة المخصصة طابقت نوع الغرفة وتهيئة السرير والإطلالة المؤكدة عند الحجز، أو عُرض بديل مناسب مع التوضيح"
         }
       ]
     },
@@ -380,12 +362,6 @@
           "ar": "تم الترويج لمرافق وخدمات الفندق أولاً قبل اقتراح بدائل خارجية"
         },
         {
-          "id": "g5",
-          "cls": "SUS",
-          "en": "Sustainable transport or local experience options mentioned where relevant",
-          "ar": "تم ذكر خيارات نقل أو تجارب محلية مستدامة عند الحاجة"
-        },
-        {
           "id": "g6",
           "cls": "EFF",
           "en": "Requested items/services delivered within the promised timeframe",
@@ -414,12 +390,6 @@
           "cls": "SUS",
           "en": "Local, sustainable or community-based experiences included among the suggestions offered",
           "ar": "تضمنت الاقتراحات تجارب محلية أو مستدامة أو مجتمعية"
-        },
-        {
-          "id": "g11",
-          "cls": "EFF",
-          "en": "If asked for additional items (soap, shampoo, tea bag, etc.), were they served within 20 minutes",
-          "ar": "في حال طلب أغراض إضافية (صابون، شامبو، أكياس شاي، إلخ)، هل تم تقديمها خلال 20 دقيقة"
         }
       ]
     },
@@ -451,8 +421,8 @@
         {
           "id": "h6",
           "cls": "SUS",
-          "en": "Complimentary drinking water provided in bottles",
-          "ar": "تم توفير مياه شرب مجانية في زجاجات"
+          "en": "Complimentary drinking water provided, in glass or sustainably packaged bottles",
+          "ar": "تم توفير مياه شرب مجانية في زجاجات زجاجية أو عبوات مستدامة"
         },
         {
           "id": "h7",
@@ -469,8 +439,8 @@
         {
           "id": "h9",
           "cls": "PRD",
-          "en": "In-room technology (TV, lighting, climate control) fully functional and easy to operate",
-          "ar": "تعمل التقنيات داخل الغرفة (التلفاز، الإضاءة، التحكم بالمناخ) بكفاءة كاملة وسهلة الاستخدام"
+          "en": "In-room lighting, climate control and room controls fully functional and easy to operate",
+          "ar": "تعمل الإضاءة والتحكم بالمناخ وأدوات التحكم داخل الغرفة بكفاءة كاملة وسهلة الاستخدام"
         },
         {
           "id": "h10",
@@ -520,6 +490,31 @@
           "cls": "SRV",
           "en": "Any defect or fault reported by the guest was resolved, or the room changed, within a reasonable time and in a professional manner",
           "ar": "أي عيب أو عطل أبلغ عنه الضيف تمت معالجته أو تغيير الغرفة خلال وقت معقول وبأسلوب مهني"
+        },
+        {
+          "id": "h18",
+          "cls": "PRD",
+          "en": "Mattress, pillows and bedding comfortable and supportive, with a choice of pillow available on request",
+          "ar": "المرتبة والوسائد والمفروشات مريحة وداعمة، مع إمكانية اختيار نوع الوسادة عند الطلب"
+        },
+        {
+          "id": "h19",
+          "cls": "SEC",
+          "en": "In-room safe present, working and simple to use",
+          "ar": "خزنة الغرفة موجودة وتعمل وسهلة الاستخدام"
+        },
+        {
+          "id": "h20",
+          "cls": "CLN",
+          "crit": true,
+          "en": "Room free of insects, pests or any visible sign of infestation (including bed linen and mattress edges)",
+          "ar": "الغرفة خالية من الحشرات والآفات وأي علامة ظاهرة للإصابة (بما في ذلك المفروشات وحواف المرتبة)"
+        },
+        {
+          "id": "h21",
+          "cls": "PRD",
+          "en": "Essential room equipment (hairdryer, iron and board or on request, working power sockets, tea/coffee set where standard) present and working",
+          "ar": "تجهيزات الغرفة الأساسية (مجفف الشعر، المكواة ولوحتها أو عند الطلب، مقابس كهرباء تعمل، طقم الشاي/القهوة حيث يكون معتادًا) متوفرة وتعمل"
         }
       ]
     },
@@ -532,8 +527,8 @@
         {
           "id": "h3",
           "cls": "CLN",
-          "en": "Bathroom completely free of mold, limescale and streaks",
-          "ar": "الحمام خالٍ تمامًا من العفن والترسبات الجيرية والبقع",
+          "en": "Bathroom free of visible mold, mildew and soap scum, with mirrors and glass streak-free",
+          "ar": "الحمام خالٍ من العفن الظاهر وترسبات الصابون، والمرايا والزجاج بلا بقع أو آثار",
           "crit": true
         },
         {
@@ -600,28 +595,10 @@
           "ar": "تمت الخدمة المسائية في التوقيت المعلن عنه"
         },
         {
-          "id": "s2",
-          "cls": "SRV",
-          "en": "Staff knocked, waited and announced their department before entering",
-          "ar": "طرق الموظف الباب وانتظر وأعلن عن قسمه قبل الدخول"
-        },
-        {
-          "id": "s5",
-          "cls": "SUS",
-          "en": "Guest’s towel/linen reuse preference respected without being asked twice",
-          "ar": "تم احترام تفضيل الضيف بشأن إعادة استخدام المناشف/المفروشات دون تكرار السؤال"
-        },
-        {
           "id": "td2",
           "cls": "CLN",
           "en": "Bathroom lightly refreshed (towels straightened, amenities tidied) during turndown",
           "ar": "تم تجديد الحمام بشكل بسيط (ترتيب المناشف والمستلزمات) أثناء الخدمة المسائية"
-        },
-        {
-          "id": "td3",
-          "cls": "SEC",
-          "en": "Do-not-disturb preference respected without staff attempting entry regardless",
-          "ar": "تم احترام لافتة عدم الإزعاج دون أي محاولة دخول من الموظفين"
         }
       ]
     },
@@ -684,6 +661,18 @@
           "cls": "SEC",
           "en": "Guest belongings left undisturbed beyond what servicing requires",
           "ar": "لم يتم المساس بمتعلقات الضيف الشخصية بما يتجاوز متطلبات التنظيف"
+        },
+        {
+          "id": "g11",
+          "cls": "EFF",
+          "en": "Additional items requested by the guest (e.g., soap, shampoo, tea bags) were delivered to the room within 20 minutes, without needing a reminder",
+          "ar": "الأغراض الإضافية التي طلبها الضيف (مثل الصابون أو الشامبو أو أكياس الشاي) وصلت إلى الغرفة خلال 20 دقيقة دون الحاجة لتذكير أو متابعة"
+        },
+        {
+          "id": "s2",
+          "cls": "SRV",
+          "en": "Staff knocked, waited and announced their department before entering any guest room",
+          "ar": "طرق الموظف الباب وانتظر وأعلن عن قسمه قبل دخول أي غرفة"
         }
       ]
     },
@@ -801,7 +790,7 @@
         },
         {
           "id": "pd2",
-          "cls": "CLN",
+          "cls": "SRV",
           "en": "Bags checked for completeness and handled without visible damage",
           "ar": "تم التأكد من اكتمال الحقائب والتعامل معها دون أي تلف ظاهر"
         },
@@ -834,8 +823,8 @@
         {
           "id": "b1",
           "cls": "SRV",
-          "en": "Guest greeted, seated and offered a table matching their preference",
-          "ar": "تم استقبال الضيف وجلوسه على طاولة تناسب تفضيله"
+          "en": "Guest greeted warmly and offered a table matching their preference",
+          "ar": "تم استقبال الضيف بترحيب وعرض طاولة تناسب تفضيله"
         },
         {
           "id": "b4",
@@ -890,6 +879,12 @@
           "cls": "SRV",
           "en": "Children or family needs (high chairs, kids’ options) accommodated without delay",
           "ar": "تمت تلبية احتياجات الأطفال والعائلات (كراسي الأطفال، خيارات الأطفال) دون تأخير"
+        },
+        {
+          "id": "bf5",
+          "cls": "SRV",
+          "en": "Table cleared promptly after each course/the meal/when requested",
+          "ar": "تم إخلاء الطاولة بسرعة بعد كل طبق/الوجبة/عند الطلب"
         }
       ]
     },
@@ -937,22 +932,10 @@
           "ar": "القهوة والشاي غير قديمين أو متروكين لفترة طويلة على السخّان"
         },
         {
-          "id": "bf3",
-          "cls": "PRD",
-          "en": "Table setting complete and consistent before the guest sat down",
-          "ar": "ترتيب الطاولة مكتمل ومتسق قبل جلوس الضيف"
-        },
-        {
           "id": "bf4",
           "cls": "CLN",
           "en": "Buffet serving utensils clean and dedicated to a single dish (no cross-contamination)",
           "ar": "أدوات تقديم البوفيه نظيفة ومخصصة لطبق واحد دون تلوث متبادل"
-        },
-        {
-          "id": "bf5",
-          "cls": "SRV",
-          "en": "Table cleared promptly after each course/the meal/when requested",
-          "ar": "تم إخلاء الطاولة بسرعة بعد كل طبق/الوجبة/عند الطلب"
         }
       ]
     },
@@ -1312,8 +1295,8 @@
         {
           "id": "p7",
           "cls": "CLN",
-          "en": "Restrooms and changing areas spotless and well-stocked throughout the visit",
-          "ar": "دورات المياه وغرف تغيير الملابس نظيفة تمامًا ومجهزة طوال فترة الزيارة"
+          "en": "Public restrooms and changing areas spotless, odor-free and well-stocked throughout the visit, with all fixtures functional",
+          "ar": "دورات المياه العامة وغرف تغيير الملابس نظيفة تمامًا وخالية من الروائح ومجهزة طوال فترة الزيارة، وجميع تجهيزاتها تعمل"
         },
         {
           "id": "pg8",
@@ -1338,12 +1321,6 @@
           "cls": "PRD",
           "en": "Corridor carpets and flooring in good repair, without visible wear or stains",
           "ar": "سجاد وأرضيات الممرات بحالة جيدة ودون تآكل أو بقع ظاهرة"
-        },
-        {
-          "id": "p12",
-          "cls": "CLN",
-          "en": "Public restrooms neat, tidy and odor-free, with all fixtures functional",
-          "ar": "دورات المياه العامة نظيفة ومرتبة وخالية من الروائح، وجميع التجهيزات تعمل بشكل جيد"
         }
       ]
     },
@@ -1399,7 +1376,7 @@
         },
         {
           "id": "vp3",
-          "cls": "CLN",
+          "cls": "SRV",
           "en": "Vehicle returned in the same condition as received, with no new marks",
           "ar": "تمت إعادة المركبة بنفس حالتها دون أي خدوش جديدة"
         },
@@ -1638,12 +1615,6 @@
       "ar": "الأمن والسلامة",
       "items": [
         {
-          "id": "sf1",
-          "cls": "SEC",
-          "en": "Guest identity verified appropriately without feeling intrusive",
-          "ar": "تم التحقق من هوية الضيف بشكل مناسب دون أن يشعر بالإزعاج"
-        },
-        {
           "id": "sf2",
           "cls": "SEC",
           "en": "Room door fitted with a working viewing port, deadbolt and security latch",
@@ -1660,8 +1631,8 @@
         {
           "id": "sf4",
           "cls": "SEC",
-          "en": "Staff never disclosed guest room numbers or details to third parties",
-          "ar": "لم يفصح أي موظف عن رقم غرفة الضيف أو بياناته لأي طرف آخر"
+          "en": "Staff never disclosed guest room numbers or details to third parties, nor discussed them audibly in public areas",
+          "ar": "لم يفصح أي موظف عن رقم غرفة الضيف أو بياناته لأي طرف آخر، ولم يناقشها بصوت مسموع في الأماكن العامة"
         },
         {
           "id": "sf6",
@@ -1718,6 +1689,12 @@
           "cls": "SUS",
           "en": "Locally sourced or seasonal products favored across F&B outlets",
           "ar": "تفضيل المنتجات المحلية أو الموسمية في منافذ الطعام والشراب"
+        },
+        {
+          "id": "s5",
+          "cls": "SUS",
+          "en": "Guest’s towel/linen reuse preference respected without being asked twice",
+          "ar": "تم احترام تفضيل الضيف بشأن إعادة استخدام المناشف/المفروشات دون تكرار السؤال"
         }
       ]
     },
@@ -1884,12 +1861,6 @@
           "ar": "تم استخدام اسم الضيف بشكل طبيعي دون إفراط"
         },
         {
-          "id": "e3",
-          "cls": "EI",
-          "en": "Service felt prompt and responsive - staff acted quickly without unnecessary delay",
-          "ar": "شعر الضيف بأن الخدمة سريعة ومتجاوبة - تصرف الموظفون بسرعة دون تأخير غير مبرر"
-        },
-        {
           "id": "e4",
           "cls": "EI",
           "en": "Staff adapted smoothly to a change in request or an unexpected situation",
@@ -1900,18 +1871,6 @@
           "cls": "EI",
           "en": "Guest treated as an individual, not processed as a generic transaction",
           "ar": "تمت معاملة الضيف كفرد مميز وليس كإجراء روتيني عام"
-        },
-        {
-          "id": "e6",
-          "cls": "EI",
-          "en": "Staff across departments coordinated seamlessly without repeating questions",
-          "ar": "تنسق الموظفون من أقسام مختلفة بسلاسة دون تكرار الأسئلة على الضيف"
-        },
-        {
-          "id": "e7",
-          "cls": "EI",
-          "en": "Staff appeared well-groomed, professional and consistent with brand image",
-          "ar": "ظهر الموظفون بمظهر أنيق ومهني يعكس هوية العلامة الفندقية"
         },
         {
           "id": "e8",
@@ -2166,7 +2125,7 @@
       "items": [
         {
           "id": "np1",
-          "cls": "CLN",
+          "cls": "PRD",
           "en": "Room adequately soundproofed from corridor and adjacent room noise",
           "ar": "عزل الغرفة الصوتي مناسب من ضوضاء الممر والغرف المجاورة"
         },
@@ -2187,12 +2146,6 @@
           "cls": "SRV",
           "en": "Back-of-house or service noise (deliveries, laundry) not audible in guest areas",
           "ar": "ضوضاء التشغيل الداخلي (التوصيل، الغسيل) غير مسموعة في مناطق الضيوف"
-        },
-        {
-          "id": "np5",
-          "cls": "SEC",
-          "en": "Guest information (name, room number) never discussed audibly in public areas",
-          "ar": "لم تتم مناقشة معلومات الضيف (الاسم، رقم الغرفة) بصوت مسموع في الأماكن العامة"
         },
         {
           "id": "np6",
@@ -2521,7 +2474,7 @@
         },
         {
           "id": "bt3",
-          "cls": "PRD",
+          "cls": "SRV",
           "en": "Unpacking and packing assistance is offered discreetly, with garments organized by the guest's own logic rather than a generic default arrangement",
           "ar": "تُعرض المساعدة في فرز الأمتعة وحزمها بهدوء، مع تنظيم الملابس وفق منطق الضيف نفسه وليس ترتيبًا افتراضيًا عامًا"
         },
@@ -2533,7 +2486,7 @@
         },
         {
           "id": "bt5",
-          "cls": "FQ",
+          "cls": "EFF",
           "en": "Shoe care, laundry, and pressing requested through the butler are returned within the promised window, and any delay is proactively communicated before the deadline passes",
           "ar": "تُعاد خدمات العناية بالأحذية والغسيل والكي المطلوبة عبر الخادم الشخصي خلال الموعد المتفق عليه، ويُبلَّغ عن أي تأخير استباقيًا قبل انقضاء الموعد"
         },
@@ -2571,7 +2524,7 @@
         },
         {
           "id": "pdc2",
-          "cls": "CLN",
+          "cls": "SEC",
           "en": "Any stated allergy is visibly flagged in the kitchen ticket system and verbally confirmed by the chef or a senior server before the first course is served",
           "ar": "تُوثَّق أي حساسية غذائية مُعلنة بوضوح في نظام طلبات المطبخ، ويؤكدها الشيف أو نادل أول شفهيًا قبل تقديم الطبق الأول"
         },
@@ -2595,7 +2548,7 @@
         },
         {
           "id": "pdc6",
-          "cls": "PRD",
+          "cls": "SRV",
           "en": "A bespoke menu or tasting sequence is offered for milestone occasions (anniversary, proposal, business closing) rather than the standard printed menu alone",
           "ar": "يُقدَّم قائمة أو تسلسل تذوّق مصمم خصيصًا للمناسبات المميزة (ذكرى سنوية، طلب زواج، إغلاق صفقة) بدلاً من القائمة المطبوعة القياسية فقط"
         },
@@ -2695,7 +2648,7 @@
         },
         {
           "id": "gp7",
-          "cls": "FQ",
+          "cls": "PRD",
           "en": "Room amenities are adjusted to reflect a guest's declared allergies or sensitivities (e.g., hypoallergenic bedding, fragrance-free toiletries) accurately and without error",
           "ar": "تُعدَّل مرافق الغرفة لتعكس حساسيات الضيف المُعلنة بدقة ودون خطأ (مثل الفراش المضاد للحساسية، مستحضرات خالية من العطور)"
         },
@@ -2745,7 +2698,7 @@
         },
         {
           "id": "lt6",
-          "cls": "FQ",
+          "cls": "SRV",
           "en": "Luggage handling during premium transfers is completed with zero visible damage, and any pre-existing damage is documented and disclosed to the guest before departure",
           "ar": "تتم مناولة الأمتعة أثناء عمليات النقل المميزة دون أي ضرر ظاهر، وتُوثَّق أي أضرار سابقة وتُفصح للضيف قبل الانطلاق"
         }
@@ -2777,7 +2730,7 @@
         },
         {
           "id": "rv4",
-          "cls": "PRD",
+          "cls": "SRV",
           "en": "In-villa kitchen or pantry stocking reflects any preferences communicated in advance, and a private chef option is clearly offered where available",
           "ar": "يعكس تجهيز المطبخ أو المخزن داخل الفيلا أي تفضيلات تم إبلاغها مسبقًا، ويُعرض خيار الشيف الخاص بوضوح عند توفره"
         },
@@ -2789,7 +2742,7 @@
         },
         {
           "id": "rv6",
-          "cls": "FQ",
+          "cls": "PRD",
           "en": "All in-villa technology (smart controls, entertainment systems, climate control) functions correctly and staff can demonstrate its use confidently on request",
           "ar": "تعمل جميع تقنيات الفيلا (أنظمة التحكم الذكية، أنظمة الترفيه، التحكم بالمناخ) بشكل صحيح، ويستطيع الموظفون شرح استخدامها بثقة عند الطلب"
         },
@@ -2838,12 +2791,6 @@
           "ar": "تُنجَز خدمة التجهيز المسائي خلال النافذة الزمنية التي أبلغ عنها الضيف (مثل وقت تناوله العشاء) دون الحاجة لطلبها مرتين أو العودة لغرفة لم تُلمس"
         },
         {
-          "id": "btd4",
-          "cls": "SEC",
-          "en": "Do-not-disturb preferences are strictly respected, and any necessary turndown deferral is handled through an approved discreet channel rather than knocking or entering",
-          "ar": "يُحترم تفضيل عدم الإزعاج بدقة تامة، وتُدار أي حاجة لتأجيل التجهيز المسائي عبر قناة معتمدة وهادئة بدلاً من الطرق أو الدخول"
-        },
-        {
           "id": "btd5",
           "cls": "EI",
           "en": "A curated sleep or wellness amenity (herbal tea, sleep mist, weighted element) is offered at turndown in a way that feels considered rather than a generic chocolate on the pillow",
@@ -2851,7 +2798,7 @@
         },
         {
           "id": "btd6",
-          "cls": "FQ",
+          "cls": "PRD",
           "en": "Lighting, temperature, and curtains are set to a calming pre-sleep configuration consistent with what was promised in the room's category description",
           "ar": "تُضبط الإضاءة ودرجة الحرارة والستائر على إعداد مريح يهيئ للنوم بما يتوافق مع ما تم وصفه في فئة الغرفة"
         }
@@ -2895,7 +2842,7 @@
         },
         {
           "id": "wl6",
-          "cls": "FQ",
+          "cls": "SRV",
           "en": "Progress or outcomes from a multi-day wellness program are summarized for the guest at the end of the stay in a clear, professional format",
           "ar": "يُلخَّص التقدم أو النتائج من برنامج العافية متعدد الأيام للضيف في نهاية الإقامة بصيغة واضحة واحترافية"
         },
@@ -2951,7 +2898,7 @@
         },
         {
           "id": "ac6",
-          "cls": "FQ",
+          "cls": "SRV",
           "en": "Cultural programming presented to guests is factually accurate and respectfully framed, avoiding stereotyping or superficial presentation of local heritage",
           "ar": "يكون المحتوى الثقافي المُقدَّم للضيوف دقيقًا من الناحية الواقعية ومصاغًا باحترام، متجنبًا التنميط أو العرض السطحي للتراث المحلي"
         }
@@ -3077,13 +3024,13 @@
         },
         {
           "id": "vps5",
-          "cls": "CLN",
+          "cls": "SEC",
           "en": "Digital records, guest folios, and correspondence relating to VIP stays are access-controlled and not left visible on unattended screens or printed documents",
           "ar": "تكون السجلات الرقمية وفواتير الضيوف والمراسلات المتعلقة بإقامات كبار الشخصيات محمية بصلاحيات وصول، ولا تُترك ظاهرة على شاشات غير مراقبة أو مستندات مطبوعة"
         },
         {
           "id": "vps6",
-          "cls": "FQ",
+          "cls": "SRV",
           "en": "Security personnel assigned to VIP protection coordinate smoothly with hotel operations without disrupting the ambiance or experience of other guests",
           "ar": "يُنسِّق أفراد الأمن المخصصون لحماية كبار الشخصيات بسلاسة مع عمليات الفندق دون الإخلال بأجواء أو تجربة النزلاء الآخرين"
         },
@@ -3139,7 +3086,7 @@
         },
         {
           "id": "ps6",
-          "cls": "FQ",
+          "cls": "SEC",
           "en": "Recommendations avoid conflicts of interest (e.g., undisclosed commission arrangements) and prioritize genuine guest fit over vendor kickbacks",
           "ar": "تتجنب التوصيات تعارض المصالح (مثل ترتيبات العمولة غير المُفصح عنها) وتُعطي الأولوية للملاءمة الحقيقية للضيف على حساب عمولات المزودين"
         }
@@ -3183,7 +3130,7 @@
         },
         {
           "id": "ce6",
-          "cls": "FQ",
+          "cls": "PRD",
           "en": "Photography or videography arrangements offered for celebrations meet a professional standard consistent with what was quoted and promised",
           "ar": "تُلبي ترتيبات التصوير الفوتوغرافي أو الفيديو المُقدَّمة للاحتفالات معيارًا احترافيًا يتوافق مع ما تم تسعيره والوعد به"
         },
@@ -3215,7 +3162,7 @@
         },
         {
           "id": "sl3",
-          "cls": "FQ",
+          "cls": "SEC",
           "en": "Any sustainability or provenance claim made to guests (organic, locally sourced, carbon-conscious) is genuine and can be substantiated with documentation on request",
           "ar": "يكون أي ادعاء بالاستدامة أو المصدر يُقدَّم للضيوف (عضوي، محلي المصدر، منخفض الأثر الكربوني) حقيقيًا ويمكن إثباته بوثائق عند الطلب"
         },
@@ -3271,7 +3218,7 @@
         },
         {
           "id": "df5",
-          "cls": "FQ",
+          "cls": "SRV",
           "en": "A thoughtful post-stay follow-up (a message, satisfaction check, or invitation to return) is sent within 3-5 days of departure without feeling like a mass marketing blast",
           "ar": "تُرسَل متابعة مدروسة بعد الإقامة (رسالة، استطلاع رضا، أو دعوة للعودة) خلال 3-5 أيام من المغادرة دون أن تبدو رسالة تسويقية جماعية"
         },
