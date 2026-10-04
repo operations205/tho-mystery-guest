@@ -9,8 +9,8 @@
         {
           "id": "r1",
           "cls": "EFF",
-          "en": "Call answered within 3-6 rings / 10-15 seconds with a warm, branded greeting",
-          "ar": "تم الرد على المكالمة خلال 3-6 رنات أو 10-15 ثانية مع تحية لبقة تعكس هوية الفندق"
+          "en": "Call answered within 3 rings (about 10 seconds) with a warm, branded greeting",
+          "ar": "تم الرد على المكالمة خلال 3 رنات (نحو 10 ثوانٍ) مع تحية لبقة تعكس هوية الفندق"
         },
         {
           "id": "r2",
@@ -141,12 +141,6 @@
           "cls": "SRV",
           "en": "Guest given clear, confident directions to the entrance or reception",
           "ar": "تم إرشاد الضيف بوضوح وثقة إلى المدخل أو الاستقبال"
-        },
-        {
-          "id": "da7",
-          "cls": "SEC",
-          "en": "Vehicle security (locking, ticket/token handover) handled without ambiguity",
-          "ar": "تم التعامل مع أمن المركبة (الإغلاق وتسليم البطاقة) دون أي لبس"
         }
       ]
     },
@@ -402,8 +396,8 @@
         {
           "id": "h1",
           "cls": "CLN",
-          "en": "Bedroom floor, surfaces and fittings spotless and free of dust or marks",
-          "ar": "أرضية وأسطح وتجهيزات الغرفة نظيفة تمامًا وخالية من الغبار أو البقع",
+          "en": "Bedroom floor, surfaces and fittings spotless and free of dust, smudges and stains",
+          "ar": "أرضية وأسطح وتجهيزات الغرفة نظيفة تمامًا وخالية من الغبار والبصمات والبقع",
           "crit": true
         },
         {
@@ -464,8 +458,8 @@
           "id": "h13",
           "cls": "PRD",
           "crit": true,
-          "en": "Furniture, doors, walls and flooring in sound condition, free of visible scratches, chipped paint, peeling, breakage or stains",
-          "ar": "الأثاث والأبواب والجدران والأرضيات بحالة سليمة وخالية من الخدوش الظاهرة أو تقشّر الدهان أو الكسور أو البقع"
+          "en": "Furniture, doors, walls and flooring in sound condition, free of visible scratches, chipped paint, peeling or breakage",
+          "ar": "الأثاث والأبواب والجدران والأرضيات بحالة سليمة وخالية من الخدوش الظاهرة أو تقشّر الدهان أو الكسور"
         },
         {
           "id": "h14",
@@ -1057,7 +1051,7 @@
         },
         {
           "id": "rs11",
-          "cls": "SRV",
+          "cls": "PRD",
           "en": "Light music or ambiance in the restaurant was pleasant",
           "ar": "الموسيقى الهادئة أو أجواء المطعم كانت لطيفة"
         }
@@ -1232,13 +1226,13 @@
         },
         {
           "id": "bl3",
-          "cls": "PRD",
+          "cls": "FQ",
           "en": "Bar snacks or nibbles, if offered, fresh and replenished",
           "ar": "مقبلات البار، إن وُجدت، طازجة ويتم تجديدها"
         },
         {
           "id": "bl4",
-          "cls": "SRV",
+          "cls": "PRD",
           "en": "Live music or ambiance (if applicable) matched the advertised atmosphere",
           "ar": "الموسيقى الحية أو الأجواء، إن وُجدت، مطابقة لما تم الإعلان عنه"
         },
@@ -1478,7 +1472,7 @@
         },
         {
           "id": "spb2",
-          "cls": "PRD",
+          "cls": "CLN",
           "en": "Changing rooms, lockers and robes clean and fully stocked",
           "ar": "غرف تغيير الملابس والخزائن والأردية نظيفة ومجهزة بالكامل"
         },
@@ -1619,13 +1613,6 @@
           "cls": "SEC",
           "en": "Room door fitted with a working viewing port, deadbolt and security latch",
           "ar": "باب الغرفة مزود بعين مراقبة وقفل أمان يعملان بكفاءة",
-          "crit": true
-        },
-        {
-          "id": "sf3",
-          "cls": "SEC",
-          "en": "Fire exits clearly signed and completely unobstructed",
-          "ar": "مخارج الطوارئ عليها لافتات واضحة وخالية تمامًا من العوائق",
           "crit": true
         },
         {
@@ -2050,8 +2037,8 @@
         {
           "id": "fe3",
           "cls": "SEC",
-          "en": "Emergency lighting along escape routes functional when tested",
-          "ar": "إضاءة الطوارئ على طول مسارات الإخلاء تعمل عند الاختبار"
+          "en": "Emergency lighting visibly in place along escape routes",
+          "ar": "إضاءة الطوارئ موجودة وظاهرة على طول مسارات الإخلاء"
         },
         {
           "id": "fe4",
@@ -2070,6 +2057,13 @@
           "cls": "SEC",
           "en": "Emergency numbers displayed in rooms/lobby area",
           "ar": "أرقام الطوارئ ظاهرة في الغرف/منطقة اللوبي"
+        },
+        {
+          "id": "sf3",
+          "cls": "SEC",
+          "en": "Fire exits clearly signed and completely unobstructed",
+          "ar": "مخارج الطوارئ عليها لافتات واضحة وخالية تمامًا من العوائق",
+          "crit": true
         }
       ]
     },
@@ -2102,12 +2096,6 @@
           "cls": "SRV",
           "en": "IT/technical support reachable and resolved a connectivity issue promptly",
           "ar": "دعم تقني متاح للتواصل ويحل مشكلات الاتصال بسرعة"
-        },
-        {
-          "id": "wt5",
-          "cls": "SEC",
-          "en": "Guest Wi-Fi network segregated from hotel back-office systems",
-          "ar": "شبكة واي فاي الضيوف منفصلة عن أنظمة تشغيل الفندق الداخلية"
         },
         {
           "id": "wt6",
@@ -2635,12 +2623,6 @@
           "ar": "يتعرّف الموظفون في مختلف الأقسام على الضيف المتكرر ويحيّونه باسمه خلال نفس الزيارة دون الحاجة للتحقق من الشاشة أولاً"
         },
         {
-          "id": "gp5",
-          "cls": "SEC",
-          "en": "Guest preference and profile data is stored and accessed in compliance with data protection practices, with access limited to staff who need it for service delivery",
-          "ar": "تُخزَّن بيانات تفضيلات الضيف وملفه الشخصي ويُصار إليها وفق ممارسات حماية البيانات، مع اقتصار الوصول على الموظفين الذين يحتاجونها لتقديم الخدمة"
-        },
-        {
           "id": "gp6",
           "cls": "EI",
           "en": "A meaningful personal detail shared by the guest during the stay (a birthday, a business milestone, a family member's name) is acknowledged again later in the same stay",
@@ -2679,12 +2661,6 @@
           "ar": "تُفحَص المركبات أو اليخوت أو المروحيات المستخدمة لنقل الضيوف من حيث النظافة وسلامة التحكم بالمناخ وسلامة المرافق قبل كل رحلة"
         },
         {
-          "id": "lt3",
-          "cls": "SEC",
-          "en": "All luxury transfer partners (yacht crew, helicopter operators, chauffeur services) hold current, verifiable licensing and insurance appropriate to the transfer type",
-          "ar": "يحمل جميع شركاء النقل الفاخر (طاقم اليخت، مشغلو المروحيات، خدمات السائقين) تراخيص وتأمينات سارية وقابلة للتحقق تتناسب مع نوع النقل"
-        },
-        {
           "id": "lt4",
           "cls": "EFF",
           "en": "Pickup timing is coordinated against real-time flight or event information so the guest is never left waiting or rushed unnecessarily",
@@ -2719,8 +2695,8 @@
         {
           "id": "rv2",
           "cls": "SEC",
-          "en": "Villa or residence entry points (gates, private doors, service access) are secured and access is logged or controlled, with the guest briefed on how privacy and security are maintained",
-          "ar": "تكون نقاط دخول الفيلا أو الإقامة السكنية (البوابات، الأبواب الخاصة، مداخل الخدمة) مؤمّنة ويُسجَّل الدخول أو يُتحكم به، مع إطلاع الضيف على كيفية الحفاظ على الخصوصية والأمن"
+          "en": "Villa or residence entry points (gates, private doors, service access) are secured, with the guest briefed on how privacy and security are maintained",
+          "ar": "نقاط دخول الفيلا أو الإقامة السكنية (البوابات، الأبواب الخاصة، مداخل الخدمة) مؤمّنة، مع إطلاع الضيف على كيفية الحفاظ على الخصوصية والأمن"
         },
         {
           "id": "rv3",
@@ -2823,18 +2799,6 @@
           "ar": "يستطيع ممارسو العافية شرح الأساس المنطقي والفائدة المتوقعة لعنصر البرنامج المُوصى به بوضوح عند السؤال، دون ادعاءات غامضة أو غير مثبتة"
         },
         {
-          "id": "wl3",
-          "cls": "SEC",
-          "en": "Any program involving medical-adjacent services (IV therapy, cryotherapy, advanced diagnostics) is supervised by appropriately licensed personnel with visible credentials on file",
-          "ar": "يُشرف على أي برنامج يتضمن خدمات شبه طبية (العلاج الوريدي، العلاج بالتبريد، الفحوصات المتقدمة) موظفون مرخصون بشكل مناسب مع وثائق اعتماد متوفرة"
-        },
-        {
-          "id": "wl4",
-          "cls": "CLN",
-          "en": "Wellness and treatment areas maintain hospital-grade cleanliness protocols where medical-adjacent equipment is used, with visible sanitation between guests",
-          "ar": "تحافظ مناطق العافية والعلاج على بروتوكولات نظافة بمستوى طبي عند استخدام معدات شبه طبية، مع تعقيم واضح بين الضيوف"
-        },
-        {
           "id": "wl5",
           "cls": "PRD",
           "en": "A personalized nutrition or menu accommodation is coordinated with dining outlets for guests enrolled in a wellness program, without the guest needing to re-explain restrictions at each meal",
@@ -2885,12 +2849,6 @@
           "ar": "يكون منسق الفن أو الثقافة، عند توفره، متاحًا فعليًا للاستشارة وليس مجرد لقب دون قدرة على تقديم ترتيبات مخصصة"
         },
         {
-          "id": "ac4",
-          "cls": "SEC",
-          "en": "Displayed art or valuable cultural artifacts are properly secured and insured, with condition checks logged periodically",
-          "ar": "تكون الأعمال الفنية أو القطع الثقافية الثمينة المعروضة مؤمَّنة بشكل صحيح ومغطاة بالتأمين، مع تسجيل فحوصات دورية لحالتها"
-        },
-        {
           "id": "ac5",
           "cls": "EFF",
           "en": "Requests for private gallery visits, artist meetings, or cultural access are confirmed within 24 hours with a clear itinerary",
@@ -2913,8 +2871,8 @@
         {
           "id": "ku1",
           "cls": "SEC",
-          "en": "Kids' club or family program staff undergo background/child-safety vetting and a visible sign-in/sign-out system tracks every child in care",
-          "ar": "يخضع موظفو نادي الأطفال أو برنامج العائلة لفحص أماني/سلامة الطفل، ويُطبَّق نظام تسجيل دخول وخروج واضح لتتبع كل طفل تحت الرعاية"
+          "en": "A visible sign-in/sign-out system tracks every child in the kids' club or family program",
+          "ar": "يُطبَّق نظام تسجيل دخول وخروج واضح لتتبع كل طفل في نادي الأطفال أو برنامج العائلة"
         },
         {
           "id": "ku2",
@@ -3039,12 +2997,6 @@
           "cls": "EI",
           "en": "Staff read and respect a VIP guest's preferred level of interaction (some want warmth and conversation, others want minimal engagement) without defaulting to one style",
           "ar": "يقرأ الموظفون مستوى التفاعل المفضل لدى ضيف كبار الشخصيات ويحترمونه (بعضهم يفضل الدفء والحديث، وآخرون يفضلون تفاعلاً محدودًا) دون الاعتماد على أسلوب واحد ثابت"
-        },
-        {
-          "id": "vps8",
-          "cls": "SEC",
-          "en": "Any breach or near-breach of guest privacy is documented, escalated to senior management, and addressed with a corrective action plan",
-          "ar": "يُوثَّق أي خرق أو شبه خرق لخصوصية الضيف، ويُصعَّد للإدارة العليا، ويُعالَج بخطة تصحيحية"
         }
       ]
     },
@@ -3083,12 +3035,6 @@
           "cls": "PRD",
           "en": "Gift wrapping or presentation of purchased items reflects the same standard of care and branding as the hotel's own amenities",
           "ar": "يعكس تغليف أو عرض المشتريات نفس مستوى العناية والهوية الذي تعكسه مرافق الفندق نفسها"
-        },
-        {
-          "id": "ps6",
-          "cls": "SEC",
-          "en": "Recommendations avoid conflicts of interest (e.g., undisclosed commission arrangements) and prioritize genuine guest fit over vendor kickbacks",
-          "ar": "تتجنب التوصيات تعارض المصالح (مثل ترتيبات العمولة غير المُفصح عنها) وتُعطي الأولوية للملاءمة الحقيقية للضيف على حساب عمولات المزودين"
         }
       ]
     },
@@ -3149,22 +3095,10 @@
       "ar": "الاستدامة ومصدر المنتجات في الفئة الفاخرة",
       "items": [
         {
-          "id": "sl1",
-          "cls": "SUS",
-          "en": "Premium ingredients and materials used in top-tier dining or amenities are sourced with traceable provenance that staff can describe accurately if asked",
-          "ar": "يتم توريد المكونات والمواد الفاخرة المستخدمة في تجارب الطعام أو المرافق الراقية بمصدر قابل للتتبع يستطيع الموظفون وصفه بدقة عند السؤال"
-        },
-        {
           "id": "sl2",
           "cls": "SUS",
           "en": "Single-use luxury packaging (amenity boxes, gift wrapping, room accessories) is minimized or designed for reuse without reducing the perceived quality of the experience",
           "ar": "يُقلَّل استخدام التغليف الفاخر أحادي الاستخدام (علب المرافق، تغليف الهدايا، إكسسوارات الغرفة) أو يُصمَّم لإعادة الاستخدام دون التأثير على جودة التجربة المُدركة"
-        },
-        {
-          "id": "sl3",
-          "cls": "SEC",
-          "en": "Any sustainability or provenance claim made to guests (organic, locally sourced, carbon-conscious) is genuine and can be substantiated with documentation on request",
-          "ar": "يكون أي ادعاء بالاستدامة أو المصدر يُقدَّم للضيوف (عضوي، محلي المصدر، منخفض الأثر الكربوني) حقيقيًا ويمكن إثباته بوثائق عند الطلب"
         },
         {
           "id": "sl4",
@@ -3177,12 +3111,6 @@
           "cls": "SRV",
           "en": "High-end amenity refills (bath products, minibar) favor reusable or refillable luxury containers where the brand standard allows, rather than defaulting to single-use only",
           "ar": "تُفضَّل إعادة تعبئة المرافق الفاخرة (منتجات الحمام، الميني بار) في عبوات قابلة لإعادة الاستخدام أو التعبئة حيثما يسمح معيار العلامة، بدلاً من الاعتماد على الاستخدام الواحد فقط"
-        },
-        {
-          "id": "sl6",
-          "cls": "CLN",
-          "en": "Sustainable cleaning products used in premium suites and villas meet the same hygiene efficacy standard as standard products, verified by documented results",
-          "ar": "تحقق منتجات التنظيف المستدامة المستخدمة في الأجنحة والفلل الفاخرة نفس معيار فعالية النظافة كالمنتجات القياسية، موثقة بنتائج مسجلة"
         }
       ]
     },
@@ -3221,12 +3149,6 @@
           "cls": "SRV",
           "en": "A thoughtful post-stay follow-up (a message, satisfaction check, or invitation to return) is sent within 3-5 days of departure without feeling like a mass marketing blast",
           "ar": "تُرسَل متابعة مدروسة بعد الإقامة (رسالة، استطلاع رضا، أو دعوة للعودة) خلال 3-5 أيام من المغادرة دون أن تبدو رسالة تسويقية جماعية"
-        },
-        {
-          "id": "df6",
-          "cls": "SEC",
-          "en": "Any feedback or concern raised at departure is logged and routed to the relevant department head for follow-up, with the guest informed of the resolution if applicable",
-          "ar": "يُسجَّل أي ملاحظة أو قلق يُثار عند المغادرة ويُوجَّه لرئيس القسم المعني للمتابعة، ويُبلَّغ الضيف بالحل إن أمكن"
         },
         {
           "id": "df7",
