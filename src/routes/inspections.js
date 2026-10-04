@@ -297,7 +297,10 @@ router.post('/:id/complete', requireRole(['inspector', 'admin']), (req, res) => 
   db.prepare("UPDATE inspections SET status='pending_review', signature=?, review_note=NULL, submitted_at=? WHERE id=?")
     .run(signature, now, req.params.id);
   if (insp.assignment_id) {
-    db.prepare("UPDATE assignments SET status='completed' WHERE id=?").run(insp.assignment_id);
+    // Submitting for review is NOT completion -- the assignment stays open until the committee
+    // approves it (see /:id/approve), otherwise the admin list shows "completed" for reports
+    // nobody has approved yet.
+    db.prepare("UPDATE assignments SET status='in_progress' WHERE id=?").run(insp.assignment_id);
   }
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });
@@ -311,6 +314,9 @@ router.post('/:id/approve', requireRole('admin'), (req, res) => {
   const now = Date.now();
   db.prepare("UPDATE inspections SET status='completed', completed_at=?, review_note=NULL WHERE id=?")
     .run(now, req.params.id);
+  if (insp.assignment_id) {
+    db.prepare("UPDATE assignments SET status='completed' WHERE id=?").run(insp.assignment_id);
+  }
   res.json(toPublic(db.prepare('SELECT * FROM inspections WHERE id=?').get(req.params.id), true));
 });
 

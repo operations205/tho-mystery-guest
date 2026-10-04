@@ -348,12 +348,45 @@ function inspInspectorName(insp){
 }
 function inspectionById(id){ return state.inspections.find(i=>i.id===id); }
 function assignmentById(id){ return state.assignments.find(a=>a.id===id); }
-function isOverdue(as){ return as.status!=='completed' && as.dueDate < new Date().toISOString().slice(0,10); }
+/* Workflow stage of an assignment, derived from the linked inspection (the source of truth for
+   review state) rather than assignment.status alone -- an inspector submitting a report moves the
+   inspection to pending_review, which must NOT read as "completed" until the committee approves.
+   new      = assigned, inspector hasn't started
+   external = with the inspector (working on it)
+   internal = inspector finished, waiting on THO's approval
+   returned = rejected by THO, back with the inspector (has review note)
+   done     = approved */
+function assignmentStage(as){
+  const insp = as.inspectionId ? inspectionById(as.inspectionId) : null;
+  if(insp){
+    if(insp.status==='completed') return 'done';
+    if(insp.status==='pending_review') return 'internal';
+    if(insp.status==='in_progress' && insp.reviewNote) return 'returned';
+    return 'external';
+  }
+  if(as.status==='completed') return 'done';
+  if(as.status==='in_progress') return 'external';
+  return 'new';
+}
+function isOverdue(as){
+  const st = assignmentStage(as);
+  return st!=='done' && st!=='internal' && as.dueDate < new Date().toISOString().slice(0,10);
+}
+const STAGE_UI = {
+  new:      {cls:'badge-gray',   icon:'schedule',        key:'stageNew'},
+  external: {cls:'badge-blue',   icon:'edit_note',       key:'stageExternal'},
+  internal: {cls:'badge-violet', icon:'domain',          key:'stageInternal'},
+  returned: {cls:'badge-orange', icon:'undo',            key:'stageReturned'},
+  done:     {cls:'badge-green',  icon:'task_alt',        key:'statusDone'}
+};
+function stageBadge(stage){
+  const u = STAGE_UI[stage];
+  return `<span class="badge ${u.cls}">${ic(u.icon)}${t(u.key)}</span>`;
+}
 function assignmentStatusBadge(as){
-  if(as.status==='completed') return `<span class="badge badge-green">${ic('task_alt')}${t('statusDone')}</span>`;
-  if(isOverdue(as)) return `<span class="badge badge-red">${ic('schedule')}${t('statusOverdue')}</span>`;
-  if(as.status==='in_progress') return `<span class="badge badge-amber">${ic('hourglass_top')}${t('statusProgress')}</span>`;
-  return `<span class="badge badge-gray">${ic('schedule')}${t('statusPending')}</span>`;
+  const stage = assignmentStage(as);
+  const overdue = isOverdue(as) ? ` <span class="badge badge-red">${ic('schedule')}${t('statusOverdue')}</span>` : '';
+  return stageBadge(stage) + overdue;
 }
 function priorityBadge(p){
   if(p==='high') return `<span class="badge badge-red">${t('priorityHigh')}</span>`;

@@ -30,9 +30,9 @@ function renderInspectorHome(){
 }
 function renderAssignmentsBody(){
   const user = currentUser();
-  const mine = state.assignments.filter(a=>a.inspectorId===user.id).slice().sort((a,b)=> a.status==='completed'?1:-1 || a.dueDate.localeCompare(b.dueDate));
-  const active = mine.filter(a=>a.status!=='completed').length;
-  const done = mine.filter(a=>a.status==='completed').length;
+  const mine = state.assignments.filter(a=>a.inspectorId===user.id).slice().sort((a,b)=> (assignmentStage(a)==='done'?1:-1) || a.dueDate.localeCompare(b.dueDate));
+  const active = mine.filter(a=>assignmentStage(a)!=='done').length;
+  const done = mine.filter(a=>assignmentStage(a)==='done').length;
   const overdue = mine.filter(isOverdue).length;
 
   const cards = mine.length===0 ? `
@@ -41,9 +41,10 @@ function renderAssignmentsBody(){
     const hotel = hotelById(as.hotelId);
     const typeLabel = hotel && PROPERTY_TYPES[hotel.type] ? tl(PROPERTY_TYPES[hotel.type]) : '';
     let actionBtn = '';
-    if(as.status==='completed'){
+    const stage = assignmentStage(as);
+    if(stage==='done' || stage==='internal'){
       actionBtn = `<button class="btn btn-ghost btn-sm ac-btn" onclick="viewInspectorReport('${as.inspectionId}')">${ic('description')}${t('viewReportBtn')}</button>`;
-    } else if(as.status==='in_progress'){
+    } else if(stage==='external' || stage==='returned'){
       actionBtn = `<button class="btn btn-primary btn-sm ac-btn" onclick="resumeInspection('${as.id}')">${ic('play_arrow')}${t('continueInspection')}</button>`;
     } else {
       actionBtn = `<button class="btn btn-gold btn-sm ac-btn" onclick="startInspectionFromAssignment('${as.id}')">${ic('play_arrow')}${t('startInspection')}</button>`;
@@ -85,7 +86,7 @@ function renderAssignmentsBody(){
 function renderProfileBody(){
   const user = currentUser();
   const mine = state.assignments.filter(a=>a.inspectorId===user.id);
-  const done = mine.filter(a=>a.status==='completed').length;
+  const done = mine.filter(a=>assignmentStage(a)==='done').length;
   return `
   <div class="profile-card">
     <div class="avatar">${initials(user.name)}</div>
@@ -650,7 +651,7 @@ async function submitSignature(){
   if(idx >= 0) state.inspections[idx] = updated; else state.inspections.push(updated);
   if(insp.assignmentId){
     const as = assignmentById(insp.assignmentId);
-    if(as) as.status = 'completed';
+    if(as) as.status = 'in_progress'; // stays open until the committee approves
   }
   state.reportMode = 'detailed';
   go('inspector-report');

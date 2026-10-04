@@ -4783,6 +4783,22 @@
     "btnSubmitForReviewAdmin": {
       "en": "Submit for Review",
       "ar": "إرسال للمراجعة"
+    },
+    "stageNew": {
+      "en": "New",
+      "ar": "جديد"
+    },
+    "stageExternal": {
+      "en": "In progress · Inspector",
+      "ar": "تحت الإجراء · خارجي"
+    },
+    "stageInternal": {
+      "en": "In progress · Internal review",
+      "ar": "تحت الإجراء · داخلي"
+    },
+    "stageReturned": {
+      "en": "Returned to inspector",
+      "ar": "معاد للمفتش"
     }
   },
   "defaultHotelsData": [

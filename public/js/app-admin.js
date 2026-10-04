@@ -59,7 +59,7 @@ function renderAdminShell(contentHtml){
 function renderAdminOverview(){
   const completed = state.inspections.filter(i=>i.status==='completed');
   const avg = completed.length ? Math.round(completed.reduce((s,i)=> s + (i.overall||0),0)/completed.length) : 0;
-  const openAssignments = state.assignments.filter(a=>a.status!=='completed').length;
+  const openAssignments = state.assignments.filter(a=>assignmentStage(a)!=='done').length;
   const overdueCount = state.assignments.filter(isOverdue).length;
   const inspectorCount = USERS.filter(u=>u.role==='inspector').length;
 
@@ -266,7 +266,7 @@ async function deleteHotelAccount(hotelId){
 function renderAdminInspectors(){
   const inspectors = USERS.filter(u=>u.role==='inspector');
   const rows = inspectors.map(u=>{
-    const count = state.assignments.filter(a=>a.inspectorId===u.id && a.status!=='completed').length;
+    const count = state.assignments.filter(a=>a.inspectorId===u.id && assignmentStage(a)!=='done').length;
     return `<tr>
       <td class="name-cell"><div class="avatar avatar-sm">${initials(u.name)}</div><div><strong>${esc(tl(u.name))}</strong><div style="color:var(--muted);font-size:12px;">${esc(tl(u.title))}</div></div></td>
       <td>${esc(u.username)}</td>
@@ -332,13 +332,13 @@ function renderAdminInspections(){
       const overall = insp.overall || 0;
       return `<span class="badge ${overall>=75?'badge-green':(overall>=60?'badge-amber':'badge-red')}">${overall}%</span>`;
     }
-    if(insp.status==='pending_review') return `<span class="badge badge-amber">${t('statusPendingReview')}</span>`;
-    return `<span class="badge badge-amber">${t('statusProgress')}</span>`;
+    if(insp.status==='pending_review') return stageBadge('internal');
+    return stageBadge(insp.reviewNote ? 'returned' : 'external');
   }
   function statusLabel(insp){
-    if(insp.status==='completed') return `<span class="badge badge-gray">${t('statusDone')}</span>`;
-    if(insp.status==='pending_review') return `<span class="badge badge-amber">${t('statusPendingReview')}</span>`;
-    return `<span class="badge badge-amber">${t('statusProgress')}</span>`;
+    if(insp.status==='completed') return stageBadge('done');
+    if(insp.status==='pending_review') return stageBadge('internal');
+    return stageBadge(insp.reviewNote ? 'returned' : 'external');
   }
 
   const rows = filtered.map(insp=>{

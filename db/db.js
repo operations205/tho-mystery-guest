@@ -245,4 +245,12 @@ if (inspectionsStatusSql && inspectionsStatusSql.sql.includes("CHECK(status IN (
   db.exec('PRAGMA foreign_keys = ON');
 }
 
+// One-time data repair: before the stage fix, submitting a report marked its assignment
+// 'completed' immediately, so assignments whose report is still awaiting committee approval (or was
+// sent back) wrongly read as completed. Reset those to 'in_progress'; idempotent.
+const wronglyCompleted = db.prepare(
+  "UPDATE assignments SET status='in_progress' WHERE status='completed' AND inspection_id IN (SELECT id FROM inspections WHERE status IN ('pending_review','in_progress'))"
+).run();
+if (wronglyCompleted.changes) console.log(`[migrate] ${wronglyCompleted.changes} assignment(s) reset from completed to in_progress (report not yet approved)`);
+
 module.exports = db;
