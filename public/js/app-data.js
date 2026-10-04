@@ -26,7 +26,7 @@ const KEY_AREAS = {
   rooms:        { icon: 'bed', en: 'Rooms & Housekeeping', ar: 'الغرف والتدبير المنزلي' },
   fnb:          { icon: 'restaurant', en: 'Food & Beverage', ar: 'الأطعمة والمشروبات' },
   facilities:   { icon: 'pool', en: 'Facilities & Wellness', ar: 'المرافق والعافية' },
-  digital:      { icon: 'devices', en: 'Digital Experience & Safety', ar: 'التجربة الرقمية والسلامة' },
+  digital:      { icon: 'devices', en: 'Digital, Safety & Integrity', ar: 'الرقمية والسلامة والنزاهة' },
   guest_recovery: { icon: 'diversity_3', en: 'Guest Recovery & Culture', ar: 'استعادة الخدمة والثقافة' }
 };
 const CAT_KEY_AREA = {
@@ -44,7 +44,7 @@ const CAT_KEY_AREA = {
   wellness_facilities:'facilities', exterior_grounds:'facilities',
   accessibility:'facilities',
   digital:'digital', wifi_tech:'digital', security_safety:'digital', fire_emergency:'digital', billing_integrity:'digital',
-  sustainability:'digital',
+  sustainability:'facilities',
   complaint_recovery:'guest_recovery', loyalty:'guest_recovery', behavior:'guest_recovery',
   culture:'guest_recovery',
   // THO-5 Plus extra categories (only present when standardId === 'plus5')
