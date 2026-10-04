@@ -489,6 +489,37 @@
           "cls": "PRD",
           "en": "In-room digital newspaper, basic service information and in-house contact numbers available",
           "ar": "تتوفر بالغرفة جريدة رقمية ومعلومات أساسية عن الخدمات وأرقام التواصل الداخلية"
+        },
+        {
+          "id": "h13",
+          "cls": "PRD",
+          "crit": true,
+          "en": "Furniture, doors, walls and flooring in sound condition, free of visible scratches, chipped paint, peeling, breakage or stains",
+          "ar": "الأثاث والأبواب والجدران والأرضيات بحالة سليمة وخالية من الخدوش الظاهرة أو تقشّر الدهان أو الكسور أو البقع"
+        },
+        {
+          "id": "h14",
+          "cls": "PRD",
+          "en": "Upholstery, curtains, carpets and soft furnishings in good condition, without tears, fraying or noticeable fading",
+          "ar": "المفروشات والستائر والسجاد والأقمشة في حالة جيدة وبدون تمزق أو تآكل أو بهتان ملحوظ"
+        },
+        {
+          "id": "h15",
+          "cls": "PRD",
+          "en": "Fittings (handles, switches, locks, drawers, wardrobe) operate smoothly and are not broken or loose",
+          "ar": "التجهيزات (المقابض والمفاتيح والأقفال والأدراج والخزانة) تعمل بسلاسة وغير مكسورة أو مفكوكة"
+        },
+        {
+          "id": "h16",
+          "cls": "PRD",
+          "en": "Room free of signs of poor maintenance (worn paint, damp odor, leaks, water marks on walls or ceiling)",
+          "ar": "الغرفة خالية من علامات ضعف الصيانة (دهان متآكل، رائحة رطوبة، تسريبات، آثار مياه على الجدران أو السقف)"
+        },
+        {
+          "id": "h17",
+          "cls": "SRV",
+          "en": "Any defect or fault reported by the guest was resolved, or the room changed, within a reasonable time and in a professional manner",
+          "ar": "أي عيب أو عطل أبلغ عنه الضيف تمت معالجته أو تغيير الغرفة خلال وقت معقول وبأسلوب مهني"
         }
       ]
     },
@@ -541,6 +572,18 @@
           "cls": "CLN",
           "en": "Bin emptied, bathroom floor dry and odor-free on arrival",
           "ar": "سلة المهملات فارغة وأرضية الحمام جافة وخالية من الروائح عند الوصول"
+        },
+        {
+          "id": "hb6",
+          "cls": "PRD",
+          "en": "Bathroom fixtures, tiles, grout/sealant, mirrors and fittings intact, without cracks, chips, rust or damage",
+          "ar": "تجهيزات الحمام والبلاط والفواصل والسيليكون والمرايا والإكسسوارات سليمة وبدون تشققات أو كسور أو صدأ أو تلف"
+        },
+        {
+          "id": "hb7",
+          "cls": "PRD",
+          "en": "No leaks, slow drainage or plumbing faults in the shower, basin, toilet or taps",
+          "ar": "لا توجد تسريبات أو بطء تصريف أو أعطال سباكة في الدش أو المغسلة أو المرحاض أو الحنفيات"
         }
       ]
     },
@@ -1769,6 +1812,12 @@
           "cls": "SRV",
           "en": "Staff remained composed and professional even if the guest was visibly frustrated",
           "ar": "حافظ الموظف على هدوئه واحترافيته حتى مع ضيف يبدو عليه الانزعاج"
+        },
+        {
+          "id": "cr7",
+          "cls": "SRV",
+          "en": "A reported room or maintenance fault was logged, acted on promptly and followed up with the guest until confirmed resolved",
+          "ar": "تم تسجيل أي عطل أو ملاحظة صيانة في الغرفة والتعامل معها فورًا ومتابعتها مع الضيف حتى التأكد من حلها"
         }
       ]
     },
@@ -2755,6 +2804,12 @@
           "cls": "EI",
           "en": "A private welcome or orientation walkthrough of the villa is offered on arrival, explaining amenities and services specific to that residence",
           "ar": "تُقدَّم جولة ترحيبية أو توجيهية خاصة داخل الفيلا عند الوصول، تشرح المرافق والخدمات الخاصة بتلك الإقامة"
+        },
+        {
+          "id": "rv9",
+          "cls": "PRD",
+          "en": "No visible physical flaw anywhere in the suite or villa, however minor (scratch, scuff, worn finish, loose fitting)",
+          "ar": "لا يوجد أي عيب مادي ظاهر في الجناح أو الفيلا مهما كان صغيرًا (خدش، احتكاك، تآكل في التشطيب، قطعة مفكوكة)"
         }
       ]
     },
