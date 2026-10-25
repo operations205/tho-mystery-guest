@@ -253,4 +253,14 @@ const wronglyCompleted = db.prepare(
 ).run();
 if (wronglyCompleted.changes) console.log(`[migrate] ${wronglyCompleted.changes} assignment(s) reset from completed to in_progress (report not yet approved)`);
 
+// One-time data cleanup: checklist items about alcohol/wine service were removed from the standard
+// entirely (not applicable in the Kingdom). Existing reports render from the live checklist so the
+// items already disappear from them; this also deletes any stored answers/notes/photos still attached
+// to those item ids so nothing about them can resurface. Idempotent.
+const REMOVED_ITEM_IDS = ['sb1','sb2','sb3','sb4','sb5','sb6','pdc7','rf5'];
+const removedAnswers = db.prepare(
+  `DELETE FROM answers WHERE item_id IN (${REMOVED_ITEM_IDS.map(() => '?').join(',')})`
+).run(...REMOVED_ITEM_IDS);
+if (removedAnswers.changes) console.log(`[migrate] ${removedAnswers.changes} stored answer(s) for removed alcohol-related items deleted`);
+
 module.exports = db;
