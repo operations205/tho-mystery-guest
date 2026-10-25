@@ -1047,7 +1047,7 @@
     },
     {
       "id": "restaurant_food_wine",
-      "icon": "wine_bar",
+      "icon": "restaurant_menu",
       "en": "Restaurant Food, Beverage & Menu Quality",
       "ar": "جودة طعام ومشروبات وقائمة المطعم",
       "items": [
@@ -1166,7 +1166,7 @@
     },
     {
       "id": "bar_lounge",
-      "icon": "local_bar",
+      "icon": "local_cafe",
       "en": "Lounge & Beverage Experience",
       "ar": "تجربة اللاونج والمشروبات",
       "items": [
@@ -2483,52 +2483,40 @@
         {
           "id": "pdc7",
           "cls": "SRV",
-          "en": "Wine, non-alcoholic pairing, or beverage recommendations offered at private dining are genuinely tailored to the dishes served, not a generic default list",
-          "ar": "تكون توصيات مزاوجة النبيذ أو المشروبات غير الكحولية المُقدَّمة في تناول الطعام الخاص مُصممة فعليًا لتناسب الأطباق المُقدَّمة، وليست قائمة افتراضية عامة"
+          "en": "Beverage pairing recommendations (e.g., tea, specialty coffee, mocktails, juices) offered at private dining are genuinely tailored to the dishes served, not a generic default list",
+          "ar": "تكون توصيات مزاوجة المشروبات (مثل الشاي والقهوة المختصة والموكتيلات والعصائر) المُقدَّمة في تناول الطعام الخاص مُصممة فعليًا لتناسب الأطباق المُقدَّمة، وليست قائمة افتراضية عامة"
         }
       ]
     },
     {
       "id": "sommelier_bar",
-      "icon": "wine_bar",
-      "en": "Sommelier & Elevated Bar Craft",
-      "ar": "خدمة أخصائي النبيذ وحرفية البار الراقية",
+      "icon": "coffee",
+      "en": "Specialty Beverage Service",
+      "ar": "خدمة المشروبات المتخصصة",
       "items": [
         {
           "id": "sb1",
           "cls": "EI",
-          "en": "A sommelier or senior beverage specialist is available on request and engages the guest with genuine questions about taste preference rather than defaulting to the most expensive recommendation",
-          "ar": "يتوفر أخصائي نبيذ أو مختص مشروبات رئيسي عند الطلب، ويتفاعل مع الضيف بأسئلة حقيقية حول تفضيلات الطعم بدلًا من التوصية الافتراضية بالأغلى ثمنًا"
+          "en": "A beverage specialist (e.g., barista or tea/coffee specialist) is available on request and asks the guest about taste preference before recommending, rather than defaulting to the most expensive option",
+          "ar": "يتوفر مختص مشروبات (مثل الباريستا أو مختص الشاي والقهوة) عند الطلب، ويسأل الضيف عن تفضيلات الطعم قبل التوصية بدلًا من التوصية الافتراضية بالأغلى ثمنًا"
         },
         {
           "id": "sb2",
           "cls": "SRV",
-          "en": "Signature cocktails or mocktails are presented with a short, accurate description of ingredients and technique when asked, without hesitation or invented detail",
-          "ar": "تُقدَّم الكوكتيلات أو المشروبات غير الكحولية المميزة مع وصف موجز ودقيق للمكونات والتقنية عند السؤال، دون تردد أو تفاصيل مُختلقة"
+          "en": "Signature beverages (mocktails, specialty coffee, tea blends, fresh juices) are presented with a short, accurate description of ingredients and preparation when asked, without hesitation or invented detail",
+          "ar": "تُقدَّم المشروبات المميزة (موكتيلات، قهوة مختصة، مزيج شاي، عصائر طازجة) مع وصف موجز ودقيق للمكونات وطريقة التحضير عند السؤال، دون تردد أو تفاصيل مُختلقة"
         },
         {
           "id": "sb3",
           "cls": "CLN",
-          "en": "Glassware, ice, and garnish preparation areas are visibly clean and organized, and glassware is free of spotting, chips, or lipstick marks before service",
-          "ar": "تكون مناطق تحضير الأواني الزجاجية والثلج والزينة نظيفة ومنظمة بوضوح، والأواني الزجاجية خالية من البقع أو الثُّلَم أو آثار أحمر الشفاه قبل التقديم"
+          "en": "Glassware, ice, and garnish preparation areas are visibly clean and organized, and glassware is free of water spots, chips, or marks before service",
+          "ar": "تكون مناطق تحضير الأواني الزجاجية والثلج والزينة نظيفة ومنظمة بوضوح، والأواني الزجاجية خالية من بقع الماء أو الثُّلَم أو الآثار قبل التقديم"
         },
         {
           "id": "sb4",
           "cls": "EFF",
-          "en": "A crafted cocktail or a properly decanted wine is delivered within a reasonable, actively-communicated time, with staff explaining any wait rather than leaving the guest wondering",
-          "ar": "يُقدَّم الكوكتيل المُحضَّر أو النبيذ المُصفّى بشكل صحيح خلال وقت معقول ومُبلَّغ عنه، مع شرح الموظفين لأي انتظار بدلاً من ترك الضيف في حيرة"
-        },
-        {
-          "id": "sb5",
-          "cls": "SRV",
-          "en": "Non-alcoholic guests are offered an equally crafted, thoughtfully presented alternative menu rather than an afterthought of soft drinks",
-          "ar": "يُقدَّم للضيوف غير الراغبين في الكحول قائمة بديلة مُصممة بعناية بنفس مستوى الاهتمام، وليس مجرد مشروبات غازية كخيار ثانوي"
-        },
-        {
-          "id": "sb6",
-          "cls": "SEC",
-          "en": "Staff responsibly monitor alcohol service and intervene courteously and discreetly if a guest appears to need it, in line with the hotel's duty of care policy",
-          "ar": "يراقب الموظفون تقديم الكحول بمسؤولية ويتدخلون بلباقة وتكتم إذا بدت الحاجة لذلك، بما يتوافق مع سياسة واجب الرعاية الخاصة بالفندق"
+          "en": "A crafted beverage (specialty coffee, mocktail or signature drink) is delivered within a reasonable, actively-communicated time, with staff explaining any wait rather than leaving the guest wondering",
+          "ar": "يُقدَّم المشروب المُحضَّر حرفيًا (قهوة مختصة أو موكتيل أو مشروب مميز) خلال وقت معقول ومُبلَّغ عنه، مع شرح الموظفين لأي انتظار بدلاً من ترك الضيف في حيرة"
         }
       ]
     },
