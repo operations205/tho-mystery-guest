@@ -8,12 +8,22 @@ let CLASS_META = {};
 let PILLAR_DESC = {};
 let CATS = [];
 let CATS_PLUS_EXTRA = [];
+let CATS_RESORT_EXTRA = [];
 let STANDARDS = {};
 let USERS = [];
 let S = {};
 
-function catsForStandard(id){
-  return id === 'plus5' ? CATS.concat(CATS_PLUS_EXTRA) : CATS;
+function isResortHotelId(hotelId){
+  const h = (typeof state !== 'undefined' && state.hotels ? state.hotels : []).find(x => x.id === hotelId);
+  return !!h && !!PROPERTY_TYPES[h.type] && PROPERTY_TYPES[h.type].en === 'Resort';
+}
+// Resort properties get the resort-only categories on top of the assigned standard.
+function catsForStandard(id, isResort){
+  const base = id === 'plus5' ? CATS.concat(CATS_PLUS_EXTRA) : CATS;
+  return isResort ? base.concat(CATS_RESORT_EXTRA) : base;
+}
+function catsForInsp(insp){
+  return catsForStandard(insp ? (insp.standardId || 'audit4') : 'audit4', insp ? isResortHotelId(insp.hotelId) : false);
 }
 
 /* ===================== 6 KEY-AREA TAXONOMY (report cover grouping) ===================== */
@@ -47,11 +57,13 @@ const CAT_KEY_AREA = {
   sustainability:'facilities',
   complaint_recovery:'guest_recovery', loyalty:'guest_recovery', behavior:'guest_recovery',
   culture:'guest_recovery',
+  // Resort-only categories (present only for properties registered as "Resort")
+  resort_arrival_mobility:'front_office', resort_beach_waterfront:'facilities', resort_activities:'facilities',
   // THO-5 Plus extra categories (only present when standardId === 'plus5')
   arrival_ceremony:'front_office', luxury_transfers:'front_office', pet_concierge:'front_office',
   personal_shopper:'front_office', departure_farewell:'front_office',
   butler_service:'rooms', residence_villa:'rooms', bespoke_turndown:'rooms',
-  private_dining_chef:'fnb', sommelier_bar:'fnb', events_celebrations_plus:'fnb',
+  private_dining_chef:'fnb', events_celebrations_plus:'fnb',
   wellness_longevity:'facilities', kids_ultra:'facilities',
   vip_privacy_security:'digital', sustainability_luxury:'digital',
   guest_profiling:'guest_recovery', art_culture_curation:'guest_recovery'

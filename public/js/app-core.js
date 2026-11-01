@@ -97,10 +97,12 @@ async function loadData(){
     // The hotel side only ever needs: strings for rendering the report layout, its own hotel
     // record, and its own completed inspections. Everything else (clients, templates, other
     // hotels' data) is admin/inspector business and stays out of this session entirely.
-    const [standardsMeta, audit4Cats, plus5Cats, hotels, inspections, settings] = await Promise.all([
+    const [standardsMeta, audit4Cats, plus5Cats, resortCats, hotels, inspections, settings] = await Promise.all([
       apiGet('/standards'),
       apiGet('/standards/audit4/categories'),
       apiGet('/standards/plus5/categories'),
+    apiGet('/standards/resort-extra/categories'),
+      apiGet('/standards/resort-extra/categories'),
       apiGet('/hotels'),
       apiGet('/inspections'),
       apiGet('/settings')
@@ -111,6 +113,7 @@ async function loadData(){
     PROPERTY_TYPES = standardsMeta.PROPERTY_TYPES;
     CATS = audit4Cats;
     CATS_PLUS_EXTRA = plus5Cats.slice(audit4Cats.length);
+    CATS_RESORT_EXTRA = resortCats;
     USERS = [ { id: me.id, role: me.role, username: me.username, name: me.name, title: me.title } ];
     state.hotels = hotels;
     state.assignments = [];
@@ -123,7 +126,7 @@ async function loadData(){
     return;
   }
 
-  const [standardsMeta, audit4Cats, plus5Cats, hotels, inspectors, assignments, inspections, settings, templates, clients, documents, hotelAccounts] = await Promise.all([
+  const [standardsMeta, audit4Cats, plus5Cats, resortCats, hotels, inspectors, assignments, inspections, settings, templates, clients, documents, hotelAccounts] = await Promise.all([
     apiGet('/standards'),
     apiGet('/standards/audit4/categories'),
     apiGet('/standards/plus5/categories'),
@@ -145,6 +148,7 @@ async function loadData(){
   PILLAR_DESC = standardsMeta.PILLAR_DESC;
   PROPERTY_TYPES = standardsMeta.PROPERTY_TYPES;
   CATS = audit4Cats;
+  CATS_RESORT_EXTRA = resortCats;
   CATS_PLUS_EXTRA = plus5Cats.slice(audit4Cats.length); // plus5 endpoint already returns audit4+extra; keep only the extra part
   USERS = [ { id: me.id, role: me.role, username: me.username, name: me.name, title: me.title, email: me.email }, ...inspectors ];
   state.hotels = hotels;
@@ -259,7 +263,7 @@ function closeDrawer(){ state.drawer = null; render(); }
 
 /* ===================== SCORING ===================== */
 function computeScores(insp){
-  const cats = catsForStandard(insp.standardId || 'audit4');
+  const cats = catsForInsp(insp);
   let yes=0, no=0, na=0;
   let critYes=0, critAnswered=0;
   const catScores = {};

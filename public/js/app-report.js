@@ -188,7 +188,7 @@ function renderMetaStrip(insp){
 
 function renderFullDetail(insp, showFlags){
   const sc = computeScores(insp);
-  const cats = catsForStandard(insp.standardId || 'audit4');
+  const cats = catsForInsp(insp);
   return cats.map(cat=>{
     const catSc = sc.catScores[cat.id];
     const rows = cat.items.map(item=>{
@@ -263,7 +263,7 @@ function renderReportBody(insp, backAction, showFlags){
   // rest marked N/A) could swing to a stark 0% off that single answer and get headlined as
   // "the weakest area", which reads as a much bigger finding than one data point supports.
   const MIN_SAMPLE_FOR_FLAGGING = 2;
-  const catList = catsForStandard(insp.standardId || 'audit4');
+  const catList = catsForInsp(insp);
   let weakestCat = null, weakestScore = 101;
   catList.forEach(c=>{
     const s = sc.catScores[c.id];
@@ -337,7 +337,7 @@ function renderReportBody(insp, backAction, showFlags){
   }</p>`;
 
   chartsRenderPromise = new Promise(resolve => setTimeout(()=>{
-    renderCharts(sc, catsForStandard(insp.standardId || 'audit4'));
+    renderCharts(sc, catsForInsp(insp));
     resolve();
   }, 0));
 
@@ -734,7 +734,7 @@ function renderHotelCategoryInsights(chronologicalList){
   // Union of every category id across both standards, keyed by id, so a hotel whose visits mix
   // audit4/plus5 standards (or just uses one) still gets one consistent label per category.
   const labelByCat = {};
-  catsForStandard('plus5').forEach(c=>{ labelByCat[c.id] = c; });
+  catsForStandard('plus5', true).forEach(c=>{ labelByCat[c.id] = c; });
 
   const seriesByCat = {}; // catId -> [{score, date}] in chronological order
   chronologicalList.forEach(insp=>{

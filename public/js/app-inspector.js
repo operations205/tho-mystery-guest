@@ -184,7 +184,7 @@ function renderInspectorInspect(){
   const insp = currentMobileInsp();
   if(!insp) return renderInspectorHome();
   const sc = computeScores(insp);
-  const cats = catsForStandard(insp.standardId || 'audit4');
+  const cats = catsForInsp(insp);
   const cat = cats[state.activeCatIndex];
   const pct = sc.totalItems>0 ? Math.round((sc.answeredCount/sc.totalItems)*100) : 0;
 
@@ -264,7 +264,7 @@ function renderInspectorInspect(){
 // This jumps the inspector straight to the first category that still needs attention.
 function attemptFinishInspection(){
   const insp = currentMobileInsp(); if(!insp) return;
-  const cats = catsForStandard(insp.standardId || 'audit4');
+  const cats = catsForInsp(insp);
   for(let idx=0; idx<cats.length; idx++){
     const hasUnanswered = cats[idx].items.some(it => !insp.answers[it.id] || !insp.answers[it.id].value);
     if(hasUnanswered){
@@ -284,7 +284,7 @@ function attemptFinishInspection(){
 function setCatM(idx){ state.activeCatIndex = idx; render(); }
 function shiftCatM(dir){
   const insp = currentMobileInsp();
-  const cats = catsForStandard(insp ? (insp.standardId || 'audit4') : 'audit4');
+  const cats = catsForInsp(insp);
   state.activeCatIndex = Math.min(cats.length-1, Math.max(0, state.activeCatIndex+dir)); render(); window.scrollTo(0,0);
 }
 function setAnswerM(itemId, value){
