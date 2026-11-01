@@ -3043,6 +3043,152 @@
       ]
     }
   ],
+  "CATS_RESORT_EXTRA": [
+    {
+      "id": "resort_arrival_mobility",
+      "icon": "directions_car",
+      "en": "Resort Arrival & On-Property Mobility",
+      "ar": "الوصول والتنقل داخل المنتجع",
+      "items": [
+        {
+          "id": "rz1",
+          "cls": "SRV",
+          "en": "Guest welcomed on arrival at the resort entrance and escorted or clearly directed to reception without having to search",
+          "ar": "تم استقبال الضيف عند مدخل المنتجع ومرافقته أو توجيهه بوضوح إلى الاستقبال دون الحاجة للبحث"
+        },
+        {
+          "id": "rz2",
+          "cls": "EFF",
+          "en": "Transfer from the entrance or reception to the room or villa (buggy, escort or clear directions) was arranged promptly, and luggage reached the room within 20 minutes",
+          "ar": "نقل الضيف من المدخل أو الاستقبال إلى الغرفة أو الفيلا (عربة أو مرافق أو توجيه واضح) تم بسرعة، ووصلت الأمتعة إلى الغرفة خلال 20 دقيقة"
+        },
+        {
+          "id": "rz3",
+          "cls": "PRD",
+          "en": "On-property signage and a resort map clearly show routes to rooms, restaurants, beach, pool and other facilities",
+          "ar": "اللوحات الإرشادية وخريطة المنتجع توضح بجلاء الطرق إلى الغرف والمطاعم والشاطئ والمسبح والمرافق الأخرى"
+        },
+        {
+          "id": "rz4",
+          "cls": "EFF",
+          "en": "Internal shuttle or buggy service operates on a posted schedule or on request, with a reasonable waiting time",
+          "ar": "خدمة النقل الداخلي (حافلة أو عربة) تعمل وفق جدول معلن أو عند الطلب، بوقت انتظار معقول"
+        },
+        {
+          "id": "rz5",
+          "cls": "SEC",
+          "en": "Pathways, steps and ramps across the property are well-lit, in good repair and safe at night",
+          "ar": "الممرات والدرجات والمنحدرات داخل المنتجع جيدة الإضاءة وبحالة جيدة وآمنة ليلًا"
+        },
+        {
+          "id": "rz6",
+          "cls": "SRV",
+          "en": "Staff briefed the guest on the resort's facilities, operating hours and booking procedures at check-in",
+          "ar": "أطلع الموظفون الضيف عند التسجيل على مرافق المنتجع وساعات التشغيل وإجراءات الحجز"
+        }
+      ]
+    },
+    {
+      "id": "resort_beach_waterfront",
+      "icon": "beach_access",
+      "en": "Beach & Waterfront",
+      "ar": "الشاطئ والواجهة البحرية",
+      "items": [
+        {
+          "id": "rz7",
+          "cls": "CLN",
+          "en": "Beach, sand and waterfront area are clean and free of litter, debris and hazards",
+          "ar": "الشاطئ والرمال والواجهة البحرية نظيفة وخالية من النفايات والمخلفات والمخاطر"
+        },
+        {
+          "id": "rz8",
+          "cls": "PRD",
+          "en": "Sunbeds, umbrellas and cabanas are clean, in good condition and available without excessive waiting",
+          "ar": "المقاعد الشاطئية والمظلات والكبائن نظيفة وبحالة جيدة ومتاحة دون انتظار طويل"
+        },
+        {
+          "id": "rz9",
+          "cls": "SRV",
+          "en": "Beach towels are provided without charge or delay, and staff attend to the guest at the beach without needing to be called repeatedly",
+          "ar": "مناشف الشاطئ متوفرة دون تأخير، وموظفو الشاطئ يخدمون الضيف دون الحاجة لاستدعائهم مرارًا"
+        },
+        {
+          "id": "rz10",
+          "cls": "SEC",
+          "en": "Lifeguards are present during posted hours, with swimming-zone markers and warning flags or signs clearly visible",
+          "ar": "وجود منقذين خلال الساعات المعلنة، مع علامات مناطق السباحة وأعلام أو لافتات التحذير بوضوح"
+        },
+        {
+          "id": "rz11",
+          "cls": "SEC",
+          "en": "Water-sports and marine equipment (if offered) is in good condition, with safety briefing and life jackets provided",
+          "ar": "معدات الرياضات المائية والبحرية (إن وُجدت) بحالة جيدة، مع إحاطة سلامة وتوفير سترات النجاة"
+        },
+        {
+          "id": "rz12",
+          "cls": "PRD",
+          "en": "Beach showers, changing areas and restrooms are clean, functional and well-stocked",
+          "ar": "الدشات الشاطئية وغرف تغيير الملابس ودورات المياه نظيفة وتعمل وجيدة التجهيز"
+        },
+        {
+          "id": "rz13",
+          "cls": "SUS",
+          "en": "Visible effort to protect the beach and marine environment (waste control, reef or wildlife guidance, no single-use plastics at the beach)",
+          "ar": "جهود واضحة لحماية الشاطئ والبيئة البحرية (إدارة النفايات، إرشادات حماية الشعاب والكائنات، الحد من البلاستيك أحادي الاستخدام)"
+        }
+      ]
+    },
+    {
+      "id": "resort_activities",
+      "icon": "hiking",
+      "en": "Resort Activities & Recreation",
+      "ar": "الأنشطة والترفيه في المنتجع",
+      "items": [
+        {
+          "id": "rz14",
+          "cls": "SRV",
+          "en": "A daily or weekly activities programme is available in the room, at reception or in the app, and is accurate and up to date",
+          "ar": "برنامج الأنشطة اليومي أو الأسبوعي متوفر في الغرفة أو الاستقبال أو التطبيق، ودقيق ومحدث"
+        },
+        {
+          "id": "rz15",
+          "cls": "SRV",
+          "en": "Activity staff are friendly, knowledgeable and proactively invite and assist guests to take part",
+          "ar": "موظفو الأنشطة ودودون وعلى دراية، ويدعون الضيوف ويساعدونهم على المشاركة بمبادرة منهم"
+        },
+        {
+          "id": "rz16",
+          "cls": "EFF",
+          "en": "Activities and excursions can be booked easily and are confirmed promptly, running at the scheduled time",
+          "ar": "يمكن حجز الأنشطة والرحلات بسهولة وتأكيدها سريعًا، وتُنفَّذ في الموعد المحدد"
+        },
+        {
+          "id": "rz17",
+          "cls": "PRD",
+          "en": "Sports and recreation facilities (courts, fitness areas, game areas) are clean, safe and in good working order",
+          "ar": "مرافق الرياضة والترفيه (الملاعب ومناطق اللياقة والألعاب) نظيفة وآمنة وتعمل بشكل جيد"
+        },
+        {
+          "id": "rz18",
+          "cls": "SEC",
+          "en": "Excursions and outdoor activities include a safety briefing, qualified guides and suitable equipment",
+          "ar": "الرحلات والأنشطة الخارجية تشمل إحاطة سلامة ومرشدين مؤهلين ومعدات مناسبة"
+        },
+        {
+          "id": "rz19",
+          "cls": "SRV",
+          "en": "Evening entertainment or guest events are suitable for families, well organised and respectful of local culture",
+          "ar": "الترفيه المسائي أو فعاليات الضيوف مناسبة للعائلات ومنظمة جيدًا وتراعي الثقافة المحلية"
+        },
+        {
+          "id": "rz20",
+          "cls": "SRV",
+          "en": "Dining options at the resort offer variety, with clear information on hours, locations, reservations and any meal plan included",
+          "ar": "خيارات الطعام في المنتجع متنوعة، مع معلومات واضحة عن الساعات والمواقع والحجز وأي باقة وجبات مشمولة"
+        }
+      ]
+    }
+  ],
   "CLASS_META": {
     "EFF": {
       "en": "Efficiency",
