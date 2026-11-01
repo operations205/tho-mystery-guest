@@ -6,14 +6,18 @@ const raw = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'db', 's
 
 const CATS = raw.CATS;
 const CATS_PLUS_EXTRA = raw.CATS_PLUS_EXTRA;
+const CATS_RESORT_EXTRA = raw.CATS_RESORT_EXTRA || [];
 const CLASS_META = raw.CLASS_META;
 const PILLAR_DESC = raw.PILLAR_DESC;
 const STANDARDS = raw.STANDARDS;
 const PROPERTY_TYPES = raw.PROPERTY_TYPES;
 const S = raw.S;
 
-function catsForStandard(id) {
-  return id === 'plus5' ? CATS.concat(CATS_PLUS_EXTRA) : CATS;
+// Resort properties (hotels.type = 4, "Resort") get the resort-only categories on top of
+// whichever standard they were assigned; every other property type is unaffected.
+function catsForStandard(id, isResort) {
+  const base = id === 'plus5' ? CATS.concat(CATS_PLUS_EXTRA) : CATS;
+  return isResort ? base.concat(CATS_RESORT_EXTRA) : base;
 }
 
 function allItemIds(standardId) {
@@ -42,8 +46,8 @@ function itemById(standardId, itemId) {
 // from here (a dashboard card, a sort/filter) would silently reintroduce that exact bug.
 const MIN_SAMPLE_FOR_FLAGGING = 2;
 
-function computeScores(standardId, answers) {
-  const cats = catsForStandard(standardId);
+function computeScores(standardId, answers, isResort) {
+  const cats = catsForStandard(standardId, isResort);
   let yes = 0, no = 0, na = 0;
   const catScores = {};
   const catCounts = {};
@@ -82,6 +86,6 @@ function computeScores(standardId, answers) {
 }
 
 module.exports = {
-  CATS, CATS_PLUS_EXTRA, CLASS_META, PILLAR_DESC, STANDARDS, PROPERTY_TYPES, S,
+  CATS, CATS_PLUS_EXTRA, CATS_RESORT_EXTRA, CLASS_META, PILLAR_DESC, STANDARDS, PROPERTY_TYPES, S,
   catsForStandard, allItemIds, itemById, computeScores, MIN_SAMPLE_FOR_FLAGGING
 };
