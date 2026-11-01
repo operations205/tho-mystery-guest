@@ -3,7 +3,14 @@ const db = require('../../db/db');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { isValidImageDataUrl } = require('../utils/validateImage');
 const { withinLength } = require('../utils/validate');
-const { computeScores, catsForStandard } = require('../lib/standards');
+const { computeScores, catsForStandard, PROPERTY_TYPES } = require('../lib/standards');
+
+// True when the inspected property is registered with the "Resort" property type.
+function isResortRow(row) {
+  if (!row || !row.hotel_id) return false;
+  const h = db.prepare('SELECT type FROM hotels WHERE id=?').get(row.hotel_id);
+  return !!h && !!PROPERTY_TYPES[h.type] && PROPERTY_TYPES[h.type].en === 'Resort';
+}
 const { renderInspectionPdf } = require('../lib/pdfExport');
 const { resolveAppOrigin } = require('../utils/origin');
 
@@ -70,7 +77,7 @@ router.get('/', (req, res) => {
   const answersByInsp = getAnswersBulk(rows.map(r => r.id));
   res.json(rows.map(r => {
     const pub = toPublic(r, false);
-    const sc = computeScores(r.standard_id, answersByInsp[r.id] || {});
+    const sc = computeScores(r.standard_id, answersByInsp[r.id] || {}, isResortRow(r));
     pub.overall = sc.overall;
     pub.totalItems = sc.totalItems;
     pub.answeredCount = sc.answeredCount;
@@ -165,7 +172,7 @@ router.get('/:id/score', (req, res) => {
   if (req.user.role === 'inspector' && row.inspector_id !== req.user.id) return res.status(403).json({ error: 'forbidden' });
   if (req.user.role === 'hotel' && !hotelCanSee(row, req.user)) return res.status(403).json({ error: 'forbidden' });
   const answers = getAnswers(row.id);
-  res.json(computeScores(row.standard_id, answers));
+  res.json(computeScores(row.standard_id, answers, isResortRow(row)));
 });
 
 // Start a new inspection from a pending assignment (inspector only, own assignment)
@@ -211,7 +218,7 @@ router.put('/:id/answers/:itemId', (req, res) => {
   if (insp.status !== 'in_progress') return res.status(400).json({ error: 'not_editable' });
 
   const body = req.body || {};
-  const item = catsForStandard(insp.standard_id).flatMap(c => c.items).find(i => i.id === req.params.itemId);
+  const item = catsForStandard(insp.standard_id, isResortRow(insp)).flatMap(c => c.items).find(i => i.id === req.params.itemId);
   if (!item) return res.status(400).json({ error: 'invalid_item' });
   if (body.value !== null && body.value !== undefined && !['yes', 'no', 'na'].includes(body.value)) {
     return res.status(400).json({ error: 'invalid_value' });
@@ -279,7 +286,7 @@ router.post('/:id/complete', requireRole(['inspector', 'admin']), (req, res) => 
   // must carry a real answer (yes/no/na — na is a legitimate "not applicable" answer) before
   // the inspection can be marked complete.
   const answers = getAnswers(req.params.id);
-  const allItems = catsForStandard(insp.standard_id).flatMap(c => c.items);
+  const allItems = catsForStandard(insp.standard_id, isResortRow(insp)).flatMap(c => c.items);
   const unansweredCount = allItems.filter(it => !answers[it.id] || !answers[it.id].value).length;
   if (unansweredCount > 0) {
     return res.status(400).json({ error: 'incomplete', unansweredCount, totalItems: allItems.length });

@@ -14,6 +14,10 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/resort-extra/categories', (req, res) => {
+  res.json(std.CATS_RESORT_EXTRA);
+});
+
 router.get('/:id/categories', (req, res) => {
   const cats = std.catsForStandard(req.params.id);
   res.json(cats);
