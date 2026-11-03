@@ -152,7 +152,7 @@
   /* Brand panel is a single photo (with the logo/tagline already composited into the image
      itself) rather than live text over a gradient — simplest way to match the reference
      design exactly without trying to hand-recreate its typography/spacing in CSS. */
-  .login-brand-panel{flex:1 1 46%;background-image:url('/login-brand.jpg');background-size:cover;background-position:center;}
+  .login-brand-panel{flex:1 1 46%;background-image:url('/login-brand-v2.jpg');background-size:cover;background-position:center;}
   /* Old embedded logos are superseded by the new topbar logo (/logo-black.png) and the
      brand-panel photo (which already has the logo composited in) — hidden rather than
      removed from the markup, to avoid touching the large inline base64 image data. */
