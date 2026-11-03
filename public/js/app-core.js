@@ -258,8 +258,8 @@ function toggleLang(){
   });
 }
 function toggleSidebar(){ state.sidebarOpen = !state.sidebarOpen; render(); }
-function openDrawer(type, editId){ state.drawer = {type, editId: editId || null}; render(); }
-function closeDrawer(){ state.drawer = null; render(); }
+function openDrawer(type, editId){ if(state.drawerDraft && state.drawerDraft.key !== type+':'+(editId||'new')) state.drawerDraft = null; state.drawer = {type, editId: editId || null}; render(); }
+function closeDrawer(){ state.drawer = null; state.drawerDraft = null; render(); }
 
 /* ===================== SCORING ===================== */
 function computeScores(insp){

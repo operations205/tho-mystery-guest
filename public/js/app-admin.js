@@ -891,7 +891,7 @@ async function submitDrawer(){
     alert((state.lang==='ar' ? 'حدث خطأ: ' : 'Something went wrong: ') + e.message);
     return;
   }
-  state.drawer = null;
+  state.drawer = null; state.drawerDraft = null;
   render();
 }
 async function deleteHotel(id){

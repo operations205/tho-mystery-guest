@@ -1,5 +1,5 @@
 /* ===================== ROOT RENDER ===================== */
-function render(){
+function _renderCore(){
   if(state.view==='print-only'){
     const insp = inspectionById(state.currentInspectionId);
     document.getElementById('app').innerHTML = insp
@@ -191,3 +191,38 @@ async function boot(){
   render();
 }
 boot();
+
+
+/* Drawer draft keeper: any re-render (navigation, logo upload, language, etc.) used to rebuild the
+   open drawer form from saved data and silently discard unsaved typing. Snapshot every id'd field
+   in the drawer before rendering and restore it afterwards; the draft is dropped only on save/cancel. */
+const DRAWER_DRAFT_KEY = 'tho_drawer_draft';
+function _drawerKey(){ const d=state.drawer; return d ? d.type+':'+(d.editId||'new') : null; }
+function _snapDrawer(){
+  try{
+    const key=_drawerKey(); if(!key) return;
+    const body=document.querySelector('.drawer-body'); if(!body) return;
+    const vals={}; let any=false;
+    body.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{
+      if(el.type==='file'||el.type==='password') return;
+      vals[el.id]= el.type==='checkbox' ? el.checked : el.value; any=true;
+    });
+    if(any) state.drawerDraft={key,vals};
+  }catch(e){}
+}
+function _restoreDrawer(){
+  try{
+    const key=_drawerKey(), dr=state.drawerDraft;
+    if(!key||!dr||dr.key!==key) return;
+    const body=document.querySelector('.drawer-body'); if(!body) return;
+    Object.keys(dr.vals).forEach(id=>{
+      const el=document.getElementById(id); if(!el||!body.contains(el)) return;
+      if(el.type==='checkbox') el.checked=!!dr.vals[id]; else el.value=dr.vals[id];
+    });
+  }catch(e){}
+}
+function render(){
+  _snapDrawer();
+  _renderCore();
+  _restoreDrawer();
+}
