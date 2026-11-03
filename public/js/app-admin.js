@@ -78,7 +78,7 @@ function renderAdminOverview(){
 
   return `
   <div class="page-head"><div><h2>${t('overviewTitle')}</h2><p>${t('overviewSub')}</p></div>
-    <button class="btn btn-gold" onclick="openDrawer('assignment')">${ic('add')}${t('newAssignment')}</button>
+    <button class="btn btn-gold" onclick="openDrawer('assignment')">${ic('add')}${t('newAssignment').replace(/^\+\s*/,'')}</button>
   </div>
   <div class="stat-row">
     <div class="stat"><div class="stat-ic">${ic('apartment')}</div><div><div class="num">${state.hotels.length}</div><div class="lbl">${t('kpiProperties')}</div></div></div>
@@ -86,7 +86,7 @@ function renderAdminOverview(){
     <div class="stat"><div class="stat-ic">${ic('assignment_turned_in')}</div><div><div class="num">${openAssignments}</div><div class="lbl">${t('kpiAssignments')}</div></div></div>
     <div class="stat"><div class="stat-ic" style="${overdueCount>0?'background:var(--red-bg);color:var(--red);':''}">${ic('schedule')}</div><div><div class="num" style="color:${overdueCount>0?'var(--red)':'var(--navy)'}">${overdueCount}</div><div class="lbl">${t('kpiOverdue')}</div></div></div>
   </div>
-  <div class="stat-row" style="grid-template-columns:1fr 1fr;">
+  <div class="stat-row">
     <div class="stat"><div class="stat-ic">${ic('fact_check')}</div><div><div class="num">${state.inspections.length}</div><div class="lbl">${t('totalInspections')}</div></div></div>
     <div class="stat"><div class="stat-ic">${ic('percent')}</div><div><div class="num">${avg}%</div><div class="lbl">${t('avgScore')}</div></div></div>
   </div>
@@ -111,7 +111,7 @@ function renderAdminProperties(){
         <button class="icon-btn" onclick="openDrawer('property','${h.id}')" title="${t('edit')}" aria-label="${t('edit')}">${ic('edit')}</button>
         <button class="icon-btn" onclick="toggleHotelAccountPanel('${h.id}')" title="${t('hotelAccountTitle')}" aria-label="${t('hotelAccountTitle')}">${ic('key')}</button>
         <button class="icon-btn" onclick="uploadHotelLogo('${h.id}')" title="${t('uploadLogo')}" aria-label="${t('uploadLogo')}">${ic('image')}</button>
-        ${h.logo ? `<button class="icon-btn" onclick="removeHotelLogo('${h.id}')" title="${t('removeLogo')}" aria-label="${t('removeLogo')}">${ic('hide_image')}</button>` : ''}
+        ${h.logo ? `<button class="icon-btn" onclick="removeHotelLogo('${h.id}')" title="${t('removeLogo')}" aria-label="${t('removeLogo')}">${ic('hide_image')}</button>` : `<span class="icon-btn" style="visibility:hidden" aria-hidden="true"></span>`}
         <button class="icon-btn danger" onclick="deleteHotel('${h.id}')" title="${t('delete')}" aria-label="${t('delete')}">${ic('delete')}</button>
       </td>
     </tr>
@@ -119,7 +119,7 @@ function renderAdminProperties(){
   }).join('');
   return `
   <div class="page-head"><div><h2>${t('propertiesTitle')}</h2><p>${t('propertiesSub')}</p></div>
-    <button class="btn btn-gold" onclick="openDrawer('property')">${ic('add')}${t('addProperty')}</button>
+    <button class="btn btn-gold" onclick="openDrawer('property')">${ic('add')}${t('addProperty').replace(/^\+\s*/,'')}</button>
   </div>
   <div class="card">
     ${state.hotels.length===0 ? `<div class="empty"><div class="big">${ic('apartment')}</div>${t('noProperties')}</div>` : `
@@ -280,7 +280,7 @@ function renderAdminInspectors(){
   }).join('');
   return `
   <div class="page-head"><div><h2>${t('inspectorsTitle')}</h2><p>${t('inspectorsSub')}</p></div>
-    <button class="btn btn-gold" onclick="openDrawer('inspector')">${ic('add')}${t('addInspector')}</button>
+    <button class="btn btn-gold" onclick="openDrawer('inspector')">${ic('add')}${t('addInspector').replace(/^\+\s*/,'')}</button>
   </div>
   <div class="card">
     ${inspectors.length===0 ? `<div class="empty"><div class="big">${ic('badge')}</div>${t('noInspectors')}</div>` : `
@@ -310,7 +310,7 @@ function renderAdminAssignments(){
   }).join('');
   return `
   <div class="page-head"><div><h2>${t('assignmentsTitle')}</h2><p>${t('assignmentsSub')}</p></div>
-    <button class="btn btn-gold" onclick="openDrawer('assignment')">${ic('add')}${t('newAssignment')}</button>
+    <button class="btn btn-gold" onclick="openDrawer('assignment')">${ic('add')}${t('newAssignment').replace(/^\+\s*/,'')}</button>
   </div>
   <div class="card">
     ${list.length===0 ? `<div class="empty"><div class="big">${ic('assignment_turned_in')}</div>${t('noAssignments')}</div>` : `
@@ -344,12 +344,12 @@ function renderAdminInspections(){
   const rows = filtered.map(insp=>{
     return `<tr>
       <td><strong>${esc(inspPropertyName(insp))}</strong></td>
-      <td>${esc(insp.propertyTypeLabel||'')}</td>
+      <td>${esc(insp.propertyTypeLabel || (()=>{const h=hotelById(insp.hotelId);return h&&PROPERTY_TYPES[h.type]?tl(PROPERTY_TYPES[h.type]):'';})())}</td>
       <td>${esc(inspInspectorName(insp))}</td>
       <td>${esc(insp.visitDate||'')}</td>
       <td>${statusBadge(insp)}</td>
       <td>${statusLabel(insp)}</td>
-      <td class="row-actions" style="justify-content:flex-end;">
+      <td class="row-actions">
         <button class="btn btn-ghost btn-sm" onclick="viewAdminReport('${insp.id}')">${t('view')}</button>
         ${isSuperAdmin() ? `<button class="icon-btn danger" onclick="deleteInspectionReport('${insp.id}')" title="${t('delete')}" aria-label="${t('delete')}">${ic('delete')}</button>` : ''}
       </td>
@@ -518,7 +518,7 @@ function renderAdminDocuments(){
 
   return `
   <div class="page-head"><div><h2>${t('docsTitle')}</h2></div>
-    <button class="btn btn-gold" onclick="openDrawer('client')">${ic('add')}${t('docsAddClient')}</button>
+    <button class="btn btn-gold" onclick="openDrawer('client')">${ic('add')}${t('docsAddClient').replace(/^\+\s*/,'')}</button>
   </div>
   ${tplBanner}
   <div class="card" style="margin-bottom:20px;">
