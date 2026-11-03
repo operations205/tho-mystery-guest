@@ -261,7 +261,9 @@
   html[dir=rtl] .search-box input{padding:10px 38px 10px 14px;}
   .search-box .material-symbols-outlined{position:absolute;inset-inline-start:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:19px;}
   .name-cell{display:flex;align-items:center;gap:10px;}
-  .row-actions{display:flex;gap:6px;justify-content:flex-end;}
+  td.row-actions{display:table-cell;text-align:end;white-space:nowrap;vertical-align:middle;}
+  td.row-actions>*{vertical-align:middle;margin-inline-start:4px;}
+  div.row-actions{display:flex;gap:6px;justify-content:flex-end;}
   .row-active{background:var(--gold-soft);}
 
   .logo-preview{width:64px;height:64px;border-radius:10px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;flex-shrink:0;}
@@ -308,7 +310,6 @@
        in a touch-first layout. Must come AFTER the base .icon-btn rule above -- same
        specificity, so source order decides the winner regardless of the media query. */
     .icon-btn{min-height:44px;min-width:44px;padding:10px;}
-    .row-actions{gap:2px;}
   }
 
   /* drawer */
@@ -481,8 +482,8 @@
   .profile-row .pv{font-weight:700;color:var(--navy);}
 
   /* ===== REPORT: dual-mode + signature block ===== */
-  .report-mode-tabs{display:flex;gap:8px;margin-bottom:18px;background:#eef0f3;padding:5px;border-radius:12px;max-width:420px;}
-  .report-mode-tab{flex:1;padding:10px 14px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;transition:background .18s,color .18s;}
+  .report-mode-tabs{display:flex;gap:8px;margin-bottom:18px;background:#eef0f3;padding:5px;border-radius:12px;max-width:560px;overflow-x:auto;}
+  .report-mode-tab{flex:1;white-space:nowrap;padding:10px 14px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;transition:background .18s,color .18s;}
   .report-mode-tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.12);}
   .report-mode-tab .material-symbols-outlined{font-size:17px;}
   .report-doc-title{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#9a6d00;margin-bottom:4px;}
